@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HowTo — Serial Air</title>
+  <meta name="description" content="Setup guide for Serial Air wireless serial monitor. Arduino library installation, ESP8266/ESP32 configuration.">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-icon">📡</span>
+      Serial Air
+    </a>
+    <ul class="nav-links">
+      <li><a href="/">Home</a></li>
+      <li><a href="/howto">HowTo</a></li>
+      <li><a href="/privacy">Privacy</a></li>
+      <li><a href="/terms">Terms</a></li>
+    </ul>
+  </div>
+</nav>
+
+<section class="howto-page">
+  <div class="container-narrow">
+    <h1>Setup Guide</h1>
+    <p class="page-subtitle">Get Serial Air working with your ESP device in minutes</p>
+
+    <!-- Requirements -->
+    <h2>Requirements</h2>
+
+    <h3>Hardware</h3>
+    <ul>
+      <li>ESP8266 (NodeMCU, Wemos D1 Mini, etc.) or ESP32 (DevKit, TTGO, etc.)</li>
+      <li>iPhone or Android device on the same WiFi network</li>
+      <li>USB cable for initial sketch upload</li>
+    </ul>
+
+    <h3>Software</h3>
+    <ul>
+      <li>Arduino IDE 1.8+ or 2.0+ (or PlatformIO)</li>
+      <li>ESP8266 or ESP32 board support installed</li>
+      <li>Serial Air app (App Store / Google Play)</li>
+    </ul>
+
+    <!-- Install Library -->
+    <h2>Step 1: Install the Arduino Library</h2>
+
+    <h3>Option A: Manual Install</h3>
+    <ol>
+      <li>Download the <code>WirelessSerial</code> folder from <a href="https://github.com/matdonaruno/serial-air/tree/main/arduino/WirelessSerial">GitHub</a></li>
+      <li>Copy it to your Arduino libraries folder:
+        <ul>
+          <li>macOS: <code>~/Documents/Arduino/libraries/</code></li>
+          <li>Windows: <code>Documents\Arduino\libraries\</code></li>
+          <li>Linux: <code>~/Arduino/libraries/</code></li>
+        </ul>
+      </li>
+      <li>Restart Arduino IDE</li>
+    </ol>
+
+    <h3>Option B: Use the App Code Generator</h3>
+    <p>Serial Air includes a built-in code generator. Open the app, go through onboarding, enter your WiFi credentials and board type. The app generates a ready-to-upload sketch — just copy and paste into Arduino IDE.</p>
+
+    <!-- Write Sketch -->
+    <h2>Step 2: Write Your Sketch</h2>
+
+    <h3>Minimal Example (STA Mode)</h3>
+    <pre><code>#include &lt;WirelessSerial.h&gt;
+
+const char* ssid = "YOUR_WIFI_SSID";
+const char* password = "YOUR_WIFI_PASSWORD";
+
+WirelessSerial ws;
+DualPrint* output;
+
+void setup() {
+    Serial.begin(115200);
+
+    // Connect to WiFi
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) delay(500);
+
+    // Start WirelessSerial
+    ws.begin();
+    output = ws.mirror(Serial);
+
+    output->println("Ready!");
+}
+
+void loop() {
+    ws.handle();  // Must call every loop
+    output->println("Hello from ESP!");
+    delay(1000);
+}</code></pre>
+
+    <div class="info-box">
+      <p><strong>Key points:</strong> <code>ws.begin()</code> starts the TCP server and mDNS. <code>ws.mirror(Serial)</code> creates a dual output — every <code>output->println()</code> goes to both USB Serial and WiFi TCP.</p>
+    </div>
+
+    <h3>AP Mode (No Router Needed)</h3>
+    <pre><code>#include &lt;WirelessSerial.h&gt;
+
+WirelessSerial ws;
+DualPrint* output;
+
+void setup() {
+    Serial.begin(115200);
+
+    // Create access point
+    WiFi.softAP("SerialAir-Device", "serialair");
+
+    ws.begin();
+    output = ws.mirror(Serial);
+    output->println("AP Mode ready!");
+    output->print("Connect to WiFi: SerialAir-Device");
+}
+
+void loop() {
+    ws.handle();
+    output->println("Hello!");
+    delay(1000);
+}</code></pre>
+
+    <p>In AP mode, connect your phone to the ESP's WiFi network, then use manual connection in Serial Air: <code>192.168.4.1:23</code></p>
+
+    <!-- Upload -->
+    <h2>Step 3: Upload to Your Board</h2>
+    <ol>
+      <li>Select your board in Arduino IDE (Tools &gt; Board)</li>
+      <li>Select the correct port (Tools &gt; Port)</li>
+      <li>Click Upload</li>
+      <li>Open Serial Monitor to verify WiFi connection (optional)</li>
+    </ol>
+
+    <!-- Connect -->
+    <h2>Step 4: Connect with Serial Air</h2>
+    <ol>
+      <li>Make sure your phone is on the <strong>same WiFi network</strong> as the ESP</li>
+      <li>Open Serial Air app</li>
+      <li>Your device should appear automatically in the device list</li>
+      <li>Tap the device to connect and start monitoring</li>
+    </ol>
+
+    <div class="info-box">
+      <p><strong>Device not found?</strong> Use manual connection — enter the ESP's IP address and port 23. You can find the IP in the Arduino Serial Monitor after WiFi connection.</p>
+    </div>
+
+    <!-- API Reference -->
+    <h2>API Reference</h2>
+
+    <h3>WirelessSerial Methods</h3>
+    <pre><code>ws.begin(port, mdnsName)   // Start TCP server + mDNS (default: 23, "esp-serial")
+ws.stop()                  // Stop server
+ws.handle()                // Process connections — call in loop()
+ws.mirror(Serial)          // Enable mirror mode, returns DualPrint*
+ws.unmirror()              // Disable mirror mode
+ws.clientCount()           // Number of TCP clients connected
+ws.isRunning()             // Server status
+ws.setMaxClients(n)        // Max clients 1-5 (default: 3)</code></pre>
+
+    <h3>Direct TCP Output (No Mirror)</h3>
+    <pre><code>ws.println("TCP only");    // Only goes to WiFi clients
+Serial.println("USB only");// Only goes to USB Serial
+output->println("Both");   // Goes to both (mirror mode)</code></pre>
+
+    <!-- Troubleshooting -->
+    <h2>Troubleshooting</h2>
+
+    <div class="faq-item">
+      <h3>Device not appearing in the app</h3>
+      <p>Ensure both devices are on the same WiFi. Some enterprise/university networks block mDNS. Try manual IP connection instead.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>Connection timeout</h3>
+      <p>Check that <code>ws.begin()</code> is called after WiFi is connected. Verify the port isn't blocked. Try port 8023 instead of 23: <code>ws.begin(8023)</code></p>
+    </div>
+
+    <div class="faq-item">
+      <h3>No data showing</h3>
+      <p>Make sure you're using <code>output->println()</code> (from <code>ws.mirror()</code>), not <code>Serial.println()</code>. Also verify <code>ws.handle()</code> is called in your <code>loop()</code>.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>AP mode — captive portal issue</h3>
+      <p>iPhone may try to open a captive portal page. Go to Settings &gt; WiFi, tap the ESP network, and disable auto-join. Then reconnect manually.</p>
+    </div>
+
+    <div class="faq-item">
+      <h3>ESP8266 crashes / resets</h3>
+      <p>Monitor heap with <code>ESP.getFreeHeap()</code>. Reduce max clients: <code>ws.setMaxClients(1)</code>. Avoid the String class in tight loops.</p>
+    </div>
+
+    <!-- Support -->
+    <h2>Need Help?</h2>
+    <p>Open an issue on <a href="https://github.com/matdonaruno/serial-air/issues">GitHub</a> and we'll help you get set up.</p>
+
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container footer-inner">
+    <span class="footer-left">&copy; 2025 Serial Air</span>
+    <ul class="footer-links">
+      <li><a href="/privacy">Privacy Policy</a></li>
+      <li><a href="/terms">Terms of Service</a></li>
+      <li><a href="https://github.com/matdonaruno/serial-air">GitHub</a></li>
+    </ul>
+  </div>
+</footer>
+
+</body>
+</html>

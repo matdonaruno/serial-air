@@ -13,8 +13,10 @@ import { Feather } from '@expo/vector-icons';
 import * as StoreReview from 'expo-store-review';
 import { NeuCard } from '../../src/components/neumorphic/NeuCard';
 import { NeuToggle } from '../../src/components/neumorphic/NeuToggle';
+import { useRouter } from 'expo-router';
 import { useSettingsStore } from '../../src/stores/useSettingsStore';
 import { useAppStore } from '../../src/stores/useAppStore';
+import { usePurchaseStore } from '../../src/stores/usePurchaseStore';
 import {
   colors,
   typography,
@@ -121,6 +123,11 @@ function LinkRow({
 // --- Main screen ---
 
 export default function SettingsScreen() {
+  const router = useRouter();
+  const isPurchased = usePurchaseStore((s) => s.isPurchased);
+  const trialDaysRemaining = usePurchaseStore((s) => s.trialDaysRemaining);
+  const restorePurchase = usePurchaseStore((s) => s.restore);
+
   const {
     fontSize,
     showTimestamp,
@@ -176,12 +183,12 @@ export default function SettingsScreen() {
 
   const handleOpenArduinoLibrary = useCallback(() => {
     Linking.openURL(
-      'https://github.com/serial-air/arduino-library'
+      'https://github.com/matdonaruno/serial-air/tree/main/arduino/WirelessSerial'
     );
   }, []);
 
   const handleOpenGitHub = useCallback(() => {
-    Linking.openURL('https://github.com/serial-air/serial-air');
+    Linking.openURL('https://github.com/matdonaruno/serial-air');
   }, []);
 
   const handleRateApp = useCallback(async () => {
@@ -268,6 +275,38 @@ export default function SettingsScreen() {
           </SettingRow>
         </NeuCard>
 
+        {/* PURCHASE Section */}
+        <Text style={styles.sectionHeader}>PURCHASE</Text>
+        <NeuCard style={styles.card}>
+          <SettingRow label="Status">
+            <Text style={[styles.rowValue, isPurchased && { color: colors.status.connected }]}>
+              {isPurchased ? 'Pro (Unlocked)' : `Trial (${trialDaysRemaining}d left)`}
+            </Text>
+          </SettingRow>
+
+          {!isPurchased && (
+            <LinkRow
+              label="Unlock Pro — $1.99"
+              icon="zap"
+              onPress={() => router.push('/paywall')}
+            />
+          )}
+
+          <LinkRow
+            label="Restore Purchase"
+            icon="refresh-cw"
+            onPress={async () => {
+              const success = await restorePurchase();
+              if (success) {
+                Alert.alert('Restored', 'Your purchase has been restored.');
+              } else {
+                Alert.alert('Not Found', 'No previous purchase was found.');
+              }
+            }}
+            isLast
+          />
+        </NeuCard>
+
         {/* ABOUT Section */}
         <Text style={styles.sectionHeader}>ABOUT</Text>
         <NeuCard style={styles.card}>
@@ -291,6 +330,18 @@ export default function SettingsScreen() {
             label="Rate this app"
             icon="star"
             onPress={handleRateApp}
+          />
+
+          <LinkRow
+            label="Privacy Policy"
+            icon="external-link"
+            onPress={() => Linking.openURL('https://serialair.netlify.app/privacy')}
+          />
+
+          <LinkRow
+            label="Terms of Service"
+            icon="external-link"
+            onPress={() => Linking.openURL('https://serialair.netlify.app/terms')}
             isLast
           />
         </NeuCard>

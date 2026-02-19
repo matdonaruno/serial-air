@@ -24,6 +24,18 @@
         ]
       }
     },
+    "android": {
+      "package": "com.serialair.app",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#1A1A2E"
+      },
+      "permissions": [
+        "android.permission.ACCESS_WIFI_STATE",
+        "android.permission.CHANGE_WIFI_MULTICAST_STATE"
+      ]
+    },
     "plugins": [
       "expo-router",
       "expo-splash-screen",

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serial Air — Wireless Serial Monitor for Arduino & ESP</title>
+  <meta name="description" content="Monitor your Arduino, ESP8266 & ESP32 serial output wirelessly from your phone. No PC needed.">
+  <meta property="og:title" content="Serial Air — Wireless Serial Monitor">
+  <meta property="og:description" content="Debug your IoT devices from your phone. No USB cable needed.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://serialair.netlify.app">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo">
+      <span class="nav-logo-icon">📡</span>
+      Serial Air
+    </a>
+    <ul class="nav-links">
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how-it-works">How It Works</a></li>
+      <li><a href="#pricing">Pricing</a></li>
+      <li><a href="/howto">HowTo</a></li>
+      <li><a href="https://github.com/matdonaruno/serial-air">GitHub</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="container">
+    <span class="hero-badge">7-Day Free Trial</span>
+    <h1>
+      Wireless Serial Monitor<br>
+      for <span class="accent">Arduino & ESP</span>
+    </h1>
+    <p class="subtitle">
+      Debug your IoT devices from your phone. No PC, no USB cable.
+      Just WiFi.
+    </p>
+    <div class="hero-buttons">
+      <a href="#" class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5C17.88 20.74 17 21.95 15.66 21.97C14.32 21.99 13.89 21.18 12.37 21.18C10.84 21.18 10.37 21.95 9.1 21.99C7.79 22.03 6.8 20.68 5.96 19.47C4.25 16.99 2.97 12.5 4.7 9.43C5.55 7.91 7.13 6.93 8.82 6.91C10.1 6.89 11.32 7.75 12.11 7.75C12.89 7.75 14.37 6.68 15.92 6.84C16.57 6.87 18.39 7.1 19.56 8.82C19.47 8.88 17.39 10.1 17.41 12.63C17.44 15.65 20.06 16.66 20.09 16.67C20.06 16.74 19.67 18.11 18.71 19.5ZM13 3.5C13.73 2.67 14.94 2.04 15.94 2C16.07 3.17 15.6 4.35 14.9 5.19C14.21 6.04 13.07 6.7 11.95 6.61C11.8 5.46 12.36 4.26 13 3.5Z"/></svg>
+        App Store
+      </a>
+      <a href="#" class="btn btn-primary">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5V3.5C3 2.91 3.34 2.39 3.84 2.15L13.69 12L3.84 21.85C3.34 21.61 3 21.09 3 20.5ZM16.81 15.12L6.05 21.34L14.54 12.85L16.81 15.12ZM20.16 10.81C20.5 11.08 20.75 11.5 20.75 12C20.75 12.5 20.5 12.92 20.16 13.19L17.89 14.5L15.39 12L17.89 9.5L20.16 10.81ZM6.05 2.66L16.81 8.88L14.54 11.15L6.05 2.66Z"/></svg>
+        Google Play
+      </a>
+      <a href="https://github.com/matdonaruno/serial-air" class="btn btn-secondary">
+        GitHub
+      </a>
+    </div>
+
+    <!-- Terminal Preview -->
+    <div class="terminal-preview">
+      <div class="terminal-bar">
+        <span class="terminal-dot red"></span>
+        <span class="terminal-dot yellow"></span>
+        <span class="terminal-dot green"></span>
+        <span class="terminal-title">Serial Air — esp-sensor.local</span>
+      </div>
+      <div class="terminal-body">
+        <span class="line"><span class="ts">[08:32:01.234]</span> Boot complete</span>
+        <span class="line"><span class="ts">[08:32:01.567]</span> <span class="ok">WiFi connected</span> — 192.168.1.42</span>
+        <span class="line"><span class="ts">[08:32:01.890]</span> WirelessSerial v1.0.0 ready</span>
+        <span class="line"><span class="ts">[08:32:03.012]</span> Temperature: 24.3°C</span>
+        <span class="line"><span class="ts">[08:32:03.015]</span> Humidity: 52.1%</span>
+        <span class="line"><span class="ts">[08:32:03.018]</span> Heap: 34,208 bytes</span>
+        <span class="line"><span class="ts">[08:32:05.001]</span> <span class="warn">Low signal: -78 dBm</span></span>
+        <span class="line"><span class="ts">[08:32:07.003]</span> Temperature: 24.4°C</span>
+        <span class="line"><span class="dim">&gt;</span> <span class="cursor">█</span></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="features" id="features">
+  <div class="container">
+    <p class="section-label">Features</p>
+    <h2 class="section-title">Everything you need to debug wirelessly</h2>
+    <div class="feature-grid">
+      <div class="neu-card-raised feature-card">
+        <div class="feature-icon">📡</div>
+        <h3>Auto Discovery</h3>
+        <p>Devices appear automatically via mDNS/Bonjour. No IP address to remember.</p>
+      </div>
+      <div class="neu-card-raised feature-card">
+        <div class="feature-icon">⚡</div>
+        <h3>Real-time Logs</h3>
+        <p>Live serial output with millisecond timestamps. Handles 10,000+ lines smoothly.</p>
+      </div>
+      <div class="neu-card-raised feature-card">
+        <div class="feature-icon">🔍</div>
+        <h3>Search & Filter</h3>
+        <p>Instantly find specific log entries. Filter by keyword, error level, or timestamp.</p>
+      </div>
+      <div class="neu-card-raised feature-card">
+        <div class="feature-icon">📤</div>
+        <h3>Export & Share</h3>
+        <p>Save logs to file. Share via AirDrop, email, or any app on your device.</p>
+      </div>
+      <div class="neu-card-raised feature-card">
+        <div class="feature-icon">💬</div>
+        <h3>Send Commands</h3>
+        <p>Bidirectional communication. Send commands and see the response in real-time.</p>
+      </div>
+      <div class="neu-card-raised feature-card">
+        <div class="feature-icon">🔄</div>
+        <h3>Auto Reconnect</h3>
+        <p>Seamless recovery from WiFi interruptions. Never miss a log line.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- How It Works -->
+<section class="how-it-works" id="how-it-works">
+  <div class="container">
+    <p class="section-label">Setup</p>
+    <h2 class="section-title">Up and running in 2 minutes</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-number">1</div>
+        <h3>Add the Library</h3>
+        <p>Add 2 lines to your Arduino sketch. That's it.</p>
+        <code>
+          #include &lt;WirelessSerial.h&gt;<br>
+          WirelessSerial ws;<br>
+          DualPrint* output;<br><br>
+          void setup() {<br>
+          &nbsp;&nbsp;ws.begin();<br>
+          &nbsp;&nbsp;output = ws.mirror(Serial);<br>
+          }
+        </code>
+      </div>
+      <div class="step">
+        <div class="step-number">2</div>
+        <h3>Upload &amp; Power On</h3>
+        <p>Flash to your ESP8266 or ESP32. Connect to WiFi.</p>
+        <code>
+          void loop() {<br>
+          &nbsp;&nbsp;ws.handle();<br>
+          &nbsp;&nbsp;output->println("Hello!");<br>
+          &nbsp;&nbsp;delay(1000);<br>
+          }
+        </code>
+      </div>
+      <div class="step">
+        <div class="step-number">3</div>
+        <h3>Open Serial Air</h3>
+        <p>Device appears automatically. Tap to connect and start monitoring.</p>
+        <code>
+          ✅ esp-sensor found<br>
+          &nbsp;&nbsp; 192.168.1.42:23<br>
+          &nbsp;&nbsp; ESP32 &bull; v1.0.0<br><br>
+          [tap to connect]
+        </code>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing -->
+<section class="pricing" id="pricing">
+  <div class="container">
+    <p class="section-label">Pricing</p>
+    <h2 class="section-title">Simple and fair</h2>
+    <div class="neu-card pricing-card">
+      <span class="hero-badge">7-Day Free Trial</span>
+      <div class="price">$1.99</div>
+      <p class="price-sub">One-time purchase. Yours forever.</p>
+      <ul class="pricing-features">
+        <li>Full features during 7-day trial</li>
+        <li>Unlimited connections after purchase</li>
+        <li>All future updates included</li>
+        <li>No subscriptions</li>
+        <li>No ads</li>
+        <li>No data collection</li>
+      </ul>
+      <a href="#" class="btn btn-primary" style="width:100%;justify-content:center;">Download Free Trial</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+  <div class="container">
+    <h2>Cut the cord. Start debugging.</h2>
+    <p>Free Arduino library. 7-day free app trial. No credit card required.</p>
+    <div class="hero-buttons">
+      <a href="https://github.com/matdonaruno/serial-air/tree/main/arduino/WirelessSerial" class="btn btn-secondary">
+        Get Arduino Library
+      </a>
+      <a href="/howto" class="btn btn-secondary">
+        Setup Guide
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="container footer-inner">
+    <span class="footer-left">&copy; 2025 Serial Air</span>
+    <ul class="footer-links">
+      <li><a href="/privacy">Privacy Policy</a></li>
+      <li><a href="/terms">Terms of Service</a></li>
+      <li><a href="/howto">HowTo</a></li>
+      <li><a href="https://github.com/matdonaruno/serial-air">GitHub</a></li>
+    </ul>
+  </div>
+</footer>
+
+</body>
+</html>

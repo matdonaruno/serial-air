@@ -6,6 +6,7 @@ import { colors } from '../src/constants/theme';
 import { useSettingsStore } from '../src/stores/useSettingsStore';
 import { useDiscoveryStore } from '../src/stores/useDiscoveryStore';
 import { useAppStore } from '../src/stores/useAppStore';
+import { usePurchaseStore } from '../src/stores/usePurchaseStore';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -18,6 +19,7 @@ export default function RootLayout() {
       await useSettingsStore.getState().loadSettings();
       await useDiscoveryStore.getState().loadRecentConnections();
       await useAppStore.getState().loadState();
+      await usePurchaseStore.getState().loadStatus();
       setReady(true);
       await SplashScreen.hideAsync();
     }
@@ -57,6 +59,18 @@ export default function RootLayout() {
         <Stack.Screen
           name="firmware-update"
           options={{ animation: 'slide_from_bottom' }}
+        />
+        <Stack.Screen
+          name="paywall"
+          options={{
+            animation: 'slide_from_bottom',
+            presentation: 'modal',
+            gestureEnabled: true,
+          }}
+        />
+        <Stack.Screen
+          name="code-generator"
+          options={{ animation: 'slide_from_right' }}
         />
       </Stack>
     </>

@@ -14,6 +14,7 @@ import { NeuCard, NeuButton, NeuInput } from '../../src/components/neumorphic';
 import { useConnectionStore } from '../../src/stores/useConnectionStore';
 import { useDiscoveryStore } from '../../src/stores/useDiscoveryStore';
 import { useSettingsStore } from '../../src/stores/useSettingsStore';
+import { usePurchaseStore } from '../../src/stores/usePurchaseStore';
 import { DeviceDiscovery } from '../../src/services/DeviceDiscovery';
 import { Device, RecentConnection } from '../../src/types';
 import {
@@ -58,6 +59,9 @@ export default function HomeScreen() {
   const addRecentConnection = useDiscoveryStore((s) => s.addRecentConnection);
   const loadRecentConnections = useDiscoveryStore((s) => s.loadRecentConnections);
   const defaultPort = useSettingsStore((s) => s.defaultPort);
+  const hasAccess = usePurchaseStore((s) => s.hasAccess);
+  const isPurchased = usePurchaseStore((s) => s.isPurchased);
+  const trialDaysRemaining = usePurchaseStore((s) => s.trialDaysRemaining);
 
   // Manual connection state
   const [manualIp, setManualIp] = useState('');
@@ -92,6 +96,10 @@ export default function HomeScreen() {
 
   const connectToDevice = useCallback(
     (host: string, port: number, deviceName?: string) => {
+      if (!hasAccess) {
+        router.push('/paywall');
+        return;
+      }
       connect(host, port, deviceName);
       addRecentConnection({
         host,
@@ -101,7 +109,7 @@ export default function HomeScreen() {
       });
       router.push('/monitor');
     },
-    [connect, addRecentConnection, router],
+    [connect, addRecentConnection, router, hasAccess],
   );
 
   const handleManualConnect = useCallback(() => {
@@ -133,6 +141,49 @@ export default function HomeScreen() {
             size={layout.actionButtonSize}
           />
         </View>
+
+        {/* ---- Trial Banner ---- */}
+        {!isPurchased && (
+          <Pressable
+            style={[
+              styles.trialBanner,
+              trialDaysRemaining <= 0 && styles.trialBannerExpired,
+            ]}
+            onPress={() => router.push('/paywall')}
+          >
+            <Feather
+              name={trialDaysRemaining > 0 ? 'clock' : 'alert-circle'}
+              size={16}
+              color={trialDaysRemaining > 0 ? colors.accent.primary : colors.status.disconnected}
+            />
+            <Text
+              style={[
+                styles.trialBannerText,
+                trialDaysRemaining <= 0 && styles.trialBannerTextExpired,
+              ]}
+            >
+              {trialDaysRemaining > 0
+                ? `Free trial: ${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining`
+                : 'Trial expired — Tap to unlock'}
+            </Text>
+            <Feather name="chevron-right" size={16} color={colors.text.muted} />
+          </Pressable>
+        )}
+
+        {/* ---- Quick Start ---- */}
+        <Pressable
+          style={styles.codeGenButton}
+          onPress={() => router.push('/code-generator')}
+        >
+          <View style={styles.codeGenIcon}>
+            <Feather name="code" size={18} color={colors.accent.primary} />
+          </View>
+          <View style={styles.codeGenText}>
+            <Text style={styles.codeGenTitle}>Generate Test Code</Text>
+            <Text style={styles.codeGenSub}>Get a ready-to-upload Arduino sketch</Text>
+          </View>
+          <Feather name="chevron-right" size={18} color={colors.text.muted} />
+        </Pressable>
 
         {/* ---- Discovered ---- */}
         <Text style={styles.sectionHeader}>DISCOVERED</Text>
@@ -433,6 +484,67 @@ const styles = StyleSheet.create({
   recentTime: {
     ...typography.caption,
     color: colors.text.muted,
+  },
+
+  // Trial banner
+  trialBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.innerCard,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 12,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.accent.glow,
+    gap: 8,
+  },
+  trialBannerExpired: {
+    borderColor: 'rgba(248, 113, 113, 0.3)',
+  },
+  trialBannerText: {
+    ...typography.bodySmall,
+    color: colors.accent.primary,
+    flex: 1,
+    fontWeight: '600',
+  },
+  trialBannerTextExpired: {
+    color: colors.status.disconnected,
+  },
+
+  // Code generator
+  codeGenButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.innerCard,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 14,
+    marginBottom: spacing.sm,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    gap: 12,
+  },
+  codeGenIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: colors.bg.surfaceLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  codeGenText: {
+    flex: 1,
+  },
+  codeGenTitle: {
+    ...typography.bodySmall,
+    color: colors.text.primary,
+    fontWeight: '600',
+  },
+  codeGenSub: {
+    ...typography.caption,
+    color: colors.text.muted,
+    marginTop: 1,
   },
 
   // Bottom spacer
