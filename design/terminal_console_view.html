@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ESP-SERIAL Terminal</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=JetBrains+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#FF6B35",
+                        "background-light": "#f8f6f5",
+                        "background-dark": "#1A1A2E", // User requested dark navy
+                        "surface-dark": "#16162A", // Terminal background
+                        "text-main": "#E8E8F0",
+                        "text-dim": "#D1D1E0",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "mono": ["JetBrains Mono", "monospace"],
+                    },
+                    boxShadow: {
+                        'neumorphic-raised': '6px 6px 12px #121220, -6px -6px 12px #22223c',
+                        'neumorphic-inset': 'inset 6px 6px 12px #0f0f1d, inset -6px -6px 12px #1d1d37',
+                        'neumorphic-btn': '4px 4px 8px #121220, -4px -4px 8px #22223c',
+                        'neumorphic-btn-active': 'inset 2px 2px 5px #121220, inset -2px -2px 5px #22223c',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar for the terminal */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: #2F2F45;
+            border-radius: 20px;
+        }
+        
+        /* Blinking cursor animation */
+        .blink {
+            animation: blinker 1s linear infinite;
+        }
+        @keyframes blinker {
+            50% { opacity: 0; }
+        }
+
+        /* Pulse animation for connected status */
+        .pulse-dot {
+            box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            animation: pulse-green 2s infinite;
+        }
+        @keyframes pulse-green {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.7);
+            }
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(74, 222, 128, 0);
+            }
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(74, 222, 128, 0);
+            }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-text-main font-display antialiased h-screen w-full overflow-hidden flex flex-col relative selection:bg-primary/30">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 pt-12 pb-4 z-20 shrink-0">
+<!-- Back Button -->
+<button class="flex items-center justify-center w-10 h-10 rounded-xl bg-background-dark shadow-neumorphic-btn text-text-dim hover:text-primary transition-colors active:shadow-neumorphic-btn-active">
+<span class="material-symbols-outlined text-[20px]">arrow_back_ios_new</span>
+</button>
+<!-- Title -->
+<h1 class="text-sm font-bold tracking-widest uppercase text-text-main">ESP-SERIAL</h1>
+<!-- Status -->
+<div class="flex items-center gap-2">
+<div class="w-2 h-2 rounded-full bg-green-400 pulse-dot"></div>
+<span class="text-xs font-bold text-green-400 tracking-wider">CONNECTED</span>
+</div>
+</header>
+<!-- Main Content: Terminal -->
+<main class="flex-1 px-4 pb-2 relative flex flex-col min-h-0">
+<!-- Terminal Window Container -->
+<div class="flex-1 bg-surface-dark rounded-[24px] shadow-neumorphic-inset p-5 overflow-hidden flex flex-col relative border border-white/[0.02]">
+<!-- Terminal Header/Meta info (Optional visual flair) -->
+<div class="flex justify-between items-center mb-4 opacity-30 text-[10px] font-mono tracking-widest border-b border-white/5 pb-2">
+<span>/dev/ttyUSB0</span>
+<span>115200 BAUD</span>
+</div>
+<!-- Scrollable Output Area -->
+<div class="flex-1 overflow-y-auto custom-scrollbar font-mono text-sm leading-relaxed space-y-1">
+<div class="text-text-dim/50 flex gap-2">
+<span class="text-primary/70">[14:19:58]</span>
+<span>Initializing Serial Communication...</span>
+</div>
+<div class="text-text-dim/50 flex gap-2">
+<span class="text-primary/70">[14:19:59]</span>
+<span>Baud Rate set to 115200</span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:01]</span>
+<span>Booting ESP8266...</span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:01]</span>
+<span>SDK Version: 2.2.1(cfd48f3)</span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:02]</span>
+<span>Chip ID: 0x00123ABC</span>
+</div>
+<div class="text-green-400 flex gap-2">
+<span class="text-blue-400">[14:20:03]</span>
+<span>Connected to WiFi: IoT_Home</span>
+</div>
+<div class="text-text-dim flex gap-2">
+<span class="text-blue-400">[14:20:03]</span>
+<span>IP Address: 192.168.1.105</span>
+</div>
+<div class="text-text-dim flex gap-2">
+<span class="text-blue-400">[14:20:04]</span>
+<span>MQTT Broker: Connected</span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:05]</span>
+<span>Sensor reading: <span class="text-primary font-bold">24.5C</span></span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:06]</span>
+<span>Sensor reading: <span class="text-primary font-bold">24.6C</span></span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:07]</span>
+<span>Heartbeat: OK</span>
+</div>
+<div class="text-yellow-500/80 flex gap-2">
+<span class="text-blue-400">[14:20:08]</span>
+<span>Warning: Latency spike detected (120ms)</span>
+</div>
+<div class="text-text-main flex gap-2">
+<span class="text-blue-400">[14:20:09]</span>
+<span>Sensor reading: <span class="text-primary font-bold">24.5C</span></span>
+</div>
+<!-- Cursor Line -->
+<div class="flex gap-2 mt-2">
+<span class="text-primary font-bold">&gt;</span>
+<span class="w-2 h-4 bg-primary blink block mt-1"></span>
+</div>
+</div>
+</div>
+</main>
+<!-- Controls Area -->
+<section class="px-6 pb-6 pt-2 shrink-0 flex flex-col gap-5 z-20">
+<!-- Quick Actions Row -->
+<div class="flex justify-between px-2">
+<button class="group flex flex-col items-center gap-1">
+<div class="w-10 h-10 rounded-full bg-background-dark shadow-neumorphic-btn flex items-center justify-center text-text-dim group-active:shadow-neumorphic-btn-active transition-all group-active:scale-95">
+<span class="material-symbols-outlined text-[18px]">delete</span>
+</div>
+<span class="text-[10px] text-text-dim/60 font-medium">Clear</span>
+</button>
+<button class="group flex flex-col items-center gap-1">
+<div class="w-10 h-10 rounded-full bg-background-dark shadow-neumorphic-btn flex items-center justify-center text-text-dim group-active:shadow-neumorphic-btn-active transition-all group-active:scale-95">
+<span class="material-symbols-outlined text-[18px]">ios_share</span>
+</div>
+<span class="text-[10px] text-text-dim/60 font-medium">Export</span>
+</button>
+<button class="group flex flex-col items-center gap-1">
+<div class="w-10 h-10 rounded-full bg-background-dark shadow-neumorphic-btn flex items-center justify-center text-text-dim group-active:shadow-neumorphic-btn-active transition-all group-active:scale-95">
+<span class="material-symbols-outlined text-[18px]">pause</span>
+</div>
+<span class="text-[10px] text-text-dim/60 font-medium">Pause</span>
+</button>
+<button class="group flex flex-col items-center gap-1">
+<div class="w-10 h-10 rounded-full bg-background-dark shadow-neumorphic-btn flex items-center justify-center text-text-dim group-active:shadow-neumorphic-btn-active transition-all group-active:scale-95">
+<span class="material-symbols-outlined text-[18px]">restart_alt</span>
+</div>
+<span class="text-[10px] text-text-dim/60 font-medium">Reset</span>
+</button>
+</div>
+<!-- Input Row -->
+<div class="flex items-center gap-4">
+<!-- Input Field -->
+<div class="flex-1 h-14 rounded-full bg-background-dark shadow-neumorphic-raised p-[2px] relative group">
+<div class="w-full h-full rounded-full bg-surface-dark shadow-neumorphic-inset flex items-center px-6">
+<span class="material-symbols-outlined text-text-dim/30 mr-2 text-[20px]">terminal</span>
+<input class="bg-transparent border-none text-text-main placeholder-text-dim/30 w-full focus:ring-0 font-mono text-sm caret-primary h-full" placeholder="Send Command..." type="text"/>
+</div>
+</div>
+<!-- Send Button -->
+<button class="w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center text-white active:scale-95 transition-transform shrink-0 border border-white/10">
+<span class="material-symbols-outlined text-[24px] ml-1">send</span>
+</button>
+</div>
+</section>
+<!-- Bottom Navigation -->
+<nav class="shrink-0 pb-6 pt-2 bg-background-dark z-30">
+<div class="flex items-center justify-center gap-8 px-8">
+<a class="flex flex-col items-center gap-1 text-primary group" href="#">
+<div class="w-12 h-12 rounded-2xl bg-background-dark shadow-neumorphic-btn flex items-center justify-center text-primary group-active:shadow-neumorphic-btn-active transition-all">
+<span class="material-symbols-outlined fill-1">terminal</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-primary mt-1"></div>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-dim/40 group hover:text-text-dim transition-colors" href="#">
+<div class="w-12 h-12 rounded-2xl bg-background-dark shadow-none flex items-center justify-center group-active:shadow-neumorphic-btn-active transition-all">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-transparent mt-1"></div>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-dim/40 group hover:text-text-dim transition-colors" href="#">
+<div class="w-12 h-12 rounded-2xl bg-background-dark shadow-none flex items-center justify-center group-active:shadow-neumorphic-btn-active transition-all">
+<span class="material-symbols-outlined">settings</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-transparent mt-1"></div>
+</a>
+<a class="flex flex-col items-center gap-1 text-text-dim/40 group hover:text-text-dim transition-colors" href="#">
+<div class="w-12 h-12 rounded-2xl bg-background-dark shadow-none flex items-center justify-center group-active:shadow-neumorphic-btn-active transition-all">
+<span class="material-symbols-outlined">person</span>
+</div>
+<div class="w-1 h-1 rounded-full bg-transparent mt-1"></div>
+</a>
+</div>
+</nav>
+</body></html>
