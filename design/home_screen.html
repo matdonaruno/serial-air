@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Serial Air Home Screen</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#FF6B35",
+                        "primary-glow": "#FF8A50",
+                        "background-dark": "#12121F",
+                        "surface-dark": "#161625", 
+                        "surface-raised": "#1B1B2A",
+                        "text-light": "#F0F0F5",
+                        "text-muted": "#6E6E7E",
+                        "input-bg": "#0D0D17",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "Helvetica Neue", "Arial", "sans-serif"]
+                    },
+                    boxShadow: {
+                        'neu-raised': '8px 8px 20px #0b0b13, -8px -8px 20px #1d1d2f',
+                        'neu-flat': '5px 5px 10px #0b0b13, -5px -5px 10px #1d1d2f',
+                        'neu-pressed': 'inset 4px 4px 10px #09090f, inset -4px -4px 10px #202030',
+                        'neu-btn': '6px 6px 15px #0a0a12, -6px -6px 15px #222238',
+                        'orange-glow': '0 0 15px rgba(255, 107, 53, 0.5), inset 2px 2px 5px rgba(255, 255, 255, 0.2), inset -2px -2px 5px rgba(0, 0, 0, 0.2)',
+                        'active-card': 'inset 2px 2px 5px #0d0d16, inset -2px -2px 5px #242436',
+                    },
+                    backgroundImage: {
+                        'orange-gradient': 'linear-gradient(135deg, #FF8A50 0%, #FF6B35 100%)',
+                        'surface-gradient': 'linear-gradient(145deg, #181829, #141421)',
+                        'surface-active': 'linear-gradient(145deg, #131320, #171726)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-font-smoothing: antialiased;
+        }::-webkit-scrollbar {
+            width: 0px;
+            background: transparent;
+        }
+        .text-shadow-sm {
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+    </style>
+<style>
+        body {
+            min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-text-light min-h-screen flex flex-col font-display overflow-x-hidden selection:bg-primary selection:text-white">
+<header class="flex items-center justify-between px-6 pt-12 pb-6 sticky top-0 z-50 bg-background-dark/90 backdrop-blur-md">
+<div class="w-12"></div> 
+<h1 class="text-xs font-bold tracking-[0.25em] text-text-light/90 uppercase text-shadow-sm">Serial Air</h1>
+<button aria-label="Settings" class="w-12 h-12 rounded-full bg-surface-dark text-text-muted flex items-center justify-center shadow-neu-flat active:shadow-neu-pressed transition-all duration-300 hover:text-text-light">
+<span class="material-symbols-outlined text-[20px]">settings</span>
+</button>
+</header>
+<main class="flex-1 flex flex-col gap-8 px-6 pb-28">
+<section>
+<h2 class="text-[11px] font-bold tracking-widest text-text-muted/70 uppercase mb-6 ml-4">Discovered</h2>
+<div class="flex flex-col gap-6">
+<div class="relative flex items-center justify-between p-5 rounded-[2rem] bg-surface-dark shadow-active-card overflow-hidden group cursor-pointer border border-white/[0.02]">
+<div class="absolute left-0 top-0 bottom-0 w-[4px] bg-primary shadow-[0_0_15px_rgba(255,107,53,0.5)]"></div>
+<div class="flex items-center gap-5 pl-3 w-full">
+<div class="w-14 h-14 rounded-full bg-surface-dark shadow-neu-raised flex items-center justify-center text-primary relative border border-white/[0.03]">
+<span class="material-symbols-outlined relative z-10">memory</span>
+<div class="absolute inset-0 rounded-full bg-primary/5 blur-md"></div>
+</div>
+<div class="flex flex-col flex-1">
+<h3 class="font-semibold text-text-light text-[17px] tracking-tight">esp-serial</h3>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.8)]"></span>
+</span>
+<span class="text-[13px] text-text-muted font-medium tracking-wide">192.168.1.45</span>
+</div>
+</div>
+<div class="text-primary opacity-100 transition-opacity pr-2 drop-shadow-[0_0_8px_rgba(255,107,53,0.6)]">
+<span class="material-symbols-outlined">radio_button_checked</span>
+</div>
+</div>
+</div>
+<div class="relative flex items-center justify-between p-5 rounded-[2rem] bg-surface-gradient shadow-neu-raised cursor-pointer transition-transform active:scale-[0.98] border border-white/[0.03]">
+<div class="flex items-center gap-5 pl-1">
+<div class="w-14 h-14 rounded-full bg-surface-dark shadow-neu-pressed flex items-center justify-center text-text-muted/80">
+<span class="material-symbols-outlined">sensors</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-semibold text-text-light/90 text-[17px] tracking-tight">living-room-sensor</h3>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="w-2 h-2 rounded-full bg-green-500/80 shadow-[0_0_6px_rgba(34,197,94,0.4)]"></span>
+<span class="text-[13px] text-text-muted font-medium tracking-wide">192.168.1.22</span>
+</div>
+</div>
+</div>
+</div>
+<div class="relative flex items-center justify-between p-5 rounded-[2rem] bg-surface-dark shadow-neu-flat opacity-60 cursor-pointer transition-transform active:scale-[0.98] border border-white/[0.01]">
+<div class="flex items-center gap-5 pl-1">
+<div class="w-14 h-14 rounded-full bg-surface-dark shadow-neu-pressed flex items-center justify-center text-text-muted/40">
+<span class="material-symbols-outlined">thermostat</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-semibold text-text-muted text-[17px] tracking-tight">garage-temp</h3>
+<div class="flex items-center gap-2 mt-1.5">
+<span class="w-2 h-2 rounded-full bg-red-500/80 shadow-[0_0_6px_rgba(239,68,68,0.4)]"></span>
+<span class="text-[13px] text-text-muted font-medium tracking-wide">Offline • 5m ago</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section>
+<h2 class="text-[11px] font-bold tracking-widest text-text-muted/70 uppercase mb-6 ml-4">Manual Connection</h2>
+<div class="p-8 rounded-[2.5rem] bg-surface-gradient shadow-neu-raised relative border border-white/[0.03]">
+<div class="flex flex-col gap-6 mb-8">
+<div class="relative group">
+<div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-muted/40 text-[22px]">public</span>
+</div>
+<input class="w-full bg-input-bg text-text-light placeholder-text-muted/30 rounded-2xl py-5 pl-14 pr-4 text-[15px] font-medium border-none shadow-neu-pressed focus:ring-0 focus:shadow-[inset_2px_2px_5px_#09090f,inset_-2px_-2px_5px_#202030,0_0_0_1px_rgba(255,107,53,0.3)] transition-all outline-none" placeholder="IP Address (e.g. 192.168.4.1)" type="text"/>
+</div>
+<div class="relative group">
+<div class="absolute inset-y-0 left-5 flex items-center pointer-events-none">
+<span class="material-symbols-outlined text-text-muted/40 text-[22px]">lan</span>
+</div>
+<input class="w-full bg-input-bg text-text-light placeholder-text-muted/30 rounded-2xl py-5 pl-14 pr-4 text-[15px] font-medium border-none shadow-neu-pressed focus:ring-0 focus:shadow-[inset_2px_2px_5px_#09090f,inset_-2px_-2px_5px_#202030,0_0_0_1px_rgba(255,107,53,0.3)] transition-all outline-none" placeholder="Port (e.g. 80)" type="number"/>
+</div>
+</div>
+<div class="absolute -bottom-8 left-1/2 transform -translate-x-1/2">
+<button class="w-16 h-16 rounded-full bg-orange-gradient flex items-center justify-center text-white shadow-orange-glow active:scale-95 transition-transform duration-200 group">
+<span class="material-symbols-outlined text-[28px] drop-shadow-md group-hover:scale-110 transition-transform">wifi</span>
+</button>
+</div>
+</div>
+</section>
+<section class="mt-6">
+<h2 class="text-[11px] font-bold tracking-widest text-text-muted/70 uppercase mb-4 ml-4">Recent</h2>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between py-4 px-5 rounded-2xl hover:bg-surface-dark transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-transparent group-hover:shadow-neu-pressed transition-shadow duration-300">
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors text-[20px]">history</span>
+</div>
+<span class="text-[15px] font-medium text-text-muted group-hover:text-text-light transition-colors">192.168.4.1:23</span>
+</div>
+<span class="text-xs text-text-muted/50 font-medium">2h ago</span>
+</div>
+<div class="flex items-center justify-between py-4 px-5 rounded-2xl hover:bg-surface-dark transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-transparent group-hover:shadow-neu-pressed transition-shadow duration-300">
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors text-[20px]">history</span>
+</div>
+<span class="text-[15px] font-medium text-text-muted group-hover:text-text-light transition-colors">10.0.0.52:8080</span>
+</div>
+<span class="text-xs text-text-muted/50 font-medium">Yesterday</span>
+</div>
+<div class="flex items-center justify-between py-4 px-5 rounded-2xl hover:bg-surface-dark transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-full flex items-center justify-center bg-transparent group-hover:shadow-neu-pressed transition-shadow duration-300">
+<span class="material-symbols-outlined text-text-muted group-hover:text-primary transition-colors text-[20px]">history</span>
+</div>
+<span class="text-[15px] font-medium text-text-muted group-hover:text-text-light transition-colors">172.16.0.2:22</span>
+</div>
+<span class="text-xs text-text-muted/50 font-medium">3d ago</span>
+</div>
+</div>
+</section>
+</main>
+<nav class="fixed bottom-0 w-full bg-background-dark/80 backdrop-blur-xl pb-8 pt-4 px-8 border-t border-white/[0.02] flex justify-between items-center z-40 shadow-[0_-10px_20px_rgba(0,0,0,0.2)]">
+<a class="flex flex-col items-center gap-1.5 text-primary group" href="#">
+<div class="relative">
+<span class="material-symbols-outlined filled drop-shadow-[0_0_8px_rgba(255,107,53,0.5)]">home</span>
+<span class="absolute -bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-primary shadow-[0_0_5px_#FF6B35]"></span>
+</div>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-text-muted hover:text-text-light transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] transition-all">terminal</span>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-text-muted hover:text-text-light transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] transition-all">bar_chart</span>
+</a>
+<a class="flex flex-col items-center gap-1.5 text-text-muted hover:text-text-light transition-colors group" href="#">
+<span class="material-symbols-outlined group-hover:drop-shadow-[0_0_5px_rgba(255,255,255,0.3)] transition-all">settings</span>
+</a>
+</nav>
+
+</body></html>
