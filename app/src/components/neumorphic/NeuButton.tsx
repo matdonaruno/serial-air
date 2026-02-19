@@ -13,6 +13,7 @@ import Animated, {
   withTiming,
 } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { colors, neuShadow, animation, typography } from '../../constants/theme';
 
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
@@ -47,6 +48,7 @@ export function NeuButton({
   }));
 
   const handlePressIn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     scale.value = withTiming(animation.buttonPress.scale, {
       duration: animation.buttonPress.duration,
     });

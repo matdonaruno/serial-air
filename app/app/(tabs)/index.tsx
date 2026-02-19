@@ -9,6 +9,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 
 import { NeuCard, NeuButton, NeuInput } from '../../src/components/neumorphic';
 import { useConnectionStore } from '../../src/stores/useConnectionStore';
@@ -149,7 +150,10 @@ export default function HomeScreen() {
               styles.trialBanner,
               trialDaysRemaining <= 0 && styles.trialBannerExpired,
             ]}
-            onPress={() => router.push('/paywall')}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              router.push('/paywall');
+            }}
           >
             <Feather
               name={trialDaysRemaining > 0 ? 'clock' : 'alert-circle'}
@@ -173,7 +177,10 @@ export default function HomeScreen() {
         {/* ---- Quick Start ---- */}
         <Pressable
           style={styles.codeGenButton}
-          onPress={() => router.push('/code-generator')}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/code-generator');
+          }}
         >
           <View style={styles.codeGenIcon}>
             <Feather name="code" size={18} color={colors.accent.primary} />
@@ -306,13 +313,14 @@ export default function HomeScreen() {
               <Pressable
                 key={`${recent.host}:${recent.port}-${index}`}
                 style={styles.recentItem}
-                onPress={() =>
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
                   connectToDevice(
                     recent.host,
                     recent.port,
                     recent.deviceName,
-                  )
-                }
+                  );
+                }}
               >
                 <Feather
                   name="clock"

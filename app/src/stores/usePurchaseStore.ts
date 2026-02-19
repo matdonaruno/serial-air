@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { PurchaseService, TrialStatus } from '../services/PurchaseService';
+import { PurchaseService } from '../services/PurchaseService';
 
 interface PurchaseStore {
   isLoaded: boolean;
@@ -16,7 +16,7 @@ interface PurchaseStore {
   restore: () => Promise<boolean>;
 }
 
-export const usePurchaseStore = create<PurchaseStore>((set, get) => ({
+export const usePurchaseStore = create<PurchaseStore>((set) => ({
   isLoaded: false,
   isPurchased: false,
   isTrialActive: false,
@@ -28,6 +28,7 @@ export const usePurchaseStore = create<PurchaseStore>((set, get) => ({
 
   loadStatus: async () => {
     try {
+      await PurchaseService.configure();
       await PurchaseService.initializeTrial();
       const status = await PurchaseService.getStatus();
       set({
@@ -45,14 +46,7 @@ export const usePurchaseStore = create<PurchaseStore>((set, get) => ({
   purchase: async () => {
     set({ isPurchasing: true, error: null });
     try {
-      // In real implementation:
-      //
-      // const { customerInfo } = await Purchases.purchasePackage(package);
-      // const isActive = customerInfo.entitlements.active[ENTITLEMENT_ID];
-      // if (isActive) { ... }
-      //
-      // For now, simulate:
-      await PurchaseService.setPurchased();
+      await PurchaseService.purchase();
       set({
         isPurchasing: false,
         isPurchased: true,

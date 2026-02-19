@@ -16,6 +16,7 @@ import Animated, {
   withTiming,
   interpolateColor,
 } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
 import { useAppStore } from '../src/stores/useAppStore';
 
@@ -62,6 +63,7 @@ export default function OnboardingScreen() {
   const isLast = currentIndex === slides.length - 1;
 
   const handleNext = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (isLast) {
       completeOnboarding();
       router.replace('/(tabs)/');
@@ -74,6 +76,7 @@ export default function OnboardingScreen() {
   };
 
   const handleSkip = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     completeOnboarding();
     router.replace('/(tabs)/');
   };

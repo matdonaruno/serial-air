@@ -114,7 +114,10 @@ export default function CodeGeneratorScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.back();
+        }} hitSlop={12}>
           <View style={styles.backButton}>
             <Feather name="arrow-left" size={20} color={colors.text.secondary} />
           </View>
@@ -141,7 +144,10 @@ export default function CodeGeneratorScreen() {
               styles.boardButton,
               board === 'esp8266' && styles.boardButtonActive,
             ]}
-            onPress={() => setBoard('esp8266')}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setBoard('esp8266');
+            }}
           >
             <Feather
               name="cpu"
@@ -163,7 +169,10 @@ export default function CodeGeneratorScreen() {
               styles.boardButton,
               board === 'esp32' && styles.boardButtonActive,
             ]}
-            onPress={() => setBoard('esp32')}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setBoard('esp32');
+            }}
           >
             <Feather
               name="cpu"

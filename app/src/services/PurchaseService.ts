@@ -2,7 +2,8 @@
  * PurchaseService — RevenueCat integration for Serial Air.
  *
  * Handles:
- * - 7-day free trial (date-based, no App Store trial)
+ * - RevenueCat SDK initialization
+ * - 7-day free trial (date-based, local)
  * - $1.99 one-time purchase (non-consumable)
  * - Purchase state persistence
  *
@@ -14,15 +15,21 @@
  * 5. Set REVENUECAT_API_KEY below
  */
 
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import Purchases, {
+  LOG_LEVEL,
+  PurchasesPackage,
+  CustomerInfo,
+} from 'react-native-purchases';
 
 const TRIAL_START_KEY = 'serial-air:trial-start';
 const PURCHASE_KEY = 'serial-air:purchased';
 const TRIAL_DAYS = 7;
 
-// Replace with your actual RevenueCat API key
-export const REVENUECAT_API_KEY_IOS = 'appl_YOUR_REVENUECAT_IOS_KEY';
-export const REVENUECAT_API_KEY_ANDROID = 'goog_YOUR_REVENUECAT_ANDROID_KEY';
+// Replace with your actual RevenueCat API keys
+const REVENUECAT_API_KEY_IOS = 'appl_YOUR_REVENUECAT_IOS_KEY';
+const REVENUECAT_API_KEY_ANDROID = 'goog_YOUR_REVENUECAT_ANDROID_KEY';
 
 export const ENTITLEMENT_ID = 'pro';
 export const PRODUCT_ID = 'serial_air_pro';
@@ -32,12 +39,38 @@ export interface TrialStatus {
   isPurchased: boolean;
   trialDaysRemaining: number;
   trialStartDate: Date | null;
-  hasAccess: boolean; // true if trial active OR purchased
+  hasAccess: boolean;
 }
+
+let isConfigured = false;
 
 export class PurchaseService {
   /**
-   * Initialize trial on first launch. Called once during app startup.
+   * Configure RevenueCat SDK. Call once at app startup.
+   */
+  static async configure(): Promise<void> {
+    if (isConfigured) return;
+
+    const apiKey = Platform.OS === 'ios'
+      ? REVENUECAT_API_KEY_IOS
+      : REVENUECAT_API_KEY_ANDROID;
+
+    // Skip configuration if placeholder keys
+    if (apiKey.includes('YOUR_REVENUECAT')) {
+      console.warn('[PurchaseService] Using placeholder API key — RevenueCat disabled');
+      return;
+    }
+
+    if (__DEV__) {
+      Purchases.setLogLevel(LOG_LEVEL.DEBUG);
+    }
+
+    await Purchases.configure({ apiKey });
+    isConfigured = true;
+  }
+
+  /**
+   * Initialize trial on first launch.
    */
   static async initializeTrial(): Promise<void> {
     const existing = await AsyncStorage.getItem(TRIAL_START_KEY);
@@ -48,6 +81,7 @@ export class PurchaseService {
 
   /**
    * Get current trial/purchase status.
+   * Checks both local trial and RevenueCat entitlements.
    */
   static async getStatus(): Promise<TrialStatus> {
     const [trialStartStr, purchasedStr] = await Promise.all([
@@ -55,7 +89,21 @@ export class PurchaseService {
       AsyncStorage.getItem(PURCHASE_KEY),
     ]);
 
-    const isPurchased = purchasedStr === 'true';
+    let isPurchased = purchasedStr === 'true';
+
+    // Also check RevenueCat if configured
+    if (!isPurchased && isConfigured) {
+      try {
+        const customerInfo = await Purchases.getCustomerInfo();
+        isPurchased = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
+        if (isPurchased) {
+          await AsyncStorage.setItem(PURCHASE_KEY, 'true');
+        }
+      } catch {
+        // Fall through to local check
+      }
+    }
+
     let trialStartDate: Date | null = null;
     let trialDaysRemaining = 0;
     let isTrialActive = false;
@@ -78,15 +126,48 @@ export class PurchaseService {
   }
 
   /**
-   * Mark purchase as complete. Called after RevenueCat confirms purchase.
+   * Get the available package for purchase.
+   */
+  static async getPackage(): Promise<PurchasesPackage | null> {
+    if (!isConfigured) return null;
+    try {
+      const offerings = await Purchases.getOfferings();
+      return offerings.current?.availablePackages[0] ?? null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Purchase the pro package.
+   * Returns CustomerInfo on success, null on failure/cancel.
+   */
+  static async purchase(): Promise<CustomerInfo | null> {
+    if (!isConfigured) {
+      // Fallback for dev/placeholder: mark purchased locally
+      await this.setPurchased();
+      return null;
+    }
+
+    const pkg = await this.getPackage();
+    if (!pkg) throw new Error('No package available');
+
+    const { customerInfo } = await Purchases.purchasePackage(pkg);
+    if (customerInfo.entitlements.active[ENTITLEMENT_ID]) {
+      await this.setPurchased();
+    }
+    return customerInfo;
+  }
+
+  /**
+   * Mark purchase as complete locally.
    */
   static async setPurchased(): Promise<void> {
     await AsyncStorage.setItem(PURCHASE_KEY, 'true');
   }
 
   /**
-   * Check if user has access (trial or purchased).
-   * Quick check for use in guards.
+   * Quick access check.
    */
   static async hasAccess(): Promise<boolean> {
     const status = await this.getStatus();
@@ -94,25 +175,24 @@ export class PurchaseService {
   }
 
   /**
-   * Restore purchases. Call after RevenueCat restorePurchases().
-   * If entitlement is active, mark as purchased locally.
+   * Restore purchases via RevenueCat.
    */
   static async restorePurchase(): Promise<boolean> {
-    // In real implementation, this calls RevenueCat:
-    //
-    // try {
-    //   const customerInfo = await Purchases.restorePurchases();
-    //   const isActive = customerInfo.entitlements.active[ENTITLEMENT_ID];
-    //   if (isActive) {
-    //     await this.setPurchased();
-    //     return true;
-    //   }
-    //   return false;
-    // } catch {
-    //   return false;
-    // }
+    if (isConfigured) {
+      try {
+        const customerInfo = await Purchases.restorePurchases();
+        const isActive = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
+        if (isActive) {
+          await this.setPurchased();
+          return true;
+        }
+        return false;
+      } catch {
+        return false;
+      }
+    }
 
-    // For now, check local state
+    // Fallback: check local state
     const status = await this.getStatus();
     return status.isPurchased;
   }

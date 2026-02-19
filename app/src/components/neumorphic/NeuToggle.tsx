@@ -5,6 +5,7 @@ import Animated, {
   withTiming,
   interpolateColor,
 } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { colors } from '../../constants/theme';
 
 interface NeuToggleProps {
@@ -32,7 +33,10 @@ export function NeuToggle({ value, onValueChange, disabled }: NeuToggleProps) {
 
   return (
     <Pressable
-      onPress={() => onValueChange(!value)}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onValueChange(!value);
+      }}
       disabled={disabled}
       style={[disabled && styles.disabled]}
     >

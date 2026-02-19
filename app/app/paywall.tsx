@@ -10,6 +10,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
 import { usePurchaseStore } from '../src/stores/usePurchaseStore';
 
@@ -38,15 +39,19 @@ export default function PaywallScreen() {
   const restore = usePurchaseStore((s) => s.restore);
 
   const handlePurchase = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     const success = await purchase();
     if (success) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     }
   };
 
   const handleRestore = async () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     const success = await restore();
     if (success) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
       router.back();
     }
   };
@@ -55,7 +60,10 @@ export default function PaywallScreen() {
     <SafeAreaView style={styles.container}>
       {/* Close button */}
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()} hitSlop={12}>
+        <Pressable onPress={() => {
+          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+          router.back();
+        }} hitSlop={12}>
           <View style={styles.closeButton}>
             <Feather name="x" size={20} color={colors.text.secondary} />
           </View>

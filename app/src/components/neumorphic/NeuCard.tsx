@@ -11,6 +11,7 @@ import Animated, {
   useSharedValue,
   withTiming,
 } from 'react-native-reanimated';
+import * as Haptics from 'expo-haptics';
 import { colors, borderRadius, neuShadow, animation } from '../../constants/theme';
 
 interface NeuCardProps {
@@ -39,6 +40,7 @@ export function NeuCard({
   }));
 
   const handlePressIn = () => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     scale.value = withTiming(animation.cardTap.scale, {
       duration: animation.cardTap.duration,
     });

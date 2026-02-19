@@ -11,6 +11,7 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import * as StoreReview from 'expo-store-review';
+import * as Haptics from 'expo-haptics';
 import { NeuCard } from '../../src/components/neumorphic/NeuCard';
 import { NeuToggle } from '../../src/components/neumorphic/NeuToggle';
 import { useRouter } from 'expo-router';
@@ -78,7 +79,10 @@ function ValueBadge({
 }) {
   return (
     <Pressable
-      onPress={onPress}
+      onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress?.();
+      }}
       disabled={disabled}
       style={({ pressed }) => [
         styles.valueBadge,
@@ -111,7 +115,10 @@ function LinkRow({
 }) {
   return (
     <>
-      <Pressable style={styles.row} onPress={onPress}>
+      <Pressable style={styles.row} onPress={() => {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        onPress();
+      }}>
         <Text style={styles.rowLabel}>{label}</Text>
         <Feather name={icon} size={18} color={colors.text.muted} />
       </Pressable>
@@ -353,7 +360,10 @@ export default function SettingsScreen() {
             styles.dangerButton,
             pressed && styles.dangerButtonPressed,
           ]}
-          onPress={handleResetDefaults}
+          onPress={() => {
+            Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+            handleResetDefaults();
+          }}
         >
           <Feather
             name="alert-triangle"
