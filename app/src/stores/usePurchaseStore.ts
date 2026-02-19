@@ -28,7 +28,7 @@ export const usePurchaseStore = create<PurchaseStore>((set) => ({
 
   loadStatus: async () => {
     try {
-      await PurchaseService.configure();
+      await PurchaseService.initialize();
       await PurchaseService.initializeTrial();
       const status = await PurchaseService.getStatus();
       set({

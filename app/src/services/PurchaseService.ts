@@ -1,38 +1,28 @@
 /**
- * PurchaseService — RevenueCat integration for Serial Air.
+ * PurchaseService — StoreKit/Google Play integration via react-native-iap.
  *
  * Handles:
- * - RevenueCat SDK initialization
  * - 7-day free trial (date-based, local)
  * - $1.99 one-time purchase (non-consumable)
  * - Purchase state persistence
+ * - Restore purchases
  *
- * RevenueCat setup:
- * 1. Create project at https://app.revenuecat.com
- * 2. Add iOS + Android apps
- * 3. Create entitlement "pro"
- * 4. Create product "serial_air_pro" ($1.99 non-consumable)
- * 5. Set REVENUECAT_API_KEY below
+ * App Store / Google Play setup:
+ * 1. Create non-consumable product "serial_air_pro" ($1.99)
+ * 2. Product ID must match PRODUCT_ID below
  */
 
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import Purchases, {
-  LOG_LEVEL,
-  PurchasesPackage,
-  CustomerInfo,
-} from 'react-native-purchases';
+import * as IAP from 'react-native-iap';
 
 const TRIAL_START_KEY = 'serial-air:trial-start';
 const PURCHASE_KEY = 'serial-air:purchased';
 const TRIAL_DAYS = 7;
 
-// Replace with your actual RevenueCat API keys
-const REVENUECAT_API_KEY_IOS = 'appl_YOUR_REVENUECAT_IOS_KEY';
-const REVENUECAT_API_KEY_ANDROID = 'goog_YOUR_REVENUECAT_ANDROID_KEY';
-
-export const ENTITLEMENT_ID = 'pro';
 export const PRODUCT_ID = 'serial_air_pro';
+
+const productIds = [PRODUCT_ID];
 
 export interface TrialStatus {
   isTrialActive: boolean;
@@ -42,31 +32,34 @@ export interface TrialStatus {
   hasAccess: boolean;
 }
 
-let isConfigured = false;
+let isInitialized = false;
 
 export class PurchaseService {
   /**
-   * Configure RevenueCat SDK. Call once at app startup.
+   * Initialize IAP connection. Call once at app startup.
    */
-  static async configure(): Promise<void> {
-    if (isConfigured) return;
+  static async initialize(): Promise<void> {
+    if (isInitialized) return;
 
-    const apiKey = Platform.OS === 'ios'
-      ? REVENUECAT_API_KEY_IOS
-      : REVENUECAT_API_KEY_ANDROID;
+    try {
+      await IAP.initConnection();
+      isInitialized = true;
 
-    // Skip configuration if placeholder keys
-    if (apiKey.includes('YOUR_REVENUECAT')) {
-      console.warn('[PurchaseService] Using placeholder API key — RevenueCat disabled');
-      return;
+      if (Platform.OS === 'ios') {
+        await IAP.clearTransactionIOS();
+      }
+    } catch (e) {
+      console.warn('[PurchaseService] IAP init failed:', e);
     }
+  }
 
-    if (__DEV__) {
-      Purchases.setLogLevel(LOG_LEVEL.DEBUG);
-    }
-
-    await Purchases.configure({ apiKey });
-    isConfigured = true;
+  /**
+   * End IAP connection. Call on app shutdown.
+   */
+  static async endConnection(): Promise<void> {
+    if (!isInitialized) return;
+    await IAP.endConnection();
+    isInitialized = false;
   }
 
   /**
@@ -81,7 +74,6 @@ export class PurchaseService {
 
   /**
    * Get current trial/purchase status.
-   * Checks both local trial and RevenueCat entitlements.
    */
   static async getStatus(): Promise<TrialStatus> {
     const [trialStartStr, purchasedStr] = await Promise.all([
@@ -91,11 +83,11 @@ export class PurchaseService {
 
     let isPurchased = purchasedStr === 'true';
 
-    // Also check RevenueCat if configured
-    if (!isPurchased && isConfigured) {
+    // Check store receipts if not purchased locally
+    if (!isPurchased && isInitialized) {
       try {
-        const customerInfo = await Purchases.getCustomerInfo();
-        isPurchased = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
+        const purchases = await IAP.getAvailablePurchases();
+        isPurchased = purchases.some((p) => p.productId === PRODUCT_ID);
         if (isPurchased) {
           await AsyncStorage.setItem(PURCHASE_KEY, 'true');
         }
@@ -126,37 +118,38 @@ export class PurchaseService {
   }
 
   /**
-   * Get the available package for purchase.
+   * Get products from the store.
    */
-  static async getPackage(): Promise<PurchasesPackage | null> {
-    if (!isConfigured) return null;
+  static async getProducts(): Promise<IAP.Product[]> {
+    if (!isInitialized) return [];
     try {
-      const offerings = await Purchases.getOfferings();
-      return offerings.current?.availablePackages[0] ?? null;
+      return await IAP.getProducts({ skus: productIds });
     } catch {
-      return null;
+      return [];
     }
   }
 
   /**
-   * Purchase the pro package.
-   * Returns CustomerInfo on success, null on failure/cancel.
+   * Purchase the pro product.
+   * Returns true on success, false on failure/cancel.
    */
-  static async purchase(): Promise<CustomerInfo | null> {
-    if (!isConfigured) {
-      // Fallback for dev/placeholder: mark purchased locally
+  static async purchase(): Promise<boolean> {
+    if (!isInitialized) {
+      // Dev fallback: mark purchased locally
       await this.setPurchased();
-      return null;
+      return true;
     }
 
-    const pkg = await this.getPackage();
-    if (!pkg) throw new Error('No package available');
-
-    const { customerInfo } = await Purchases.purchasePackage(pkg);
-    if (customerInfo.entitlements.active[ENTITLEMENT_ID]) {
+    try {
+      await IAP.requestPurchase({ sku: PRODUCT_ID });
       await this.setPurchased();
+      return true;
+    } catch (e: any) {
+      if (e?.code === 'E_USER_CANCELLED') {
+        throw { userCancelled: true };
+      }
+      throw e;
     }
-    return customerInfo;
   }
 
   /**
@@ -175,25 +168,24 @@ export class PurchaseService {
   }
 
   /**
-   * Restore purchases via RevenueCat.
+   * Restore purchases from App Store / Google Play.
    */
   static async restorePurchase(): Promise<boolean> {
-    if (isConfigured) {
-      try {
-        const customerInfo = await Purchases.restorePurchases();
-        const isActive = !!customerInfo.entitlements.active[ENTITLEMENT_ID];
-        if (isActive) {
-          await this.setPurchased();
-          return true;
-        }
-        return false;
-      } catch {
-        return false;
-      }
+    if (!isInitialized) {
+      const status = await this.getStatus();
+      return status.isPurchased;
     }
 
-    // Fallback: check local state
-    const status = await this.getStatus();
-    return status.isPurchased;
+    try {
+      const purchases = await IAP.getAvailablePurchases();
+      const found = purchases.some((p) => p.productId === PRODUCT_ID);
+      if (found) {
+        await this.setPurchased();
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
   }
 }
