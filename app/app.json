@@ -6,8 +6,13 @@
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "scheme": "serial-air",
-    "userInterfaceStyle": "automatic",
+    "userInterfaceStyle": "dark",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#1A1A2E"
+    },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.serialair.app",
@@ -20,10 +25,24 @@
       }
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-splash-screen",
+      [
+        "expo-updates",
+        {
+          "username": "serial-air"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "updates": {
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
     }
   }
 }

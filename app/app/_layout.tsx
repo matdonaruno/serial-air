@@ -1,49 +1,62 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import * as SplashScreen from 'expo-splash-screen';
+import { colors } from '../src/constants/theme';
 import { useSettingsStore } from '../src/stores/useSettingsStore';
 import { useDiscoveryStore } from '../src/stores/useDiscoveryStore';
-import { COLORS } from '../src/constants/defaults';
+import { useAppStore } from '../src/stores/useAppStore';
+
+SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const colors = COLORS.dark;
+  const [ready, setReady] = useState(false);
+  const hasOnboarded = useAppStore((s) => s.hasOnboarded);
 
   useEffect(() => {
-    useSettingsStore.getState().loadSettings();
-    useDiscoveryStore.getState().loadRecentConnections();
+    async function prepare() {
+      await useSettingsStore.getState().loadSettings();
+      await useDiscoveryStore.getState().loadRecentConnections();
+      await useAppStore.getState().loadState();
+      setReady(true);
+      await SplashScreen.hideAsync();
+    }
+    prepare();
   }, []);
+
+  if (!ready) return null;
 
   return (
     <>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
-          headerStyle: { backgroundColor: colors.background },
-          headerTintColor: colors.text,
-          headerTitleStyle: { fontWeight: '600' },
-          contentStyle: { backgroundColor: colors.background },
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.bg.primary },
+          animation: 'slide_from_right',
         }}
       >
-        <Stack.Screen
-          name="index"
-          options={{
-            title: 'Serial Air',
-            headerLargeTitle: true,
-          }}
-        />
+        {!hasOnboarded && (
+          <Stack.Screen
+            name="onboarding"
+            options={{ animation: 'fade' }}
+          />
+        )}
+        <Stack.Screen name="(tabs)" />
         <Stack.Screen
           name="monitor"
           options={{
-            title: 'Monitor',
-            headerBackTitle: 'Back',
+            animation: 'slide_from_right',
+            gestureEnabled: true,
           }}
         />
         <Stack.Screen
-          name="settings"
-          options={{
-            title: 'Settings',
-            headerBackTitle: 'Back',
-          }}
+          name="device-settings"
+          options={{ animation: 'slide_from_right' }}
+        />
+        <Stack.Screen
+          name="firmware-update"
+          options={{ animation: 'slide_from_bottom' }}
         />
       </Stack>
     </>
