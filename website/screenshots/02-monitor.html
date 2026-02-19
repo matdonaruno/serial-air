@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=430">
+  <title>Screenshot 2 — Monitor</title>
+  <link rel="stylesheet" href="mockup.css">
+</head>
+<body style="background:#0D0D17;display:flex;flex-direction:column;align-items:center;padding:40px 0;">
+
+  <div class="marketing-header">
+    <h2>Real-time <span class="hl">Terminal</span></h2>
+    <p>Millisecond timestamps, color-coded output</p>
+  </div>
+
+  <div class="phone">
+    <div class="phone-content">
+
+      <!-- Monitor Header -->
+      <div class="monitor-header">
+        <div class="back-btn">&#x2B05;&#xFE0F;</div>
+        <h1 style="font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text);">ESP-SENSOR</h1>
+        <div class="status-badge">
+          <div class="dot"><div class="dot-inner"></div></div>
+          <span class="status-label">Connected</span>
+        </div>
+      </div>
+
+      <!-- Terminal -->
+      <div class="terminal-container" style="margin-bottom:12px;">
+        <div class="terminal-meta">
+          <span>/dev/ttyUSB0</span>
+          <span>115200 BAUD</span>
+        </div>
+
+        <div class="log-line">
+          <span class="log-ts">[14:23:01.042]</span>
+          <span class="log-text">Boot complete</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:01.187]</span>
+          <span class="log-text ok">WiFi connected &mdash; 192.168.1.42</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:01.204]</span>
+          <span class="log-text">WirelessSerial v1.0.0 ready</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:05.331]</span>
+          <span class="log-text">Temperature: 24.3&deg;C</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:05.332]</span>
+          <span class="log-text">Humidity: 52.1%</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:05.340]</span>
+          <span class="log-text">Heap: 34,208 bytes</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:10.518]</span>
+          <span class="log-text warn">Low signal: -78 dBm</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:15.002]</span>
+          <span class="log-text err">Sensor timeout!</span>
+        </div>
+        <div class="log-line">
+          <span class="log-ts">[14:23:20.117]</span>
+          <span class="log-text">Temperature: 24.4&deg;C</span>
+        </div>
+
+        <div class="cursor-line">
+          <span class="cursor-prompt">&gt; &#x2588;</span>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="actions-row">
+        <div class="action-btn">
+          <div class="action-circle">&#x1F5D1;</div>
+          <span class="action-label">Clear</span>
+        </div>
+        <div class="action-btn">
+          <div class="action-circle">&#x1F4E4;</div>
+          <span class="action-label">Export</span>
+        </div>
+        <div class="action-btn">
+          <div class="action-circle">&#x23F8;</div>
+          <span class="action-label">Pause</span>
+        </div>
+        <div class="action-btn">
+          <div class="action-circle">&#x1F504;</div>
+          <span class="action-label">Reset</span>
+        </div>
+      </div>
+
+      <!-- Command Input -->
+      <div class="input-row">
+        <div class="cmd-input">Send Command...</div>
+        <div class="send-btn">&#x27A4;</div>
+      </div>
+
+      <div class="home-indicator"></div>
+
+    </div>
+  </div>
+
+</body></html>

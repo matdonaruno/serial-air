@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=430">
+  <title>Screenshot 3 — Code Generator</title>
+  <link rel="stylesheet" href="mockup.css">
+</head>
+<body style="background:#0D0D17;display:flex;flex-direction:column;align-items:center;padding:40px 0;">
+
+  <div class="marketing-header">
+    <h2>Built-in <span class="hl">Code Generator</span></h2>
+    <p>Ready-to-upload Arduino sketch in seconds</p>
+  </div>
+
+  <div class="phone">
+    <div class="phone-content">
+
+      <!-- Header -->
+      <div class="monitor-header">
+        <div class="back-btn">&#x2B05;&#xFE0F;</div>
+        <h1 style="font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--text);">Test Code</h1>
+        <div style="width:40px;"></div>
+      </div>
+
+      <!-- Intro text -->
+      <p style="font-family:var(--font);font-size:14px;color:var(--text-sec);line-height:1.5;margin-bottom:16px;">
+        Generate a complete Arduino sketch to test your wireless serial connection. Select your board, enter WiFi credentials, and copy the code.
+      </p>
+
+      <!-- Board Selection -->
+      <div class="board-row">
+        <div class="board-btn active">
+          <span>&#x1F4DF;</span> ESP8266
+        </div>
+        <div class="board-btn">
+          <span>&#x1F4DF;</span> ESP32
+        </div>
+      </div>
+
+      <!-- WiFi Inputs -->
+      <div class="neu-card" style="margin-bottom:16px;">
+        <div style="font-family:var(--font);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:12px;">WiFi Credentials</div>
+        <div class="neu-input" style="margin-bottom:10px;">
+          <span class="icon">&#x1F4F6;</span>
+          <span style="font-family:var(--font);font-size:16px;color:var(--text);">MyNetwork</span>
+        </div>
+        <div class="neu-input" style="margin-bottom:0;">
+          <span class="icon">&#x1F512;</span>
+          <span style="font-family:var(--font);font-size:16px;color:var(--text);letter-spacing:3px;">&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;&#x2022;</span>
+        </div>
+      </div>
+
+      <!-- Security note -->
+      <p style="font-family:var(--font);font-size:11px;color:var(--text-muted);text-align:center;margin-bottom:16px;">
+        &#x1F512; Credentials stay on your device &mdash; never sent to any server
+      </p>
+
+      <!-- Generated Code Section -->
+      <div class="sec-header">Generated Code</div>
+
+      <div class="code-preview">
+<span style="color:var(--text-muted);">#include</span> <span style="color:var(--accent);">&lt;ESP8266WiFi.h&gt;</span>
+<span style="color:var(--text-muted);">#include</span> <span style="color:var(--accent);">&lt;WirelessSerial.h&gt;</span>
+
+<span style="color:var(--text-muted);">const char*</span> ssid = <span style="color:var(--green);">"MyNetwork"</span>;
+<span style="color:var(--text-muted);">const char*</span> pass = <span style="color:var(--green);">"********"</span>;
+
+WirelessSerial SerialAir;
+
+<span style="color:var(--blue);">void</span> <span style="color:var(--text);">setup</span>() {
+  Serial.begin(<span style="color:var(--accent);">115200</span>);
+  WiFi.begin(ssid, pass);
+  <span style="color:var(--text-muted);">// Wait for connection...</span>
+  SerialAir.begin(<span style="color:var(--accent);">"esp-test"</span>);
+}
+
+<span style="color:var(--blue);">void</span> <span style="color:var(--text);">loop</span>() {
+  SerialAir.println(<span style="color:var(--green);">"Hello!"</span>);
+  delay(<span style="color:var(--accent);">1000</span>);
+}
+      </div>
+
+      <!-- Copy Button -->
+      <div class="cta-btn" style="margin-bottom:16px;">
+        &#x1F4CB; Copy to Clipboard
+      </div>
+
+      <!-- Next Steps -->
+      <div class="neu-card" style="padding:16px;">
+        <div style="font-family:var(--font);font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px;">&#x1F4A1; Next Steps</div>
+        <div style="font-family:var(--font);font-size:13px;color:var(--text-sec);line-height:1.8;">
+          1. Open Arduino IDE<br>
+          2. Install WirelessSerial library<br>
+          3. Paste the generated code<br>
+          4. Upload to your ESP board<br>
+          5. Return here to connect
+        </div>
+      </div>
+
+      <div class="home-indicator"></div>
+
+    </div>
+  </div>
+
+</body></html>

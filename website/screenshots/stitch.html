@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Serial Air — App Store Stitch Preview</title>
+  <link rel="stylesheet" href="mockup.css">
+  <style>
+    body {
+      background: linear-gradient(180deg, #0D0D17 0%, #1A1A2E 40%, #1A1A2E 60%, #0D0D17 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 60px 20px;
+      min-height: 100vh;
+    }
+
+    .hero-text {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .hero-text .app-icon {
+      width: 80px;
+      height: 80px;
+      border-radius: 20px;
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 40px;
+      margin: 0 auto 16px;
+      box-shadow: 0 8px 24px rgba(255,107,53,0.3);
+    }
+
+    .hero-text h1 {
+      font-family: var(--font);
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+
+    .hero-text h1 .hl { color: var(--accent); }
+
+    .hero-text p {
+      font-family: var(--font);
+      font-size: 18px;
+      color: var(--text-sec);
+    }
+
+    .phones-row {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+      overflow-x: auto;
+      max-width: 100%;
+      padding: 0 20px;
+    }
+
+    .phones-row .phone {
+      transform: scale(0.7);
+      transform-origin: top center;
+      flex-shrink: 0;
+    }
+
+    .caption {
+      text-align: center;
+      margin-top: -160px;
+      margin-bottom: 40px;
+    }
+
+    .caption h3 {
+      font-family: var(--font);
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--accent);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .caption p {
+      font-family: var(--font);
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .badges-row {
+      display: flex;
+      gap: 16px;
+      margin-top: 40px;
+    }
+
+    .store-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 24px;
+      font-family: var(--font);
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .store-badge .emoji { font-size: 20px; }
+  </style>
+</head>
+<body>
+
+  <!-- Hero -->
+  <div class="hero-text">
+    <div class="app-icon">📡</div>
+    <h1>Serial <span class="hl">Air</span></h1>
+    <p>Wireless Serial Monitor for Arduino & ESP</p>
+  </div>
+
+  <!-- 3 phones side by side -->
+  <div class="phones-row">
+
+    <!-- Phone 1: Home -->
+    <div style="text-align:center;">
+      <div class="phone">
+        <div class="phone-content">
+          <div class="app-header">
+            <h1>SERIAL AIR</h1>
+            <div class="settings-btn">⚙️</div>
+          </div>
+          <div class="sec-header">DISCOVERED</div>
+          <div class="neu-card with-accent">
+            <div class="device-row">
+              <div class="device-icon online">🔲</div>
+              <div class="device-info">
+                <div class="device-name">esp-sensor</div>
+                <div class="device-status">
+                  <div class="status-dot green"></div>
+                  <span class="device-addr">192.168.1.42:23</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="neu-card">
+            <div class="device-row">
+              <div class="device-icon offline">🔲</div>
+              <div class="device-info">
+                <div class="device-name offline-name">esp-garden</div>
+                <div class="device-status">
+                  <div class="status-dot gray"></div>
+                  <span class="device-addr">Offline · 2h ago</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="sec-header">MANUAL CONNECTION</div>
+          <div class="neu-card">
+            <div class="neu-input"><span class="icon">🌐</span><span class="placeholder">IP Address</span></div>
+            <div class="neu-input"><span class="icon">#</span><span class="placeholder">Port (23)</span></div>
+          </div>
+          <div class="connect-btn-wrapper"><div class="connect-btn">📡</div></div>
+          <div style="flex:1;"></div>
+          <div class="tab-bar">
+            <div class="tab-item"><span class="tab-icon active">🏠</span><span class="tab-label active">Home</span></div>
+            <div class="tab-item"><span class="tab-icon">💻</span><span class="tab-label">Terminal</span></div>
+            <div class="tab-item"><span class="tab-icon">📊</span><span class="tab-label">Analytics</span></div>
+            <div class="tab-item"><span class="tab-icon">⚙️</span><span class="tab-label">Settings</span></div>
+          </div>
+          <div class="home-indicator"></div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1px;">AUTO DISCOVERY</div>
+        <div style="font-family:var(--font);font-size:12px;color:var(--text-muted);">Tap to connect</div>
+      </div>
+    </div>
+
+    <!-- Phone 2: Monitor -->
+    <div style="text-align:center;">
+      <div class="phone">
+        <div class="phone-content">
+          <div class="monitor-header">
+            <div class="back-btn">←</div>
+            <h1 style="font-family:var(--font);font-size:14px;font-weight:700;letter-spacing:2.5px;color:var(--text);">ESP-SENSOR</h1>
+            <div class="status-badge">
+              <div class="dot"><div class="dot-inner"></div></div>
+              <span class="status-label">CONNECTED</span>
+            </div>
+          </div>
+          <div class="terminal-container" style="flex:1;">
+            <div class="terminal-meta">
+              <span>/dev/ttyUSB0</span>
+              <span>115200 BAUD</span>
+            </div>
+            <div class="log-line"><span class="log-ts">[08:32:01.234]</span><span class="log-text">Boot complete</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:01.567]</span><span class="log-text ok">WiFi connected — 192.168.1.42</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:01.890]</span><span class="log-text">WirelessSerial v1.0.0 ready</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:03.012]</span><span class="log-text">Temperature: 24.3°C</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:03.015]</span><span class="log-text">Humidity: 52.1%</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:03.018]</span><span class="log-text">Heap: 34,208 bytes</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:05.001]</span><span class="log-text warn">Low signal: -78 dBm</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:06.003]</span><span class="log-text err">Sensor timeout!</span></div>
+            <div class="log-line"><span class="log-ts">[08:32:07.003]</span><span class="log-text">Temperature: 24.4°C</span></div>
+            <div class="cursor-line"><span class="cursor-prompt">&gt; █</span></div>
+          </div>
+          <div class="actions-row">
+            <div class="action-btn"><div class="action-circle">🗑</div><span class="action-label">Clear</span></div>
+            <div class="action-btn"><div class="action-circle">📤</div><span class="action-label">Export</span></div>
+            <div class="action-btn"><div class="action-circle">⏸</div><span class="action-label">Pause</span></div>
+            <div class="action-btn"><div class="action-circle">🔄</div><span class="action-label">Reset</span></div>
+          </div>
+          <div class="input-row">
+            <div class="cmd-input">Send Command...</div>
+            <div class="send-btn">➤</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1px;">REAL-TIME TERMINAL</div>
+        <div style="font-family:var(--font);font-size:12px;color:var(--text-muted);">Color-coded output</div>
+      </div>
+    </div>
+
+    <!-- Phone 3: Paywall -->
+    <div style="text-align:center;">
+      <div class="phone">
+        <div class="phone-content" style="align-items:center;">
+          <div style="align-self:flex-end;"><div class="back-btn" style="font-size:14px;">✕</div></div>
+          <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%;">
+            <div class="paywall-icon">⚡</div>
+            <div class="paywall-title">Unlock Serial Air</div>
+            <div class="paywall-sub">One-time purchase. Yours forever.</div>
+            <div class="trial-badge">⏱ 7 days left in trial</div>
+            <div class="neu-card" style="width:100%;">
+              <ul class="feature-list">
+                <li><div class="feat-icon">📶</div> Unlimited connections</li>
+                <li><div class="feat-icon">⏱</div> No time restrictions</li>
+                <li><div class="feat-icon">🔄</div> All future updates</li>
+                <li><div class="feat-icon">🛡</div> No ads, no tracking</li>
+                <li><div class="feat-icon">💻</div> Full terminal features</li>
+                <li><div class="feat-icon">📥</div> Log export &amp; sharing</li>
+              </ul>
+            </div>
+            <div class="price-big">$1.99</div>
+            <div class="price-label">One-time purchase</div>
+          </div>
+          <div style="width:100%;">
+            <div class="cta-btn">Purchase — $1.99 🔒</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-family:var(--font);font-size:13px;font-weight:600;color:var(--accent);letter-spacing:1px;">SIMPLE PRICING</div>
+        <div style="font-family:var(--font);font-size:12px;color:var(--text-muted);">No subscriptions</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Store badges -->
+  <div class="badges-row">
+    <div class="store-badge"><span class="emoji"></span> App Store</div>
+    <div class="store-badge"><span class="emoji">▶️</span> Google Play</div>
+    <div class="store-badge"><span class="emoji">📦</span> GitHub</div>
+  </div>
+
+</body>
+</html>
