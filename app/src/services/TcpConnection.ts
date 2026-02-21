@@ -55,8 +55,7 @@ export class TcpConnection {
         {
           host: this.options.host,
           port: this.options.port,
-          timeout: this.options.timeout,
-        },
+        } as any,
         () => {
           this.reconnectAttempt = 0;
           this.events.onConnect();

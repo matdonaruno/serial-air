@@ -31,7 +31,7 @@
     "react-native-screens": "~4.4.0",
     "react-native-svg": "~15.8.0",
     "react-native-tcp-socket": "^6.2.0",
-    "react-native-zeroconf": "^0.13.9",
+    "react-native-zeroconf": "^0.14.0",
     "@expo/vector-icons": "^14.0.0",
     "@react-navigation/bottom-tabs": "^7.0.0",
     "@react-navigation/native": "^7.0.0",

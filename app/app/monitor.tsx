@@ -95,11 +95,11 @@ function BlinkingCursor() {
       withSequence(
         withTiming(0, {
           duration: animation.statusBlink.duration,
-          easing: Easing.step0,
+          easing: Easing.steps(1, true),
         }),
         withTiming(1, {
           duration: animation.statusBlink.duration,
-          easing: Easing.step0,
+          easing: Easing.steps(1, true),
         }),
       ),
       -1,
