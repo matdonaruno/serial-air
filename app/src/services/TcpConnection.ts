@@ -1,11 +1,12 @@
 import TcpSocket from 'react-native-tcp-socket';
 import { TcpConnectionOptions, TcpConnectionEvents } from '../types';
+import { Connection } from './Connection';
 import {
   CONNECTION_TIMEOUT_MS,
   RECONNECT_INTERVAL_MS,
 } from '../constants/defaults';
 
-export class TcpConnection {
+export class TcpConnection implements Connection {
   private socket: ReturnType<typeof TcpSocket.createConnection> | null = null;
   private options: Required<TcpConnectionOptions>;
   private events: TcpConnectionEvents;

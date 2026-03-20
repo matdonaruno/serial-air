@@ -25,6 +25,7 @@ import {
   borderRadius,
   layout,
 } from '../../src/constants/theme';
+import { t } from '../../src/i18n';
 
 // --- Cycle helpers ---
 
@@ -175,12 +176,12 @@ export default function SettingsScreen() {
 
   const handleResetDefaults = useCallback(() => {
     Alert.alert(
-      'Reset to Factory Defaults',
-      'This will reset all settings to their default values. This action cannot be undone.',
+      t('settings_reset'),
+      t('settings_reset_confirm'),
       [
-        { text: 'Cancel', style: 'cancel' },
+        { text: t('cancel'), style: 'cancel' },
         {
-          text: 'Reset',
+          text: t('settings_reset_button'),
           style: 'destructive',
           onPress: resetSettings,
         },
@@ -212,7 +213,7 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.screen}>
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>SETTINGS</Text>
+        <Text style={styles.headerTitle}>{t('settings_title')}</Text>
       </View>
 
       <ScrollView
@@ -221,35 +222,35 @@ export default function SettingsScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* DISPLAY Section */}
-        <Text style={styles.sectionHeader}>DISPLAY</Text>
+        <Text style={styles.sectionHeader}>{t('settings_display')}</Text>
         <NeuCard style={styles.card}>
-          <SettingRow label="Font Size">
+          <SettingRow label={t('settings_font_size')}>
             <ValueBadge value={`${fontSize}px`} onPress={handleCycleFontSize} />
           </SettingRow>
 
-          <SettingRow label="Timestamp">
+          <SettingRow label={t('settings_timestamp')}>
             <NeuToggle
               value={showTimestamp}
               onValueChange={(v) => updateSetting('showTimestamp', v)}
             />
           </SettingRow>
 
-          <SettingRow label="Auto-scroll">
+          <SettingRow label={t('settings_auto_scroll')}>
             <NeuToggle
               value={autoScroll}
               onValueChange={(v) => updateSetting('autoScroll', v)}
             />
           </SettingRow>
 
-          <SettingRow label="Max Lines">
+          <SettingRow label={t('settings_max_lines')}>
             <ValueBadge
               value={formatLines(maxLines)}
               onPress={handleCycleMaxLines}
             />
           </SettingRow>
 
-          <SettingRow label="Theme" isLast>
-            <ValueBadge value="Dark" disabled />
+          <SettingRow label={t('settings_theme')} isLast>
+            <ValueBadge value={t('settings_theme_dark')} disabled />
           </SettingRow>
         </NeuCard>
 
@@ -274,12 +275,19 @@ export default function SettingsScreen() {
             />
           </SettingRow>
 
-          <SettingRow label="Timeout" isLast>
+          <SettingRow label="Timeout">
             <ValueBadge
               value={formatMs(connectionTimeout)}
               onPress={handleCycleTimeout}
             />
           </SettingRow>
+
+          <LinkRow
+            label="Trusted Devices"
+            icon="shield"
+            onPress={() => router.push('/trusted-devices')}
+            isLast
+          />
         </NeuCard>
 
         {/* PURCHASE Section */}

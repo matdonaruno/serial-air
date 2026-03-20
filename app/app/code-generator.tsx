@@ -14,6 +14,7 @@ import { Feather } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
+import { t } from '../src/i18n';
 
 type BoardType = 'esp8266' | 'esp32';
 
@@ -122,7 +123,7 @@ export default function CodeGeneratorScreen() {
             <Feather name="arrow-left" size={20} color={colors.text.secondary} />
           </View>
         </Pressable>
-        <Text style={styles.headerTitle}>TEST CODE</Text>
+        <Text style={styles.headerTitle}>{t('codegen_title')}</Text>
         <View style={{ width: 36 }} />
       </View>
 
@@ -133,11 +134,11 @@ export default function CodeGeneratorScreen() {
       >
         {/* Intro */}
         <Text style={styles.introText}>
-          Generate a test sketch for your board. Enter your WiFi credentials, copy the code, and paste into Arduino IDE.
+          {t('codegen_intro')}
         </Text>
 
         {/* Board Selection */}
-        <Text style={styles.sectionLabel}>SELECT BOARD</Text>
+        <Text style={styles.sectionLabel}>{t('codegen_select_board')}</Text>
         <View style={styles.boardRow}>
           <Pressable
             style={[
@@ -191,13 +192,13 @@ export default function CodeGeneratorScreen() {
         </View>
 
         {/* WiFi Credentials */}
-        <Text style={styles.sectionLabel}>WIFI CREDENTIALS</Text>
+        <Text style={styles.sectionLabel}>{t('codegen_wifi_creds')}</Text>
         <View style={styles.inputCard}>
           <View style={styles.inputRow}>
             <Feather name="wifi" size={18} color={colors.text.muted} style={styles.inputIcon} />
             <TextInput
               style={styles.textInput}
-              placeholder="WiFi SSID (network name)"
+              placeholder={t('codegen_ssid_placeholder')}
               placeholderTextColor={colors.text.muted}
               value={ssid}
               onChangeText={setSsid}
@@ -210,7 +211,7 @@ export default function CodeGeneratorScreen() {
             <Feather name="lock" size={18} color={colors.text.muted} style={styles.inputIcon} />
             <TextInput
               style={styles.textInput}
-              placeholder="WiFi Password"
+              placeholder={t('codegen_password_placeholder')}
               placeholderTextColor={colors.text.muted}
               value={password}
               onChangeText={setPassword}
@@ -224,12 +225,12 @@ export default function CodeGeneratorScreen() {
         <View style={styles.infoBox}>
           <Feather name="shield" size={14} color={colors.text.muted} />
           <Text style={styles.infoText}>
-            Credentials are only used to generate the sketch. Nothing is stored or sent anywhere.
+            {t('codegen_creds_info')}
           </Text>
         </View>
 
         {/* Code Preview */}
-        <Text style={styles.sectionLabel}>GENERATED CODE</Text>
+        <Text style={styles.sectionLabel}>{t('codegen_generated')}</Text>
         <View style={styles.codeCard}>
           <ScrollView
             horizontal
@@ -248,13 +249,13 @@ export default function CodeGeneratorScreen() {
             color={colors.white}
           />
           <Text style={styles.copyButtonText}>
-            {copied ? 'Copied!' : 'Copy to Clipboard'}
+            {copied ? t('codegen_copied') : t('codegen_copy')}
           </Text>
         </Pressable>
 
         {/* Instructions */}
         <View style={styles.stepsCard}>
-          <Text style={styles.stepsTitle}>Next Steps</Text>
+          <Text style={styles.stepsTitle}>{t('codegen_next_steps')}</Text>
           <StepItem number="1" text="Open Arduino IDE" />
           <StepItem number="2" text="Paste the code into a new sketch" />
           <StepItem

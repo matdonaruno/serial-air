@@ -25,7 +25,6 @@ function TabIcon({
         size={22}
         color={focused ? colors.accent.primary : colors.text.muted}
       />
-      {focused && <View style={styles.activeDot} />}
     </View>
   );
 }
@@ -85,9 +84,9 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.bg.primary,
     borderTopWidth: 0,
-    height: 80,
-    paddingBottom: 20,
-    paddingTop: 8,
+    height: 96,
+    paddingBottom: 28,
+    paddingTop: 12,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -10 },
     shadowOpacity: 0.2,

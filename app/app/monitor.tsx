@@ -8,7 +8,12 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
+  Keyboard,
+  useWindowDimensions,
 } from 'react-native';
+import * as Clipboard from 'expo-clipboard';
+import * as Haptics from 'expo-haptics';
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
@@ -16,6 +21,8 @@ import Animated, {
   withTiming,
   withSequence,
   Easing,
+  FadeIn,
+  FadeOut,
 } from 'react-native-reanimated';
 import { Feather } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -36,10 +43,22 @@ import {
   neuShadow,
 } from '../src/constants/theme';
 import { LogLine } from '../src/types';
+import { t } from '../src/i18n';
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+function formatUptime(connectedAt: Date | null): string {
+  if (!connectedAt) return '';
+  const diffMs = new Date().getTime() - new Date(connectedAt).getTime();
+  const totalSecs = Math.floor(diffMs / 1000);
+  const hrs = Math.floor(totalSecs / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+}
 
 function getLineColor(text: string): string {
   const lower = text.toLowerCase();
@@ -54,7 +73,6 @@ function getLineColor(text: string): string {
 // Sub-components
 // ---------------------------------------------------------------------------
 
-/** Pulsing green dot for connected status */
 function StatusDot() {
   const opacity = useSharedValue(1);
 
@@ -86,7 +104,6 @@ function StatusDot() {
   );
 }
 
-/** Blinking cursor at the bottom of the terminal */
 function BlinkingCursor() {
   const opacity = useSharedValue(1);
 
@@ -125,17 +142,35 @@ function BlinkingCursor() {
 // Log line renderer
 // ---------------------------------------------------------------------------
 
-const LogLineRow = React.memo(({ item }: { item: LogLine }) => {
-  const lineColor = getLineColor(item.text);
-  return (
-    <View style={styles.logLine}>
-      <Text style={styles.logTimestamp}>{formatTimestamp(item.timestamp)}</Text>
-      <Text style={[styles.logText, { color: lineColor }]} numberOfLines={4}>
-        {item.text}
-      </Text>
-    </View>
-  );
-});
+const LogLineRow = React.memo(
+  ({ item, showTimestamp }: { item: LogLine; showTimestamp: boolean }) => {
+    const lineColor = getLineColor(item.text);
+
+    const handleLongPress = useCallback(async () => {
+      const copyText = showTimestamp
+        ? `${formatTimestamp(item.timestamp)} ${item.text}`
+        : item.text;
+      await Clipboard.setStringAsync(copyText);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }, [item, showTimestamp]);
+
+    return (
+      <Pressable onLongPress={handleLongPress} style={styles.logLine}>
+        {showTimestamp && (
+          <Text style={styles.logTimestamp}>
+            {formatTimestamp(item.timestamp)}
+          </Text>
+        )}
+        <Text
+          style={[styles.logText, { color: lineColor }]}
+          selectable={true}
+        >
+          {item.text}
+        </Text>
+      </Pressable>
+    );
+  },
+);
 
 // ---------------------------------------------------------------------------
 // Main Screen
@@ -145,12 +180,21 @@ export default function MonitorScreen() {
   const router = useRouter();
   const flatListRef = useRef<FlatList>(null);
   const [commandText, setCommandText] = useState('');
+  const [showOverlay, setShowOverlay] = useState(false);
+  const overlayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const { width, height } = useWindowDimensions();
+  const isLandscape = width > height;
 
   // --- stores ---
   const status = useConnectionStore((s) => s.status);
   const currentDevice = useConnectionStore((s) => s.currentDevice);
   const sendCommand = useConnectionStore((s) => s.sendCommand);
   const disconnect = useConnectionStore((s) => s.disconnect);
+  const connectionType = useConnectionStore((s) => s.connectionType);
+  const connectedAt = useConnectionStore((s) => s.connectedAt);
+
+  const [uptimeStr, setUptimeStr] = useState('');
 
   const lines = useLogStore((s) => s.lines);
   const isPaused = useLogStore((s) => s.isPaused);
@@ -160,6 +204,7 @@ export default function MonitorScreen() {
   const getFilteredLines = useLogStore((s) => s.getFilteredLines);
 
   const autoScroll = useSettingsStore((s) => s.autoScroll);
+  const showTimestamp = useSettingsStore((s) => s.showTimestamp);
 
   const filteredLines = useMemo(() => getFilteredLines(), [lines, filter]);
 
@@ -179,16 +224,71 @@ export default function MonitorScreen() {
     };
   }, []);
 
+  // --- uptime counter ---
+  useEffect(() => {
+    if (status !== 'connected' || !connectedAt) {
+      setUptimeStr('');
+      return;
+    }
+    const interval = setInterval(() => {
+      setUptimeStr(formatUptime(connectedAt));
+    }, 1000);
+    setUptimeStr(formatUptime(connectedAt));
+    return () => clearInterval(interval);
+  }, [status, connectedAt]);
+
+  // --- hide overlay after timeout ---
+  const showOverlayWithTimer = useCallback(() => {
+    setShowOverlay(true);
+    if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+    overlayTimerRef.current = setTimeout(() => {
+      setShowOverlay(false);
+    }, 4000);
+  }, []);
+
+  // --- dismiss keyboard on tap ---
+  const handleTerminalPress = useCallback(() => {
+    Keyboard.dismiss();
+    if (isLandscape) {
+      if (showOverlay) {
+        setShowOverlay(false);
+        if (overlayTimerRef.current) clearTimeout(overlayTimerRef.current);
+      } else {
+        showOverlayWithTimer();
+      }
+    }
+  }, [isLandscape, showOverlay, showOverlayWithTimer]);
+
+  // --- derived (needed before handlers) ---
+  const isConnected = status === 'connected';
+
   // --- handlers ---
   const handleBack = useCallback(() => {
-    disconnect();
-    router.back();
-  }, [disconnect, router]);
+    if (isConnected) {
+      Alert.alert(
+        t('monitor_disconnect_title'),
+        t('monitor_disconnect_msg'),
+        [
+          { text: t('cancel'), style: 'cancel' },
+          {
+            text: t('monitor_disconnect_button'),
+            style: 'destructive',
+            onPress: () => {
+              disconnect();
+              router.back();
+            },
+          },
+        ],
+      );
+    } else {
+      router.back();
+    }
+  }, [disconnect, router, isConnected]);
 
   const handleClear = useCallback(() => {
-    Alert.alert('Clear Logs', 'Are you sure you want to clear all logs?', [
-      { text: 'Cancel', style: 'cancel' },
-      { text: 'Clear', style: 'destructive', onPress: () => clear() },
+    Alert.alert(t('monitor_clear_title'), t('monitor_clear_msg'), [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('monitor_clear'), style: 'destructive', onPress: () => clear() },
     ]);
   }, [clear]);
 
@@ -196,40 +296,26 @@ export default function MonitorScreen() {
     try {
       await exportLogToText(filteredLines);
     } catch {
-      Alert.alert('Export Error', 'Failed to export log file.');
+      Alert.alert(t('monitor_export_error'), t('monitor_export_error_msg'));
     }
   }, [filteredLines]);
-
-  const handleReset = useCallback(() => {
-    if (currentDevice) {
-      disconnect();
-      // Small delay to allow socket cleanup before reconnecting
-      setTimeout(() => {
-        if (currentDevice) {
-          useConnectionStore
-            .getState()
-            .connect(currentDevice.host, currentDevice.port, currentDevice.name);
-        }
-      }, 300);
-    }
-  }, [currentDevice, disconnect]);
 
   const handleSend = useCallback(() => {
     const trimmed = commandText.trim();
     if (!trimmed) return;
     sendCommand(trimmed);
     setCommandText('');
+    Keyboard.dismiss();
   }, [commandText, sendCommand]);
 
   // --- derived ---
-  const isConnected = status === 'connected';
   const statusLabel = status === 'connected'
-    ? 'CONNECTED'
+    ? t('monitor_connected')
     : status === 'connecting'
-    ? 'CONNECTING'
+    ? t('monitor_connecting')
     : status === 'reconnecting'
-    ? 'RECONNECTING'
-    : 'DISCONNECTED';
+    ? t('monitor_reconnecting')
+    : t('monitor_disconnected');
   const statusColor = status === 'connected'
     ? colors.status.connected
     : status === 'connecting' || status === 'reconnecting'
@@ -238,115 +324,213 @@ export default function MonitorScreen() {
 
   // --- render ---
   const renderLogLine = useCallback(
-    ({ item }: { item: LogLine }) => <LogLineRow item={item} />,
-    [],
+    ({ item }: { item: LogLine }) => (
+      <LogLineRow item={item} showTimestamp={showTimestamp} />
+    ),
+    [showTimestamp],
   );
 
   const keyExtractor = useCallback((item: LogLine) => String(item.id), []);
 
-  return (
-    <SafeAreaView style={styles.safeArea}>
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
-        {/* ============================================================ */}
-        {/* Header                                                        */}
-        {/* ============================================================ */}
-        <View style={styles.header}>
-          <NeuButton icon="arrow-left" onPress={handleBack} size={layout.actionButtonSize} />
+  // --- action buttons (shared between portrait and overlay) ---
+  const actionButtons = (
+    <>
+      <NeuButton
+        icon="trash-2"
+        label={isLandscape ? undefined : t('monitor_clear')}
+        onPress={handleClear}
+        size={isLandscape ? 36 : layout.actionButtonSize}
+      />
+      <NeuButton
+        icon="share"
+        label={isLandscape ? undefined : t('monitor_export')}
+        onPress={handleExport}
+        size={isLandscape ? 36 : layout.actionButtonSize}
+      />
+      <NeuButton
+        icon={isPaused ? 'play' : 'pause'}
+        label={isLandscape ? undefined : (isPaused ? t('monitor_resume') : t('monitor_pause'))}
+        onPress={togglePause}
+        active={isPaused}
+        size={isLandscape ? 36 : layout.actionButtonSize}
+      />
+      <NeuButton
+        icon="clock"
+        label={isLandscape ? undefined : (showTimestamp ? t('monitor_time') : t('monitor_no_time'))}
+        onPress={() =>
+          useSettingsStore.getState().updateSetting('showTimestamp', !showTimestamp)
+        }
+        active={showTimestamp}
+        size={isLandscape ? 36 : layout.actionButtonSize}
+      />
+      <NeuButton
+        icon={autoScroll ? 'chevrons-down' : 'minus'}
+        label={isLandscape ? undefined : (autoScroll ? t('monitor_auto') : t('monitor_manual'))}
+        onPress={() =>
+          useSettingsStore.getState().updateSetting('autoScroll', !autoScroll)
+        }
+        active={autoScroll}
+        size={isLandscape ? 36 : layout.actionButtonSize}
+      />
+    </>
+  );
 
-          <Text style={styles.headerTitle}>
-            {currentDevice?.name ?? 'ESP-SERIAL'}
-          </Text>
-
-          <View style={styles.statusBadge}>
-            {isConnected && <StatusDot />}
-            <Text style={[styles.statusText, { color: statusColor }]}>
-              {statusLabel}
+  // =====================================================================
+  // LANDSCAPE: fullscreen log + tap overlay
+  // =====================================================================
+  if (isLandscape) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <Pressable style={styles.flex} onPress={handleTerminalPress}>
+          {/* Status indicator (always visible, minimal) */}
+          <View style={styles.landscapeStatusBar}>
+            <View style={styles.statusBadge}>
+              {isConnected && <StatusDot />}
+              <Text style={[styles.statusText, { color: statusColor }]}>
+                {statusLabel}
+              </Text>
+            </View>
+            <Text style={styles.landscapeLineCount}>
+              {t('monitor_lines')(filteredLines.length)}
             </Text>
           </View>
-        </View>
 
-        {/* ============================================================ */}
-        {/* Terminal Area                                                  */}
-        {/* ============================================================ */}
-        <NeuContainer style={styles.terminalContainer}>
-          {/* Meta bar */}
-          <View style={styles.metaBar}>
-            <Text style={styles.metaText}>/dev/ttyUSB0</Text>
-            <Text style={styles.metaText}>115200 BAUD</Text>
-          </View>
-
-          {/* Log viewer */}
+          {/* Full screen log */}
           <FlatList
             ref={flatListRef}
             data={filteredLines}
             renderItem={renderLogLine}
             keyExtractor={keyExtractor}
             style={styles.logList}
-            contentContainerStyle={styles.logListContent}
+            contentContainerStyle={styles.logListContentLandscape}
             showsVerticalScrollIndicator={false}
             ListFooterComponent={<BlinkingCursor />}
           />
-        </NeuContainer>
 
-        {/* ============================================================ */}
-        {/* Action Buttons                                                */}
-        {/* ============================================================ */}
-        <View style={styles.actionsRow}>
-          <NeuButton
-            icon="trash-2"
-            label="Clear"
-            onPress={handleClear}
-            size={layout.actionButtonSize}
-          />
-          <NeuButton
-            icon="share"
-            label="Export"
-            onPress={handleExport}
-            size={layout.actionButtonSize}
-          />
-          <NeuButton
-            icon={isPaused ? 'play' : 'pause'}
-            label={isPaused ? 'Resume' : 'Pause'}
-            onPress={togglePause}
-            active={isPaused}
-            size={layout.actionButtonSize}
-          />
-          <NeuButton
-            icon="refresh-cw"
-            label="Reset"
-            onPress={handleReset}
-            size={layout.actionButtonSize}
-          />
-        </View>
+          {/* Overlay: actions + command input */}
+          {showOverlay && (
+            <Animated.View
+              entering={FadeIn.duration(200)}
+              exiting={FadeOut.duration(200)}
+              style={styles.landscapeOverlay}
+            >
+              {/* Back button */}
+              <View style={styles.landscapeOverlayTop}>
+                <NeuButton icon="arrow-left" onPress={handleBack} size={36} />
+                <View style={styles.landscapeActions}>
+                  {actionButtons}
+                </View>
+              </View>
 
-        {/* ============================================================ */}
-        {/* Command Input                                                 */}
-        {/* ============================================================ */}
-        <View style={styles.inputRow}>
-          <NeuInput
-            icon="terminal"
-            placeholder="Send Command..."
-            value={commandText}
-            onChangeText={setCommandText}
-            onSubmitEditing={handleSend}
-            returnKeyType="send"
-            autoCapitalize="none"
-            autoCorrect={false}
-            containerStyle={styles.inputWrapper}
-            style={styles.inputMono}
-          />
-          <NeuButton
-            icon="send"
-            onPress={handleSend}
-            size={56}
-            variant="accent"
-            disabled={!isConnected || commandText.trim().length === 0}
-          />
-        </View>
-      </KeyboardAvoidingView>
+              {/* Command input */}
+              <View style={styles.landscapeOverlayBottom}>
+                <NeuInput
+                  icon="terminal"
+                  placeholder="Send Command..."
+                  value={commandText}
+                  onChangeText={setCommandText}
+                  onSubmitEditing={handleSend}
+                  returnKeyType="send"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  containerStyle={styles.inputWrapper}
+                  style={styles.inputMono}
+                />
+                <NeuButton
+                  icon="send"
+                  onPress={handleSend}
+                  size={44}
+                  variant="accent"
+                  disabled={!isConnected || commandText.trim().length === 0}
+                />
+              </View>
+            </Animated.View>
+          )}
+        </Pressable>
+      </SafeAreaView>
+    );
+  }
+
+  // =====================================================================
+  // PORTRAIT: standard layout
+  // =====================================================================
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
+        <KeyboardAvoidingView
+          style={styles.flex}
+          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        >
+          {/* Header */}
+          <View style={styles.header}>
+            <NeuButton icon="arrow-left" onPress={handleBack} size={layout.actionButtonSize} />
+            <Text style={styles.headerTitle}>
+              {currentDevice?.name ?? 'ESP-SERIAL'}
+            </Text>
+            <View style={styles.statusBadge}>
+              {isConnected && <StatusDot />}
+              <Feather
+                name={connectionType === 'ble' ? 'bluetooth' : 'wifi'}
+                size={12}
+                color={statusColor}
+              />
+              <Text style={[styles.statusText, { color: statusColor }]}>
+                {statusLabel}
+              </Text>
+            </View>
+          </View>
+
+          {/* Terminal Area */}
+          <NeuContainer style={styles.terminalContainer}>
+            <View style={styles.metaBar}>
+              <Text style={styles.metaText}>
+                {connectionType === 'ble' ? 'BLE' : 'WiFi'} {'\u2022'} {currentDevice?.host ?? '—'}:{currentDevice?.port ?? '—'}
+              </Text>
+              <Text style={styles.metaText}>
+                {uptimeStr ? t('monitor_connected_time')(uptimeStr) : statusLabel}
+              </Text>
+            </View>
+            <FlatList
+              ref={flatListRef}
+              data={filteredLines}
+              renderItem={renderLogLine}
+              keyExtractor={keyExtractor}
+              style={styles.logList}
+              contentContainerStyle={styles.logListContent}
+              showsVerticalScrollIndicator={false}
+              ListFooterComponent={<BlinkingCursor />}
+            />
+          </NeuContainer>
+
+          {/* Action Buttons */}
+          <View style={styles.actionsRow}>
+            {actionButtons}
+          </View>
+
+          {/* Command Input */}
+          <View style={styles.inputRow}>
+            <NeuInput
+              icon="terminal"
+              placeholder={t('monitor_send_placeholder')}
+              value={commandText}
+              onChangeText={setCommandText}
+              onSubmitEditing={handleSend}
+              returnKeyType="send"
+              autoCapitalize="none"
+              autoCorrect={false}
+              containerStyle={styles.inputWrapper}
+              style={styles.inputMono}
+            />
+            <NeuButton
+              icon="send"
+              onPress={handleSend}
+              size={56}
+              variant="accent"
+              disabled={!isConnected || commandText.trim().length === 0}
+            />
+          </View>
+        </KeyboardAvoidingView>
+      </Pressable>
     </SafeAreaView>
   );
 }
@@ -364,7 +548,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
 
-  // Header
+  // Header (portrait)
   header: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -403,7 +587,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
 
-  // Terminal
+  // Terminal (portrait)
   terminalContainer: {
     flex: 1,
     marginHorizontal: layout.screenPaddingH,
@@ -425,6 +609,10 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   logListContent: {
+    paddingBottom: spacing.sm,
+  },
+  logListContentLandscape: {
+    paddingHorizontal: spacing.md,
     paddingBottom: spacing.sm,
   },
 
@@ -461,7 +649,7 @@ const styles = StyleSheet.create({
     color: colors.accent.primary,
   },
 
-  // Action buttons
+  // Action buttons (portrait)
   actionsRow: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
@@ -470,7 +658,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: layout.screenPaddingH,
   },
 
-  // Command input
+  // Command input (portrait)
   inputRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -484,5 +672,43 @@ const styles = StyleSheet.create({
   inputMono: {
     fontFamily: 'Menlo',
     fontSize: 14,
+  },
+
+  // Landscape status bar (always visible, minimal)
+  landscapeStatusBar: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: spacing.md,
+    paddingVertical: 4,
+  },
+  landscapeLineCount: {
+    fontFamily: 'Menlo',
+    fontSize: 10,
+    color: colors.text.muted,
+  },
+
+  // Landscape overlay
+  landscapeOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    justifyContent: 'space-between',
+    backgroundColor: 'rgba(26, 26, 46, 0.85)',
+    padding: spacing.md,
+  },
+  landscapeOverlayTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.lg,
+  },
+  landscapeActions: {
+    flexDirection: 'row',
+    flex: 1,
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+  },
+  landscapeOverlayBottom: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
   },
 });

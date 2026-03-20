@@ -3,7 +3,7 @@
     "name": "Serial Air",
     "slug": "serial-air",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/icon.png",
     "scheme": "serial-air",
     "userInterfaceStyle": "dark",
@@ -19,6 +19,7 @@
       "buildNumber": "1",
       "infoPlist": {
         "NSLocalNetworkUsageDescription": "Serial Air uses your local network to discover and connect to microcontrollers for serial monitoring.",
+        "NSBluetoothAlwaysUsageDescription": "Serial Air uses Bluetooth to discover and connect to nearby ESP32 microcontrollers.",
         "NSBonjourServices": [
           "_serial-air._tcp"
         ]
@@ -33,8 +34,14 @@
       },
       "permissions": [
         "android.permission.ACCESS_WIFI_STATE",
-        "android.permission.CHANGE_WIFI_MULTICAST_STATE"
+        "android.permission.CHANGE_WIFI_MULTICAST_STATE",
+        "android.permission.BLUETOOTH_SCAN",
+        "android.permission.BLUETOOTH_CONNECT",
+        "android.permission.ACCESS_FINE_LOCATION"
       ]
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router",

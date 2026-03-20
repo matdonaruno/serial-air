@@ -19,6 +19,7 @@ import Animated, {
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
 import { useAppStore } from '../src/stores/useAppStore';
+import { t } from '../src/i18n';
 
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
 
@@ -31,34 +32,23 @@ interface Slide {
   description: string;
 }
 
-const slides: Slide[] = [
-  {
-    icon: 'wifi',
-    title: 'Wireless Serial',
-    subtitle: 'No cables needed',
-    description:
-      'Monitor your ESP8266 and ESP32 serial output wirelessly over WiFi. Just add 2 lines of code to your Arduino sketch.',
-  },
-  {
-    icon: 'search',
-    title: 'Auto-Discovery',
-    subtitle: 'mDNS powered',
-    description:
-      'Serial Air automatically finds your devices on the local network using Bonjour/mDNS. No IP configuration needed.',
-  },
-  {
-    icon: 'terminal',
-    title: 'Real-time Monitor',
-    subtitle: 'Full-featured terminal',
-    description:
-      'View logs in real-time, filter output, send commands, export logs, and more. All from your iPhone.',
-  },
-];
+function getSlides(): Slide[] {
+  return [
+    { icon: 'wifi', title: t('onboarding_slide1_title'), subtitle: t('onboarding_slide1_subtitle'), description: t('onboarding_slide1_desc') },
+    { icon: 'code', title: t('onboarding_slide2_title'), subtitle: t('onboarding_slide2_subtitle'), description: t('onboarding_slide2_desc') },
+    { icon: 'search', title: t('onboarding_slide3_title'), subtitle: t('onboarding_slide3_subtitle'), description: t('onboarding_slide3_desc') },
+    { icon: 'zap', title: t('onboarding_slide4_title'), subtitle: t('onboarding_slide4_subtitle'), description: t('onboarding_slide4_desc') },
+    { icon: 'terminal', title: t('onboarding_slide5_title'), subtitle: t('onboarding_slide5_subtitle'), description: t('onboarding_slide5_desc') },
+    { icon: 'send', title: t('onboarding_slide6_title'), subtitle: t('onboarding_slide6_subtitle'), description: t('onboarding_slide6_desc') },
+    { icon: 'download', title: t('onboarding_slide7_title'), subtitle: t('onboarding_slide7_subtitle'), description: t('onboarding_slide7_desc') },
+  ];
+}
 
 export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const completeOnboarding = useAppStore((s) => s.completeOnboarding);
+  const slides = getSlides();
 
   const isLast = currentIndex === slides.length - 1;
 
@@ -66,7 +56,7 @@ export default function OnboardingScreen() {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     if (isLast) {
       completeOnboarding();
-      router.replace('/(tabs)/');
+      router.replace('/' as any);
     } else {
       flatListRef.current?.scrollToIndex({
         index: currentIndex + 1,
@@ -78,7 +68,7 @@ export default function OnboardingScreen() {
   const handleSkip = () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     completeOnboarding();
-    router.replace('/(tabs)/');
+    router.replace('/' as any);
   };
 
   const renderSlide = ({ item }: ListRenderItemInfo<Slide>) => (
@@ -96,7 +86,7 @@ export default function OnboardingScreen() {
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={handleSkip} hitSlop={12}>
-          <Text style={styles.skipText}>Skip</Text>
+          <Text style={styles.skipText}>{t('onboarding_skip')}</Text>
         </Pressable>
       </View>
 
@@ -134,7 +124,7 @@ export default function OnboardingScreen() {
       <View style={styles.bottomRow}>
         <Pressable style={styles.nextButton} onPress={handleNext}>
           <Text style={styles.nextButtonText}>
-            {isLast ? 'Get Started' : 'Next'}
+            {isLast ? t('onboarding_get_started') : t('onboarding_next')}
           </Text>
           <Feather
             name={isLast ? 'check' : 'arrow-right'}

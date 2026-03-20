@@ -42,14 +42,18 @@ export class PurchaseService {
     if (isInitialized) return;
 
     try {
-      await IAP.initConnection();
+      // Timeout after 5s — IAP.initConnection can hang on simulator
+      const timeout = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('IAP init timeout')), 5000)
+      );
+      await Promise.race([IAP.initConnection(), timeout]);
       isInitialized = true;
 
       if (Platform.OS === 'ios') {
         await IAP.clearTransactionIOS();
       }
     } catch (e) {
-      console.warn('[PurchaseService] IAP init failed:', e);
+      console.log('[PurchaseService] IAP init skipped (expected on simulator):', e);
     }
   }
 
@@ -135,9 +139,12 @@ export class PurchaseService {
    */
   static async purchase(): Promise<boolean> {
     if (!isInitialized) {
-      // Dev fallback: mark purchased locally
-      await this.setPurchased();
-      return true;
+      if (__DEV__) {
+        // Dev-only fallback for simulator testing
+        await this.setPurchased();
+        return true;
+      }
+      throw new Error('Store not available. Please try again later.');
     }
 
     try {

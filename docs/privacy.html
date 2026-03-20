@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Serial Air</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+            background: #050510;
+            color: #e0e0e0;
+            line-height: 1.8;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px 60px;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 80px 0 60px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #00d2ff, #0080ff, #00d2ff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 4s ease infinite;
+            margin-bottom: 8px;
+        }
+
+        .hero .subtitle {
+            font-family: 'Noto Sans JP', sans-serif;
+            font-size: 1rem;
+            color: rgba(0, 210, 255, 0.5);
+            font-weight: 300;
+            letter-spacing: 2px;
+            margin-bottom: 16px;
+        }
+
+        .hero .last-updated {
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 210, 255, 0.08);
+            border-radius: 30px;
+            padding: 40px;
+            margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 210, 255, 0.08);
+            border-color: rgba(0, 210, 255, 0.15);
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 24px;
+            padding-left: 20px;
+            border-left: 3px solid #00d2ff;
+            line-height: 1.4;
+        }
+
+        h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #00d2ff;
+            margin-top: 28px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        h3::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(0, 210, 255, 0.3), transparent);
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 14px;
+            font-weight: 300;
+            font-size: 0.95rem;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 14px 0;
+        }
+
+        ul li {
+            background: rgba(0, 210, 255, 0.03);
+            border: 1px solid rgba(0, 210, 255, 0.06);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 300;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+
+        ul li:hover {
+            border-color: rgba(0, 210, 255, 0.15);
+            background: rgba(0, 210, 255, 0.05);
+        }
+
+        ul li::before {
+            content: '\2726';
+            color: #00d2ff;
+            margin-right: 10px;
+            font-size: 0.7rem;
+        }
+
+        .important-box {
+            background: rgba(0, 210, 255, 0.04);
+            border: 1px solid rgba(0, 210, 255, 0.25);
+            border-radius: 16px;
+            padding: 24px 28px;
+            margin: 24px 0;
+            box-shadow: 0 0 30px rgba(0, 210, 255, 0.06);
+        }
+
+        .important-box p {
+            color: rgba(255, 255, 255, 0.85);
+            font-weight: 400;
+            margin-bottom: 0;
+        }
+
+        .important-box .label {
+            color: #00d2ff;
+            font-weight: 600;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .contact-card {
+            text-align: center;
+            background: rgba(0, 210, 255, 0.03);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 210, 255, 0.1);
+            border-radius: 30px;
+            padding: 40px;
+            margin-top: 40px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 60px rgba(0, 210, 255, 0.08);
+        }
+
+        .contact-card h2 {
+            border-left: none;
+            padding-left: 0;
+            text-align: center;
+        }
+
+        .contact-card a {
+            color: #00d2ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: opacity 0.2s ease;
+        }
+
+        .contact-card a:hover {
+            opacity: 0.75;
+        }
+
+        footer {
+            text-align: center;
+            padding: 40px 0 20px;
+            color: rgba(255, 255, 255, 0.2);
+            font-size: 0.8rem;
+            font-weight: 300;
+        }
+
+        @media (max-width: 768px) {
+            .hero { padding: 50px 0 40px; }
+            .hero h1 { font-size: 2rem; }
+            .card { padding: 28px 22px; border-radius: 22px; }
+            .container { padding: 20px 16px 40px; }
+            h2 { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+
+    <div class="container">
+        <div class="hero">
+            <h1>Privacy Policy</h1>
+            <div class="subtitle">プライバシーポリシー</div>
+            <div class="last-updated">Last updated: March 18, 2026</div>
+        </div>
+
+        <!-- 1. Introduction -->
+        <div class="card">
+            <h2>1. Introduction</h2>
+            <p>Serial Air respects your privacy. This Privacy Policy explains how we handle information when you use our wireless serial monitor application for ESP8266 and ESP32 microcontrollers. We are committed to transparency about our data practices, which can be summarized simply: your data stays on your device.</p>
+        </div>
+
+        <!-- 2. Information We Collect -->
+        <div class="card">
+            <h2>2. Information We Collect</h2>
+
+            <h3>2.1 Device Connection Data</h3>
+            <p>When you connect to microcontrollers, the following information is handled locally on your device:</p>
+            <ul>
+                <li>IP addresses (local network only, never transmitted externally)</li>
+                <li>Device names discovered via mDNS</li>
+                <li>Device identifiers (MAC address-based)</li>
+                <li>Connection timestamps</li>
+            </ul>
+            <p>All connection data is stored exclusively on your device and is never sent to any external server.</p>
+
+            <h3>2.2 Purchase Information</h3>
+            <ul>
+                <li>Purchase status is stored locally on your device</li>
+                <li>All payment transactions are handled entirely by Apple through the App Store</li>
+                <li>Serial Air never receives or processes payment details</li>
+            </ul>
+
+            <h3>2.3 Local Settings</h3>
+            <ul>
+                <li>App preferences (display settings, connection defaults)</li>
+                <li>Trusted device list</li>
+                <li>All settings stored on-device via AsyncStorage</li>
+            </ul>
+
+            <div class="important-box">
+                <span class="label">Important</span>
+                <p>Serial Air does NOT collect, transmit, or store any personal data on external servers. All data remains on your device.</p>
+            </div>
+        </div>
+
+        <!-- 3. Information Usage -->
+        <div class="card">
+            <h2>3. How We Use Information</h2>
+
+            <h3>3.1 Service Operation</h3>
+            <ul>
+                <li>Connecting to your microcontrollers over WiFi and Bluetooth</li>
+                <li>Discovering devices on your local network via mDNS</li>
+                <li>Displaying serial monitor output from connected devices</li>
+            </ul>
+
+            <h3>3.2 Local Storage</h3>
+            <ul>
+                <li>Persisting your app preferences between sessions</li>
+                <li>Maintaining your trusted device list for quick reconnection</li>
+            </ul>
+        </div>
+
+        <!-- 4. Third-Party Services -->
+        <div class="card">
+            <h2>4. Third-Party Services</h2>
+
+            <h3>4.1 Apple App Store</h3>
+            <p>In-app purchase transactions are processed through the Apple App Store. Apple's own privacy policy governs how they handle payment information. Serial Air does not receive any payment or billing details.</p>
+
+            <h3>4.2 No Tracking Services</h3>
+            <ul>
+                <li>No analytics SDKs or services</li>
+                <li>No tracking or advertising frameworks</li>
+                <li>No third-party data collection of any kind</li>
+            </ul>
+        </div>
+
+        <!-- 5. Data Storage & Security -->
+        <div class="card">
+            <h2>5. Data Storage &amp; Security</h2>
+            <ul>
+                <li>All data is stored locally on your device</li>
+                <li>No cloud servers or external databases are used</li>
+                <li>Network communication occurs only between your device and your microcontrollers on your local network</li>
+                <li>All app data is deleted when the app is uninstalled</li>
+            </ul>
+        </div>
+
+        <!-- 6. Children's Privacy -->
+        <div class="card">
+            <h2>6. Children's Privacy</h2>
+            <p>Serial Air is not directed at children under the age of 13. We do not knowingly collect any personal information from children. Since the app does not collect personal data from any user, no special provisions for children's data are necessary.</p>
+        </div>
+
+        <!-- 7. International -->
+        <div class="card">
+            <h2>7. International Data Transfer</h2>
+            <p>Serial Air does not transfer any data internationally. All information remains stored locally on your device. There are no servers, databases, or cloud services involved in the operation of this app.</p>
+        </div>
+
+        <!-- 8. Changes to Policy -->
+        <div class="card">
+            <h2>8. Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. Any changes will be communicated through app updates on the App Store. We encourage you to review this policy periodically. Continued use of the app after changes constitutes acceptance of the updated policy.</p>
+        </div>
+
+        <!-- 9. Contact -->
+        <div class="contact-card">
+            <h2>9. Contact Us</h2>
+            <p>If you have any questions or concerns about this Privacy Policy, please contact us:</p>
+            <p style="margin-top: 16px;">
+                <strong style="color: #fff;">Masashi Umetani</strong><br>
+                <a href="mailto:support@serialair.app">support@serialair.app</a>
+            </p>
+        </div>
+
+        <footer>
+            &copy; 2026 Serial Air
+        </footer>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        class Particle {
+            constructor() {
+                this.reset();
+            }
+            reset() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 120 + 40;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                this.opacity = Math.random() * 0.07 + 0.02;
+                this.color = Math.random() > 0.5 ? '0, 210, 255' : '0, 60, 180';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x < -this.size || this.x > canvas.width + this.size ||
+                    this.y < -this.size || this.y > canvas.height + this.size) {
+                    this.reset();
+                }
+            }
+            draw() {
+                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, `rgba(${this.color}, ${this.opacity})`);
+                gradient.addColorStop(1, `rgba(${this.color}, 0)`);
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < 15; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => { p.update(); p.draw(); });
+            requestAnimationFrame(animate);
+        }
+        animate();
+    </script>
+</body>
+</html>

@@ -48,6 +48,8 @@ export class DeviceDiscovery {
         port: service.port || DEFAULT_PORT,
         deviceType: service.txt?.device,
         libraryVersion: service.txt?.version,
+        deviceId: service.txt?.id,
+        connectionType: 'wifi',
         isOnline: true,
         lastSeen: new Date(),
       };

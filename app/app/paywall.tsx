@@ -13,22 +13,12 @@ import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
 import { usePurchaseStore } from '../src/stores/usePurchaseStore';
+import { PurchaseService } from '../src/services/PurchaseService';
+import { t } from '../src/i18n';
 
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
 
-interface FeatureItem {
-  icon: FeatherIconName;
-  text: string;
-}
-
-const features: FeatureItem[] = [
-  { icon: 'wifi', text: 'Unlimited connections' },
-  { icon: 'clock', text: 'No time restrictions' },
-  { icon: 'refresh-cw', text: 'All future updates' },
-  { icon: 'shield', text: 'No ads, no tracking' },
-  { icon: 'terminal', text: 'Full terminal features' },
-  { icon: 'download', text: 'Log export & sharing' },
-];
+const FALLBACK_PRICE = '$1.99';
 
 export default function PaywallScreen() {
   const isPurchasing = usePurchaseStore((s) => s.isPurchasing);
@@ -37,6 +27,24 @@ export default function PaywallScreen() {
   const error = usePurchaseStore((s) => s.error);
   const purchase = usePurchaseStore((s) => s.purchase);
   const restore = usePurchaseStore((s) => s.restore);
+  const [localizedPrice, setLocalizedPrice] = React.useState<string>(FALLBACK_PRICE);
+
+  const features: { icon: FeatherIconName; text: string }[] = [
+    { icon: 'wifi', text: t('paywall_feature_connections') },
+    { icon: 'clock', text: t('paywall_feature_time') },
+    { icon: 'refresh-cw', text: t('paywall_feature_updates') },
+    { icon: 'shield', text: t('paywall_feature_no_ads') },
+    { icon: 'terminal', text: t('paywall_feature_terminal') },
+    { icon: 'download', text: t('paywall_feature_export') },
+  ];
+
+  React.useEffect(() => {
+    PurchaseService.getProducts().then((products) => {
+      if (products.length > 0) {
+        setLocalizedPrice(products[0].localizedPrice ?? FALLBACK_PRICE);
+      }
+    });
+  }, []);
 
   const handlePurchase = async () => {
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
@@ -76,22 +84,22 @@ export default function PaywallScreen() {
           <Feather name="zap" size={36} color={colors.accent.primary} />
         </View>
 
-        <Text style={styles.title}>Unlock Serial Air</Text>
-        <Text style={styles.subtitle}>One-time purchase. Yours forever.</Text>
+        <Text style={styles.title}>{t('paywall_title')}</Text>
+        <Text style={styles.subtitle}>{t('paywall_subtitle')}</Text>
 
         {/* Trial badge */}
         {trialDaysRemaining > 0 ? (
           <View style={styles.trialBadge}>
             <Feather name="clock" size={14} color={colors.accent.primary} />
             <Text style={styles.trialBadgeText}>
-              {trialDaysRemaining} day{trialDaysRemaining !== 1 ? 's' : ''} left in trial
+              {t('paywall_trial_left')(trialDaysRemaining)}
             </Text>
           </View>
         ) : (
           <View style={[styles.trialBadge, styles.trialExpired]}>
             <Feather name="alert-circle" size={14} color={colors.status.disconnected} />
             <Text style={[styles.trialBadgeText, { color: colors.status.disconnected }]}>
-              Trial expired
+              {t('paywall_trial_expired')}
             </Text>
           </View>
         )}
@@ -110,8 +118,8 @@ export default function PaywallScreen() {
 
         {/* Price */}
         <View style={styles.priceContainer}>
-          <Text style={styles.price}>$1.99</Text>
-          <Text style={styles.priceLabel}>One-time purchase</Text>
+          <Text style={styles.price}>{localizedPrice}</Text>
+          <Text style={styles.priceLabel}>{t('paywall_one_time')}</Text>
         </View>
 
         {/* Error */}
@@ -131,7 +139,7 @@ export default function PaywallScreen() {
             <ActivityIndicator color={colors.white} size="small" />
           ) : (
             <>
-              <Text style={styles.purchaseButtonText}>Purchase — $1.99</Text>
+              <Text style={styles.purchaseButtonText}>{t('paywall_purchase')(localizedPrice)}</Text>
               <Feather name="lock" size={16} color={colors.white} />
             </>
           )}
@@ -145,17 +153,17 @@ export default function PaywallScreen() {
           {isRestoring ? (
             <ActivityIndicator color={colors.text.secondary} size="small" />
           ) : (
-            <Text style={styles.restoreButtonText}>Restore Purchase</Text>
+            <Text style={styles.restoreButtonText}>{t('paywall_restore')}</Text>
           )}
         </Pressable>
 
         <View style={styles.legalLinks}>
           <Pressable onPress={() => Linking.openURL('https://serialair.netlify.app/terms')}>
-            <Text style={styles.legalText}>Terms</Text>
+            <Text style={styles.legalText}>{t('paywall_terms')}</Text>
           </Pressable>
           <Text style={styles.legalDot}>&bull;</Text>
           <Pressable onPress={() => Linking.openURL('https://serialair.netlify.app/privacy')}>
-            <Text style={styles.legalText}>Privacy</Text>
+            <Text style={styles.legalText}>{t('paywall_privacy')}</Text>
           </Pressable>
         </View>
       </View>

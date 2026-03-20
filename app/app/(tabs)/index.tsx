@@ -5,19 +5,33 @@ import {
   ScrollView,
   StyleSheet,
   Pressable,
+  Alert,
+  Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  withSequence,
+  Easing,
+} from 'react-native-reanimated';
 
 import { NeuCard, NeuButton, NeuInput } from '../../src/components/neumorphic';
-import { useConnectionStore } from '../../src/stores/useConnectionStore';
+import { useConnectionStore, getBleManager } from '../../src/stores/useConnectionStore';
 import { useDiscoveryStore } from '../../src/stores/useDiscoveryStore';
 import { useSettingsStore } from '../../src/stores/useSettingsStore';
 import { usePurchaseStore } from '../../src/stores/usePurchaseStore';
+import { useTrustStore } from '../../src/stores/useTrustStore';
 import { DeviceDiscovery } from '../../src/services/DeviceDiscovery';
+import { BleDiscovery } from '../../src/services/BleDiscovery';
 import { Device, RecentConnection } from '../../src/types';
+import { t } from '../../src/i18n';
+import { CoachMark } from '../../src/components/CoachMark';
 import {
   colors,
   spacing,
@@ -35,14 +49,167 @@ function timeAgo(date: Date): string {
   const now = new Date();
   const diffMs = now.getTime() - new Date(date).getTime();
   const diffMin = Math.floor(diffMs / 60000);
-  if (diffMin < 1) return 'just now';
-  if (diffMin < 60) return `${diffMin}m ago`;
+  if (diffMin < 1) return t('home_time_just_now');
+  if (diffMin < 60) return t('home_time_min')(diffMin);
   const diffHr = Math.floor(diffMin / 60);
-  if (diffHr < 24) return `${diffHr}h ago`;
+  if (diffHr < 24) return t('home_time_hour')(diffHr);
   const diffDay = Math.floor(diffHr / 24);
-  if (diffDay === 1) return 'Yesterday';
-  return `${diffDay}d ago`;
+  if (diffDay === 1) return t('home_time_yesterday');
+  return t('home_time_day')(diffDay);
 }
+
+function formatUptime(connectedAt: Date | null): string {
+  if (!connectedAt) return '';
+  const diffMs = new Date().getTime() - new Date(connectedAt).getTime();
+  const secs = Math.floor(diffMs / 1000);
+  const mins = Math.floor(secs / 60);
+  const hrs = Math.floor(mins / 60);
+  if (hrs > 0) return `${hrs}h ${mins % 60}m`;
+  if (mins > 0) return `${mins}m ${secs % 60}s`;
+  return `${secs}s`;
+}
+
+// ---------------------------------------------------------------------------
+// Connection Status Banner
+// ---------------------------------------------------------------------------
+
+function ConnectionBanner() {
+  const status = useConnectionStore((s) => s.status);
+  const currentDevice = useConnectionStore((s) => s.currentDevice);
+  const connectedAt = useConnectionStore((s) => s.connectedAt);
+  const connectionType = useConnectionStore((s) => s.connectionType);
+  const [uptimeStr, setUptimeStr] = useState('');
+
+  // Pulsing dot for connected state
+  const opacity = useSharedValue(1);
+  useEffect(() => {
+    if (status === 'connected') {
+      opacity.value = withRepeat(
+        withSequence(
+          withTiming(0.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        ),
+        -1,
+        false,
+      );
+    } else {
+      opacity.value = 1;
+    }
+  }, [status]);
+
+  const dotStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+
+  // Uptime counter
+  useEffect(() => {
+    if (status !== 'connected' || !connectedAt) {
+      setUptimeStr('');
+      return;
+    }
+    const interval = setInterval(() => {
+      setUptimeStr(formatUptime(connectedAt));
+    }, 1000);
+    setUptimeStr(formatUptime(connectedAt));
+    return () => clearInterval(interval);
+  }, [status, connectedAt]);
+
+  if (status === 'disconnected') {
+    return (
+      <View style={[bannerStyles.container, bannerStyles.disconnected]}>
+        <View style={[bannerStyles.dot, { backgroundColor: colors.text.muted }]} />
+        <Text style={[bannerStyles.text, { color: colors.text.muted }]}>{t('home_no_connection')}</Text>
+      </View>
+    );
+  }
+
+  if (status === 'reconnecting') {
+    return (
+      <View style={[bannerStyles.container, bannerStyles.reconnecting]}>
+        <Animated.View style={[bannerStyles.dot, { backgroundColor: colors.status.connecting }, dotStyle]} />
+        <Text style={[bannerStyles.text, { color: colors.status.connecting }]}>{t('home_reconnecting')}</Text>
+      </View>
+    );
+  }
+
+  if (status === 'connecting') {
+    return (
+      <View style={[bannerStyles.container, bannerStyles.connecting]}>
+        <View style={[bannerStyles.dot, { backgroundColor: colors.status.connecting }]} />
+        <Text style={[bannerStyles.text, { color: colors.status.connecting }]}>{t('home_connecting')}</Text>
+      </View>
+    );
+  }
+
+  // connected
+  return (
+    <View style={[bannerStyles.container, bannerStyles.connected]}>
+      <Animated.View style={[bannerStyles.dot, bannerStyles.dotConnected, dotStyle]} />
+      <Text style={[bannerStyles.text, { color: colors.status.connected }]} numberOfLines={1}>
+        {currentDevice?.name ?? 'Device'}
+      </Text>
+      <Feather
+        name={connectionType === 'ble' ? 'bluetooth' : 'wifi'}
+        size={14}
+        color={colors.status.connected}
+      />
+      {uptimeStr ? (
+        <Text style={bannerStyles.uptime}>{uptimeStr}</Text>
+      ) : null}
+    </View>
+  );
+}
+
+const bannerStyles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderRadius: borderRadius.innerCard,
+    paddingHorizontal: spacing.md,
+    paddingVertical: 10,
+    marginBottom: spacing.md,
+    gap: 8,
+  },
+  disconnected: {
+    backgroundColor: colors.bg.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  reconnecting: {
+    backgroundColor: colors.bg.surface,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 152, 0, 0.3)',
+  },
+  connecting: {
+    backgroundColor: colors.bg.surface,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 152, 0, 0.2)',
+  },
+  connected: {
+    backgroundColor: colors.bg.surface,
+    borderWidth: 1,
+    borderColor: 'rgba(76, 175, 80, 0.3)',
+  },
+  dot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  dotConnected: {
+    backgroundColor: colors.status.connected,
+    shadowColor: colors.status.connected,
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.7,
+    shadowRadius: 4,
+  },
+  text: {
+    ...typography.bodySmall,
+    fontWeight: '600',
+    flex: 1,
+  },
+  uptime: {
+    ...typography.caption,
+    color: colors.text.secondary,
+  },
+});
 
 // ---------------------------------------------------------------------------
 // Home Screen
@@ -53,6 +220,7 @@ export default function HomeScreen() {
 
   // Stores
   const connect = useConnectionStore((s) => s.connect);
+  const connectBLE = useConnectionStore((s) => s.connectBLE);
   const devices = useDiscoveryStore((s) => s.devices);
   const addDevice = useDiscoveryStore((s) => s.addDevice);
   const removeDevice = useDiscoveryStore((s) => s.removeDevice);
@@ -60,24 +228,32 @@ export default function HomeScreen() {
   const addRecentConnection = useDiscoveryStore((s) => s.addRecentConnection);
   const loadRecentConnections = useDiscoveryStore((s) => s.loadRecentConnections);
   const defaultPort = useSettingsStore((s) => s.defaultPort);
+  const autoReconnect = useSettingsStore((s) => s.autoReconnect);
+  const connectionTimeout = useSettingsStore((s) => s.connectionTimeout);
   const hasAccess = usePurchaseStore((s) => s.hasAccess);
   const isPurchased = usePurchaseStore((s) => s.isPurchased);
   const trialDaysRemaining = usePurchaseStore((s) => s.trialDaysRemaining);
+  const isDeviceTrusted = useTrustStore((s) => s.isDeviceTrusted);
+  const trustDevice = useTrustStore((s) => s.trustDevice);
 
   // Manual connection state
   const [manualIp, setManualIp] = useState('');
   const [manualPort, setManualPort] = useState('');
+  const [manualTimeout, setManualTimeout] = useState('');
+  const [manualAutoReconnect, setManualAutoReconnect] = useState(autoReconnect);
 
-  // Discovery ref
+  // Discovery refs
   const discoveryRef = useRef<DeviceDiscovery | null>(null);
+  const bleDiscoveryRef = useRef<BleDiscovery | null>(null);
 
   // -------------------------------------------------------------------
-  // Discovery lifecycle
+  // Discovery lifecycle (WiFi + BLE)
   // -------------------------------------------------------------------
 
   useEffect(() => {
     loadRecentConnections();
 
+    // WiFi (mDNS) discovery
     const discovery = new DeviceDiscovery(
       (device: Device) => addDevice(device),
       (name: string) => removeDevice(name),
@@ -85,9 +261,23 @@ export default function HomeScreen() {
     discoveryRef.current = discovery;
     discovery.startScan();
 
+    // BLE discovery (may not be available on simulator)
+    const bleManager = getBleManager();
+    if (bleManager) {
+      const bleDiscovery = new BleDiscovery(
+        bleManager,
+        (device: Device) => addDevice(device),
+        (name: string) => removeDevice(name),
+      );
+      bleDiscoveryRef.current = bleDiscovery;
+      bleDiscovery.startScan();
+    }
+
     return () => {
       discovery.destroy();
       discoveryRef.current = null;
+      bleDiscoveryRef.current?.destroy();
+      bleDiscoveryRef.current = null;
     };
   }, []);
 
@@ -95,22 +285,78 @@ export default function HomeScreen() {
   // Connect helpers
   // -------------------------------------------------------------------
 
+  const doConnect = useCallback(
+    (device: Device) => {
+      if (device.connectionType === 'ble') {
+        connectBLE(device.host, device.name);
+      } else {
+        connect(device.host, device.port, device.name);
+      }
+      addRecentConnection({
+        host: device.host,
+        port: device.port,
+        deviceName: device.name,
+        lastConnected: new Date(),
+      });
+      router.push('/monitor');
+    },
+    [connect, connectBLE, addRecentConnection, router],
+  );
+
   const connectToDevice = useCallback(
     (host: string, port: number, deviceName?: string) => {
       if (!hasAccess) {
         router.push('/paywall');
         return;
       }
-      connect(host, port, deviceName);
-      addRecentConnection({
+      doConnect({
+        name: deviceName || `${host}:${port}`,
         host,
         port,
-        deviceName,
-        lastConnected: new Date(),
+        connectionType: 'wifi',
+        isOnline: true,
+        lastSeen: new Date(),
       });
-      router.push('/monitor');
     },
-    [connect, addRecentConnection, router, hasAccess],
+    [doConnect, hasAccess, router],
+  );
+
+  const handleDeviceTap = useCallback(
+    (device: Device) => {
+      if (!device.isOnline) return;
+      if (!hasAccess) {
+        router.push('/paywall');
+        return;
+      }
+
+      // If device has a deviceId and is not trusted, show trust dialog
+      if (device.deviceId && !isDeviceTrusted(device.deviceId)) {
+        Alert.alert(
+          t('home_trust_title'),
+          `${device.name}\n${device.deviceId}`,
+          [
+            { text: t('cancel'), style: 'cancel' },
+            {
+              text: t('home_trust_connect'),
+              onPress: () => {
+                trustDevice({
+                  deviceId: device.deviceId!,
+                  name: device.name,
+                  trustedAt: new Date(),
+                  lastSeen: new Date(),
+                  connectionType: device.connectionType ?? 'wifi',
+                });
+                doConnect(device);
+              },
+            },
+          ],
+        );
+        return;
+      }
+
+      doConnect(device);
+    },
+    [doConnect, hasAccess, router, isDeviceTrusted, trustDevice],
   );
 
   const handleManualConnect = useCallback(() => {
@@ -135,13 +381,16 @@ export default function HomeScreen() {
       >
         {/* ---- Header ---- */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>SERIAL AIR</Text>
+          <Text style={styles.headerTitle}>{t('home_title')}</Text>
           <NeuButton
             icon="settings"
             onPress={() => router.push('/(tabs)/settings')}
             size={layout.actionButtonSize}
           />
         </View>
+
+        {/* ---- Connection Status Banner ---- */}
+        <ConnectionBanner />
 
         {/* ---- Trial Banner ---- */}
         {!isPurchased && (
@@ -167,8 +416,8 @@ export default function HomeScreen() {
               ]}
             >
               {trialDaysRemaining > 0
-                ? `Free trial: ${trialDaysRemaining} day${trialDaysRemaining !== 1 ? 's' : ''} remaining`
-                : 'Trial expired — Tap to unlock'}
+                ? t('home_trial_remaining')(trialDaysRemaining)
+                : t('home_trial_expired')}
             </Text>
             <Feather name="chevron-right" size={16} color={colors.text.muted} />
           </Pressable>
@@ -186,26 +435,23 @@ export default function HomeScreen() {
             <Feather name="code" size={18} color={colors.accent.primary} />
           </View>
           <View style={styles.codeGenText}>
-            <Text style={styles.codeGenTitle}>Generate Test Code</Text>
-            <Text style={styles.codeGenSub}>Get a ready-to-upload Arduino sketch</Text>
+            <Text style={styles.codeGenTitle}>{t('home_generate_code')}</Text>
+            <Text style={styles.codeGenSub}>{t('home_generate_code_sub')}</Text>
           </View>
           <Feather name="chevron-right" size={18} color={colors.text.muted} />
         </Pressable>
 
         {/* ---- Discovered ---- */}
-        <Text style={styles.sectionHeader}>DISCOVERED</Text>
+        <Text style={styles.sectionHeader}>{t('home_discovered')}</Text>
 
         {devices.map((device) => {
           const isOnline = device.isOnline;
+          const trusted = device.deviceId ? isDeviceTrusted(device.deviceId) : false;
           return (
             <NeuCard
               key={device.name}
               style={styles.deviceCard}
-              onPress={() =>
-                isOnline
-                  ? connectToDevice(device.host, device.port, device.name)
-                  : undefined
-              }
+              onPress={() => handleDeviceTap(device)}
               accentBorder={isOnline}
               disabled={!isOnline}
             >
@@ -218,7 +464,7 @@ export default function HomeScreen() {
                   ]}
                 >
                   <Feather
-                    name="cpu"
+                    name={device.connectionType === 'ble' ? 'bluetooth' : 'wifi'}
                     size={24}
                     color={
                       isOnline ? colors.accent.primary : colors.text.muted
@@ -228,15 +474,25 @@ export default function HomeScreen() {
 
                 {/* Name / status */}
                 <View style={styles.deviceInfo}>
-                  <Text
-                    style={[
-                      styles.deviceName,
-                      !isOnline && styles.deviceNameOffline,
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {device.name}
-                  </Text>
+                  <View style={styles.deviceNameRow}>
+                    <Text
+                      style={[
+                        styles.deviceName,
+                        !isOnline && styles.deviceNameOffline,
+                      ]}
+                      numberOfLines={1}
+                    >
+                      {device.name}
+                    </Text>
+                    {device.deviceId && (
+                      <Feather
+                        name={trusted ? 'check-circle' : 'shield'}
+                        size={14}
+                        color={trusted ? colors.status.connected : colors.text.muted}
+                        style={{ marginLeft: 6 }}
+                      />
+                    )}
+                  </View>
                   <View style={styles.deviceStatusRow}>
                     <View
                       style={[
@@ -251,9 +507,15 @@ export default function HomeScreen() {
                     />
                     <Text style={styles.deviceAddress}>
                       {isOnline
-                        ? device.host
-                        : `Offline \u2022 ${timeAgo(device.lastSeen)}`}
+                        ? `${device.host}:${device.port}`
+                        : `${t('home_offline')} \u2022 ${timeAgo(device.lastSeen)}`}
                     </Text>
+                    {isOnline && device.deviceType && (
+                      <Text style={styles.deviceMeta}> \u2022 {device.deviceType}</Text>
+                    )}
+                    {isOnline && device.libraryVersion && (
+                      <Text style={styles.deviceMeta}> \u2022 v{device.libraryVersion}</Text>
+                    )}
                   </View>
                 </View>
               </View>
@@ -265,18 +527,18 @@ export default function HomeScreen() {
           <NeuCard style={styles.emptyCard}>
             <View style={styles.emptyContent}>
               <Feather name="search" size={24} color={colors.text.muted} />
-              <Text style={styles.emptyText}>Scanning for devices...</Text>
+              <Text style={styles.emptyText}>{t('home_scanning')}</Text>
             </View>
           </NeuCard>
         )}
 
-        {/* ---- Manual Connection ---- */}
-        <Text style={styles.sectionHeader}>MANUAL CONNECTION</Text>
+        {/* ---- WiFi Connection ---- */}
+        <Text style={styles.sectionHeader}>{t('home_wifi_connection')}</Text>
 
         <NeuCard style={styles.manualCard}>
           <NeuInput
             icon="globe"
-            placeholder="IP Address (e.g. 192.168.4.1)"
+            placeholder={t('home_ip_placeholder')}
             value={manualIp}
             onChangeText={setManualIp}
             keyboardType="numeric"
@@ -284,30 +546,63 @@ export default function HomeScreen() {
             autoCorrect={false}
             containerStyle={styles.inputContainer}
           />
-          <NeuInput
-            icon="hash"
-            placeholder={`Port (e.g. ${defaultPort})`}
-            value={manualPort}
-            onChangeText={setManualPort}
-            keyboardType="number-pad"
-            containerStyle={styles.inputContainer}
-          />
-        </NeuCard>
+          <View style={styles.portTimeoutRow}>
+            <NeuInput
+              icon="hash"
+              placeholder={t('home_port_placeholder')(defaultPort)}
+              value={manualPort}
+              onChangeText={setManualPort}
+              keyboardType="number-pad"
+              containerStyle={styles.halfInput}
+            />
+            <NeuInput
+              icon="clock"
+              placeholder={t('home_timeout_placeholder')(connectionTimeout / 1000)}
+              value={manualTimeout}
+              onChangeText={setManualTimeout}
+              keyboardType="number-pad"
+              containerStyle={styles.halfInput}
+            />
+          </View>
 
-        {/* Connect button — positioned centered below the card */}
-        <View style={styles.connectButtonWrapper}>
-          <NeuButton
-            icon="wifi"
-            onPress={handleManualConnect}
-            size={layout.connectButtonSize}
-            variant="accent"
-          />
-        </View>
+          <View style={styles.toggleRow}>
+            <Text style={styles.toggleLabel}>{t('home_auto_reconnect')}</Text>
+            <Switch
+              value={manualAutoReconnect}
+              onValueChange={setManualAutoReconnect}
+              trackColor={{ false: colors.bg.surfaceLight, true: colors.accent.glow }}
+              thumbColor={manualAutoReconnect ? colors.accent.primary : colors.text.muted}
+            />
+          </View>
+
+          <View style={styles.hintRow}>
+            <Feather name="info" size={14} color={colors.text.muted} />
+            <Text style={styles.hintText}>
+              {t('home_wifi_hint')}
+            </Text>
+          </View>
+
+          <Pressable
+            style={({ pressed }) => [
+              styles.connectButton,
+              pressed && styles.connectButtonPressed,
+              !manualIp.trim() && styles.connectButtonDisabled,
+            ]}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+              handleManualConnect();
+            }}
+            disabled={!manualIp.trim()}
+          >
+            <Feather name="wifi" size={18} color={colors.bg.primary} />
+            <Text style={styles.connectButtonText}>{t('home_connect_wifi')}</Text>
+          </Pressable>
+        </NeuCard>
 
         {/* ---- Recent ---- */}
         {recentConnections.length > 0 && (
           <>
-            <Text style={styles.sectionHeader}>RECENT</Text>
+            <Text style={styles.sectionHeader}>{t('home_recent')}</Text>
 
             {recentConnections.map((recent: RecentConnection, index: number) => (
               <Pressable
@@ -342,6 +637,16 @@ export default function HomeScreen() {
         {/* Bottom spacing so content isn't hidden behind tab bar */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
+
+      <CoachMark
+        id="home"
+        steps={[
+          { icon: 'search', title: t('coach_home_1_title'), description: t('coach_home_1_desc') },
+          { icon: 'shield', title: t('coach_home_2_title'), description: t('coach_home_2_desc') },
+          { icon: 'activity', title: t('coach_home_3_title'), description: t('coach_home_3_desc') },
+        ]}
+        dismissLabel={t('coach_ok')}
+      />
     </SafeAreaView>
   );
 }
@@ -374,11 +679,6 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...typography.headerTitle,
     color: colors.text.primary,
-  },
-  // Settings button positioned absolutely on the right
-  settingsBtn: {
-    position: 'absolute',
-    right: 0,
   },
 
   // Section headers
@@ -413,10 +713,14 @@ const styles = StyleSheet.create({
   deviceInfo: {
     flex: 1,
   },
+  deviceNameRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
   deviceName: {
     ...typography.deviceName,
     color: colors.text.primary,
-    marginBottom: 4,
   },
   deviceNameOffline: {
     color: colors.text.muted,
@@ -441,6 +745,10 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.text.secondary,
   },
+  deviceMeta: {
+    ...typography.caption,
+    color: colors.text.muted,
+  },
 
   // Empty state
   emptyCard: {
@@ -458,18 +766,62 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
   },
 
-  // Manual connection
+  // WiFi connection card
   manualCard: {
     gap: spacing.md,
   },
-  inputContainer: {
-    // spacing handled by NeuCard gap
+  inputContainer: {},
+  portTimeoutRow: {
+    flexDirection: 'row',
+    gap: spacing.md,
   },
-  connectButtonWrapper: {
+  halfInput: {
+    flex: 1,
+  },
+  toggleRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginTop: -spacing.xl,
-    marginBottom: spacing.sm,
-    zIndex: 1,
+    justifyContent: 'space-between',
+    paddingVertical: 4,
+  },
+  toggleLabel: {
+    ...typography.bodySmall,
+    color: colors.text.secondary,
+    flex: 1,
+  },
+  hintRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 8,
+    backgroundColor: colors.bg.surfaceLight,
+    borderRadius: borderRadius.small,
+    padding: spacing.sm,
+  },
+  hintText: {
+    ...typography.caption,
+    color: colors.text.muted,
+    flex: 1,
+    lineHeight: 18,
+  },
+  connectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.accent.primary,
+    borderRadius: borderRadius.innerCard,
+    paddingVertical: 14,
+  },
+  connectButtonPressed: {
+    opacity: 0.85,
+  },
+  connectButtonDisabled: {
+    opacity: 0.4,
+  },
+  connectButtonText: {
+    ...typography.body,
+    color: colors.bg.primary,
+    fontWeight: '700',
   },
 
   // Recent connections

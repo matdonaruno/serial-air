@@ -4,8 +4,18 @@ export interface Device {
   port: number;
   deviceType?: string;
   libraryVersion?: string;
+  deviceId?: string;
+  connectionType?: 'wifi' | 'ble';
   isOnline: boolean;
   lastSeen: Date;
+}
+
+export interface TrustedDevice {
+  deviceId: string;
+  name: string;
+  trustedAt: Date;
+  lastSeen: Date;
+  connectionType: 'wifi' | 'ble';
 }
 
 export interface LogLine {
