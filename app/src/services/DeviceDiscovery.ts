@@ -22,7 +22,8 @@ export class DeviceDiscovery {
   startScan(): void {
     if (this.scanning) return;
     this.scanning = true;
-    this.zeroconf.scan(MDNS_SERVICE_TYPE, 'tcp.');
+    console.log('[DeviceDiscovery] Starting mDNS scan for', MDNS_SERVICE_TYPE);
+    this.zeroconf.scan('serial-air', 'tcp.');
   }
 
   stopScan(): void {
@@ -41,7 +42,16 @@ export class DeviceDiscovery {
   }
 
   private _setupListeners(): void {
+    this.zeroconf.on('start', () => {
+      console.log('[DeviceDiscovery] mDNS scan started');
+    });
+
+    this.zeroconf.on('found', (name: string) => {
+      console.log('[DeviceDiscovery] mDNS found:', name);
+    });
+
     this.zeroconf.on('resolved', (service: any) => {
+      console.log('[DeviceDiscovery] mDNS resolved:', service.name, service.host);
       const device: Device = {
         name: service.name || 'Unknown Device',
         host: service.host || service.addresses?.[0] || '',

@@ -11,6 +11,7 @@ import {
   Pressable,
   Keyboard,
   useWindowDimensions,
+  PanResponder,
 } from 'react-native';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
@@ -217,12 +218,8 @@ export default function MonitorScreen() {
     }
   }, [filteredLines.length, autoScroll, isPaused]);
 
-  // --- disconnect on unmount ---
-  useEffect(() => {
-    return () => {
-      disconnect();
-    };
-  }, []);
+  // Connection persists when navigating away.
+  // User must explicitly tap "Disconnect" to end the session.
 
   // --- uptime counter ---
   useEffect(() => {
@@ -261,6 +258,19 @@ export default function MonitorScreen() {
 
   // --- derived (needed before handlers) ---
   const isConnected = status === 'connected';
+
+  // --- swipe left to Plotter ---
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) =>
+        Math.abs(gestureState.dx) > 30 && Math.abs(gestureState.dy) < 30,
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx < -80) {
+          router.push('/(tabs)/analytics' as any);
+        }
+      },
+    })
+  ).current;
 
   // --- handlers ---
   const handleBack = useCallback(() => {
@@ -403,7 +413,7 @@ export default function MonitorScreen() {
             keyExtractor={keyExtractor}
             style={styles.logList}
             contentContainerStyle={styles.logListContentLandscape}
-            showsVerticalScrollIndicator={false}
+            showsVerticalScrollIndicator={true}
             ListFooterComponent={<BlinkingCursor />}
           />
 
@@ -456,7 +466,8 @@ export default function MonitorScreen() {
   // =====================================================================
   return (
     <SafeAreaView style={styles.safeArea}>
-      <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
+      <View style={styles.flex} {...panResponder.panHandlers}>
+        <Pressable style={styles.flex} onPress={Keyboard.dismiss}>
         <KeyboardAvoidingView
           style={styles.flex}
           behavior={Platform.OS === 'ios' ? 'padding' : undefined}
@@ -464,20 +475,20 @@ export default function MonitorScreen() {
           {/* Header */}
           <View style={styles.header}>
             <NeuButton icon="arrow-left" onPress={handleBack} size={layout.actionButtonSize} />
-            <Text style={styles.headerTitle}>
-              {currentDevice?.name ?? 'ESP-SERIAL'}
-            </Text>
-            <View style={styles.statusBadge}>
-              {isConnected && <StatusDot />}
-              <Feather
-                name={connectionType === 'ble' ? 'bluetooth' : 'wifi'}
-                size={12}
-                color={statusColor}
-              />
-              <Text style={[styles.statusText, { color: statusColor }]}>
-                {statusLabel}
+            <View style={styles.headerCenter}>
+              <Text style={styles.headerTitle} numberOfLines={1}>
+                {currentDevice?.name ?? 'Serial Air'}
               </Text>
             </View>
+            <View style={styles.statusDotSmall}>
+              {isConnected && <StatusDot />}
+              {!isConnected && <View style={[styles.statusDotStatic, { backgroundColor: statusColor }]} />}
+            </View>
+            <NeuButton
+              icon="trending-up"
+              onPress={() => router.push('/(tabs)/analytics' as any)}
+              size={layout.actionButtonSize}
+            />
           </View>
 
           {/* Terminal Area */}
@@ -497,7 +508,7 @@ export default function MonitorScreen() {
               keyExtractor={keyExtractor}
               style={styles.logList}
               contentContainerStyle={styles.logListContent}
-              showsVerticalScrollIndicator={false}
+              showsVerticalScrollIndicator={true}
               ListFooterComponent={<BlinkingCursor />}
             />
           </NeuContainer>
@@ -531,6 +542,12 @@ export default function MonitorScreen() {
           </View>
         </KeyboardAvoidingView>
       </Pressable>
+
+      {/* Swipe hint */}
+      <View style={styles.swipeHint}>
+        <Feather name="chevron-left" size={12} color={colors.text.muted} />
+      </View>
+      </View>
     </SafeAreaView>
   );
 }
@@ -560,6 +577,18 @@ const styles = StyleSheet.create({
   headerTitle: {
     ...typography.headerTitle,
     color: colors.text.primary,
+  },
+  headerCenter: {
+    flex: 1,
+    alignItems: 'center',
+  },
+  statusDotSmall: {
+    marginRight: 8,
+  },
+  statusDotStatic: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
   },
   statusBadge: {
     flexDirection: 'row',
@@ -672,6 +701,19 @@ const styles = StyleSheet.create({
   inputMono: {
     fontFamily: 'Menlo',
     fontSize: 14,
+  },
+
+  // Landscape status bar (always visible, minimal)
+  swipeHint: {
+    position: 'absolute',
+    right: 0,
+    top: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+    paddingVertical: 14,
+    paddingLeft: 4,
+    paddingRight: 2,
   },
 
   // Landscape status bar (always visible, minimal)

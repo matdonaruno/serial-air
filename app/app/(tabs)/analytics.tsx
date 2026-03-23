@@ -6,10 +6,12 @@ import {
   SafeAreaView,
   Dimensions,
   Alert,
+  PanResponder,
 } from 'react-native';
 import Svg, { Polyline, Line, Text as SvgText } from 'react-native-svg';
 import ViewShot, { captureRef } from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
+import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 
@@ -65,6 +67,21 @@ interface DataSeries {
 }
 
 export default function AnalyticsScreen() {
+  const router = useRouter();
+
+  // Swipe right to go back to Monitor
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gs) =>
+        Math.abs(gs.dx) > 30 && Math.abs(gs.dy) < 30,
+      onPanResponderRelease: (_, gs) => {
+        if (gs.dx > 80) {
+          router.push('/monitor');
+        }
+      },
+    })
+  ).current;
+
   const status = useConnectionStore((s) => s.status);
   const currentDevice = useConnectionStore((s) => s.currentDevice);
   const lines = useLogStore((s) => s.lines);
@@ -165,29 +182,38 @@ export default function AnalyticsScreen() {
   });
 
   return (
-    <SafeAreaView style={styles.screen}>
+    <SafeAreaView style={styles.screen} {...panResponder.panHandlers}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>{t('plotter_title')}</Text>
-        <View style={styles.headerActions}>
+      </View>
+
+      {/* Action bar */}
+      <View style={styles.actionBar}>
+        {isConnected && (
           <NeuButton
-            icon="share"
-            onPress={handleExport}
-            size={layout.actionButtonSize}
-            disabled={!hasData}
-          />
-          <NeuButton
-            icon={paused ? 'play' : 'pause'}
-            onPress={handleTogglePause}
-            size={layout.actionButtonSize}
-            active={paused}
-          />
-          <NeuButton
-            icon="trash-2"
-            onPress={handleClear}
+            icon="terminal"
+            onPress={() => router.push('/monitor')}
             size={layout.actionButtonSize}
           />
-        </View>
+        )}
+        <NeuButton
+          icon="share"
+          onPress={handleExport}
+          size={layout.actionButtonSize}
+          disabled={!hasData}
+        />
+        <NeuButton
+          icon={paused ? 'play' : 'pause'}
+          onPress={handleTogglePause}
+          size={layout.actionButtonSize}
+          active={paused}
+        />
+        <NeuButton
+          icon="trash-2"
+          onPress={handleClear}
+          size={layout.actionButtonSize}
+        />
       </View>
 
       {/* Connection status */}
@@ -278,6 +304,11 @@ export default function AnalyticsScreen() {
         </View>
       )}
 
+      {/* Swipe hint */}
+      <View style={styles.swipeHint}>
+        <Feather name="chevron-right" size={12} color={colors.text.muted} />
+      </View>
+
       <CoachMark
         id="plotter"
         steps={[
@@ -308,11 +339,14 @@ const styles = StyleSheet.create({
     ...typography.headerTitle,
     color: colors.text.primary,
   },
-  headerActions: {
-    position: 'absolute',
-    right: layout.screenPaddingH,
+  actionBar: {
     flexDirection: 'row',
-    gap: spacing.sm,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: layout.screenPaddingH,
+    marginBottom: spacing.sm,
   },
   statusBar: {
     flexDirection: 'row',
@@ -353,13 +387,13 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   chartContainer: {
+    flex: 1,
     marginHorizontal: layout.screenPaddingH,
     backgroundColor: colors.bg.surface,
     borderRadius: borderRadius.card,
     borderWidth: 1,
     borderColor: colors.borderLight,
     padding: spacing.md,
-    minHeight: 300,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -411,5 +445,16 @@ const styles = StyleSheet.create({
     fontFamily: 'Menlo',
     fontSize: 12,
     color: colors.text.primary,
+  },
+  swipeHint: {
+    position: 'absolute',
+    left: 0,
+    top: '50%',
+    backgroundColor: 'rgba(255, 255, 255, 0.06)',
+    borderTopRightRadius: 10,
+    borderBottomRightRadius: 10,
+    paddingVertical: 14,
+    paddingRight: 4,
+    paddingLeft: 2,
   },
 });

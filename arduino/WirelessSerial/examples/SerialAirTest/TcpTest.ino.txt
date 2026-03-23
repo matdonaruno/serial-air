@@ -1,0 +1,47 @@
+/**
+ * TcpTest — Minimal TCP server test for ESP32-C3
+ *
+ * This bypasses WirelessSerial to verify basic TCP works.
+ * Upload this, connect with: nc 192.168.0.20 23
+ *
+ * If this works but WirelessSerial doesn't, the issue is in the library.
+ * If this also fails, the issue is ESP32-C3 WiFi/TCP stack.
+ */
+
+#include <WiFi.h>
+
+const char* WIFI_SSID = "BBIQRT-2G-pe388f";
+const char* WIFI_PASS = "8c7f21e9c1edd";
+
+WiFiServer server(23);
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+
+    Serial.println("=== TCP Test (no WirelessSerial) ===");
+
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(WIFI_SSID, WIFI_PASS);
+    Serial.print("WiFi");
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.print(".");
+    }
+    Serial.printf("\nIP: %s\n", WiFi.localIP().toString().c_str());
+
+    server.begin();
+    Serial.println("TCP server on port 23 — waiting for client...");
+}
+
+void loop() {
+    WiFiClient client = server.available();
+    if (client) {
+        Serial.println("Client connected!");
+        while (client.connected()) {
+            client.printf("Hello from ESP32-C3! Uptime: %lus\n", millis() / 1000);
+            delay(1000);
+        }
+        Serial.println("Client disconnected.");
+    }
+}

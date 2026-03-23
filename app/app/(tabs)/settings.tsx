@@ -26,6 +26,7 @@ import {
   layout,
 } from '../../src/constants/theme';
 import { t } from '../../src/i18n';
+import { FREE_MODE } from '../../src/constants/defaults';
 
 // --- Cycle helpers ---
 
@@ -290,37 +291,41 @@ export default function SettingsScreen() {
           />
         </NeuCard>
 
-        {/* PURCHASE Section */}
-        <Text style={styles.sectionHeader}>PURCHASE</Text>
-        <NeuCard style={styles.card}>
-          <SettingRow label="Status">
-            <Text style={[styles.rowValue, isPurchased && { color: colors.status.connected }]}>
-              {isPurchased ? 'Pro (Unlocked)' : `Trial (${trialDaysRemaining}d left)`}
-            </Text>
-          </SettingRow>
+        {/* PURCHASE Section (hidden in FREE_MODE) */}
+        {!FREE_MODE && (
+          <>
+            <Text style={styles.sectionHeader}>{t('settings_purchase')}</Text>
+            <NeuCard style={styles.card}>
+              <SettingRow label={t('settings_status')}>
+                <Text style={[styles.rowValue, isPurchased && { color: colors.status.connected }]}>
+                  {isPurchased ? t('settings_pro_unlocked') : t('settings_trial_left')(trialDaysRemaining)}
+                </Text>
+              </SettingRow>
 
-          {!isPurchased && (
-            <LinkRow
-              label="Unlock Pro — $1.99"
-              icon="zap"
-              onPress={() => router.push('/paywall')}
-            />
-          )}
+              {!isPurchased && (
+                <LinkRow
+                  label={t('settings_unlock_pro')}
+                  icon="zap"
+                  onPress={() => router.push('/paywall')}
+                />
+              )}
 
-          <LinkRow
-            label="Restore Purchase"
-            icon="refresh-cw"
-            onPress={async () => {
-              const success = await restorePurchase();
-              if (success) {
-                Alert.alert('Restored', 'Your purchase has been restored.');
-              } else {
-                Alert.alert('Not Found', 'No previous purchase was found.');
-              }
-            }}
-            isLast
-          />
-        </NeuCard>
+              <LinkRow
+                label={t('settings_restore_purchase')}
+                icon="refresh-cw"
+                onPress={async () => {
+                  const success = await restorePurchase();
+                  if (success) {
+                    Alert.alert(t('settings_restored'), t('settings_restored_msg'));
+                  } else {
+                    Alert.alert(t('settings_not_found'), t('settings_not_found_msg'));
+                  }
+                }}
+                isLast
+              />
+            </NeuCard>
+          </>
+        )}
 
         {/* ABOUT Section */}
         <Text style={styles.sectionHeader}>ABOUT</Text>

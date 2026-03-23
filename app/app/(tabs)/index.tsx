@@ -7,6 +7,8 @@ import {
   Pressable,
   Alert,
   Switch,
+  Image,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -25,6 +27,7 @@ import { NeuCard, NeuButton, NeuInput } from '../../src/components/neumorphic';
 import { useConnectionStore, getBleManager } from '../../src/stores/useConnectionStore';
 import { useDiscoveryStore } from '../../src/stores/useDiscoveryStore';
 import { useSettingsStore } from '../../src/stores/useSettingsStore';
+import { FREE_MODE } from '../../src/constants/defaults';
 import { usePurchaseStore } from '../../src/stores/usePurchaseStore';
 import { useTrustStore } from '../../src/stores/useTrustStore';
 import { DeviceDiscovery } from '../../src/services/DeviceDiscovery';
@@ -115,8 +118,9 @@ function ConnectionBanner() {
   if (status === 'disconnected') {
     return (
       <View style={[bannerStyles.container, bannerStyles.disconnected]}>
-        <View style={[bannerStyles.dot, { backgroundColor: colors.text.muted }]} />
+        <Feather name="wifi-off" size={16} color={colors.text.muted} />
         <Text style={[bannerStyles.text, { color: colors.text.muted }]}>{t('home_no_connection')}</Text>
+        <Feather name="chevron-down" size={14} color={colors.text.muted} />
       </View>
     );
   }
@@ -242,6 +246,9 @@ export default function HomeScreen() {
   const [manualTimeout, setManualTimeout] = useState('');
   const [manualAutoReconnect, setManualAutoReconnect] = useState(autoReconnect);
 
+  // Connect modal state
+  const [modalDevice, setModalDevice] = useState<Device | null>(null);
+
   // Discovery refs
   const discoveryRef = useRef<DeviceDiscovery | null>(null);
   const bleDiscoveryRef = useRef<BleDiscovery | null>(null);
@@ -328,36 +335,29 @@ export default function HomeScreen() {
         router.push('/paywall');
         return;
       }
-
-      // If device has a deviceId and is not trusted, show trust dialog
-      if (device.deviceId && !isDeviceTrusted(device.deviceId)) {
-        Alert.alert(
-          t('home_trust_title'),
-          `${device.name}\n${device.deviceId}`,
-          [
-            { text: t('cancel'), style: 'cancel' },
-            {
-              text: t('home_trust_connect'),
-              onPress: () => {
-                trustDevice({
-                  deviceId: device.deviceId!,
-                  name: device.name,
-                  trustedAt: new Date(),
-                  lastSeen: new Date(),
-                  connectionType: device.connectionType ?? 'wifi',
-                });
-                doConnect(device);
-              },
-            },
-          ],
-        );
-        return;
-      }
-
-      doConnect(device);
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      setModalDevice(device);
     },
-    [doConnect, hasAccess, router, isDeviceTrusted, trustDevice],
+    [hasAccess, router],
   );
+
+  const handleModalConnect = useCallback(() => {
+    if (!modalDevice) return;
+
+    // Trust if needed
+    if (modalDevice.deviceId && !isDeviceTrusted(modalDevice.deviceId)) {
+      trustDevice({
+        deviceId: modalDevice.deviceId,
+        name: modalDevice.name,
+        trustedAt: new Date(),
+        lastSeen: new Date(),
+        connectionType: modalDevice.connectionType ?? 'wifi',
+      });
+    }
+
+    doConnect(modalDevice);
+    setModalDevice(null);
+  }, [modalDevice, doConnect, isDeviceTrusted, trustDevice]);
 
   const handleManualConnect = useCallback(() => {
     const ip = manualIp.trim();
@@ -381,19 +381,18 @@ export default function HomeScreen() {
       >
         {/* ---- Header ---- */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>{t('home_title')}</Text>
-          <NeuButton
-            icon="settings"
-            onPress={() => router.push('/(tabs)/settings')}
-            size={layout.actionButtonSize}
+          <Image
+            source={require('../../assets/icon.png')}
+            style={styles.headerIcon}
           />
+          <Text style={styles.headerTitle}>{t('home_title')}</Text>
         </View>
 
         {/* ---- Connection Status Banner ---- */}
         <ConnectionBanner />
 
-        {/* ---- Trial Banner ---- */}
-        {!isPurchased && (
+        {/* ---- Trial Banner (hidden in FREE_MODE) ---- */}
+        {!FREE_MODE && !isPurchased && (
           <Pressable
             style={[
               styles.trialBanner,
@@ -423,26 +422,15 @@ export default function HomeScreen() {
           </Pressable>
         )}
 
-        {/* ---- Quick Start ---- */}
-        <Pressable
-          style={styles.codeGenButton}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/code-generator');
-          }}
-        >
-          <View style={styles.codeGenIcon}>
-            <Feather name="code" size={18} color={colors.accent.primary} />
-          </View>
-          <View style={styles.codeGenText}>
-            <Text style={styles.codeGenTitle}>{t('home_generate_code')}</Text>
-            <Text style={styles.codeGenSub}>{t('home_generate_code_sub')}</Text>
-          </View>
-          <Feather name="chevron-right" size={18} color={colors.text.muted} />
-        </Pressable>
-
         {/* ---- Discovered ---- */}
         <Text style={styles.sectionHeader}>{t('home_discovered')}</Text>
+
+        {devices.length > 0 && (
+          <View style={styles.tapHint}>
+            <Feather name="arrow-down" size={14} color={colors.accent.primary} />
+            <Text style={styles.tapHintText}>{t('home_tap_to_connect')}</Text>
+          </View>
+        )}
 
         {devices.map((device) => {
           const isOnline = device.isOnline;
@@ -485,11 +473,16 @@ export default function HomeScreen() {
                       {device.name}
                     </Text>
                     {device.deviceId && (
+                      <Text style={styles.deviceIdShort}>
+                        {device.deviceId.slice(-4)}
+                      </Text>
+                    )}
+                    {device.deviceId && (
                       <Feather
                         name={trusted ? 'check-circle' : 'shield'}
                         size={14}
                         color={trusted ? colors.status.connected : colors.text.muted}
-                        style={{ marginLeft: 6 }}
+                        style={{ marginLeft: 4 }}
                       />
                     )}
                   </View>
@@ -505,17 +498,11 @@ export default function HomeScreen() {
                         isOnline && styles.statusDotGlow,
                       ]}
                     />
-                    <Text style={styles.deviceAddress}>
+                    <Text style={styles.deviceAddress} numberOfLines={1}>
                       {isOnline
-                        ? `${device.host}:${device.port}`
+                        ? `${device.host}:${device.port}${device.deviceType ? ` \u2022 ${device.deviceType}` : ''}${device.libraryVersion ? ` \u2022 v${device.libraryVersion}` : ''}`
                         : `${t('home_offline')} \u2022 ${timeAgo(device.lastSeen)}`}
                     </Text>
-                    {isOnline && device.deviceType && (
-                      <Text style={styles.deviceMeta}> \u2022 {device.deviceType}</Text>
-                    )}
-                    {isOnline && device.libraryVersion && (
-                      <Text style={styles.deviceMeta}> \u2022 v{device.libraryVersion}</Text>
-                    )}
                   </View>
                 </View>
               </View>
@@ -526,9 +513,10 @@ export default function HomeScreen() {
         {devices.length === 0 && (
           <NeuCard style={styles.emptyCard}>
             <View style={styles.emptyContent}>
-              <Feather name="search" size={24} color={colors.text.muted} />
+              <Feather name="search" size={18} color={colors.text.muted} />
               <Text style={styles.emptyText}>{t('home_scanning')}</Text>
             </View>
+            <Text style={styles.emptyHint}>{t('home_scanning_hint')}</Text>
           </NeuCard>
         )}
 
@@ -634,6 +622,24 @@ export default function HomeScreen() {
           </>
         )}
 
+        {/* ---- Test Code ---- */}
+        <Text style={styles.sectionHeader}>{t('home_generate_code')}</Text>
+        <Pressable
+          style={styles.codeGenButton}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            router.push('/code-generator');
+          }}
+        >
+          <View style={styles.codeGenIcon}>
+            <Feather name="code" size={18} color={colors.accent.primary} />
+          </View>
+          <View style={styles.codeGenText}>
+            <Text style={styles.codeGenTitle}>{t('home_generate_code_sub')}</Text>
+          </View>
+          <Feather name="chevron-right" size={18} color={colors.text.muted} />
+        </Pressable>
+
         {/* Bottom spacing so content isn't hidden behind tab bar */}
         <View style={styles.bottomSpacer} />
       </ScrollView>
@@ -647,9 +653,190 @@ export default function HomeScreen() {
         ]}
         dismissLabel={t('coach_ok')}
       />
+
+      {/* Connect Modal */}
+      <Modal
+        visible={modalDevice !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setModalDevice(null)}
+      >
+        <Pressable style={modalStyles.overlay} onPress={() => setModalDevice(null)}>
+          <Pressable style={modalStyles.card} onPress={() => {}}>
+            {/* Device icon & name */}
+            <View style={modalStyles.deviceHeader}>
+              <View style={modalStyles.iconCircle}>
+                <Feather
+                  name={modalDevice?.connectionType === 'ble' ? 'bluetooth' : 'wifi'}
+                  size={28}
+                  color={colors.accent.primary}
+                />
+              </View>
+              <Text style={modalStyles.deviceName}>{modalDevice?.name}</Text>
+              {modalDevice?.deviceId && (
+                <Text style={modalStyles.deviceId}>{modalDevice.deviceId}</Text>
+              )}
+            </View>
+
+            {/* Connection details */}
+            <View style={modalStyles.details}>
+              <View style={modalStyles.detailRow}>
+                <Feather name="globe" size={16} color={colors.text.muted} />
+                <Text style={modalStyles.detailLabel}>IP</Text>
+                <Text style={modalStyles.detailValue}>{modalDevice?.host}</Text>
+              </View>
+              <View style={modalStyles.detailRow}>
+                <Feather name="hash" size={16} color={colors.text.muted} />
+                <Text style={modalStyles.detailLabel}>Port</Text>
+                <Text style={modalStyles.detailValue}>{modalDevice?.port}</Text>
+              </View>
+              {modalDevice?.deviceType && (
+                <View style={modalStyles.detailRow}>
+                  <Feather name="cpu" size={16} color={colors.text.muted} />
+                  <Text style={modalStyles.detailLabel}>Type</Text>
+                  <Text style={modalStyles.detailValue}>{modalDevice.deviceType}</Text>
+                </View>
+              )}
+              {modalDevice?.connectionType && (
+                <View style={modalStyles.detailRow}>
+                  <Feather name="radio" size={16} color={colors.text.muted} />
+                  <Text style={modalStyles.detailLabel}>Via</Text>
+                  <Text style={modalStyles.detailValue}>
+                    {modalDevice.connectionType === 'ble' ? 'Bluetooth' : 'WiFi'}
+                  </Text>
+                </View>
+              )}
+              {modalDevice?.deviceId && !isDeviceTrusted(modalDevice.deviceId) && (
+                <View style={modalStyles.trustHint}>
+                  <Feather name="shield" size={14} color={colors.accent.primary} />
+                  <Text style={modalStyles.trustHintText}>{t('home_trust_title')}</Text>
+                </View>
+              )}
+            </View>
+
+            {/* Buttons */}
+            <Pressable
+              style={modalStyles.connectButton}
+              onPress={handleModalConnect}
+            >
+              <Feather name="zap" size={18} color={colors.bg.primary} />
+              <Text style={modalStyles.connectButtonText}>{t('home_connect_button')}</Text>
+            </Pressable>
+
+            <Pressable
+              style={modalStyles.cancelButton}
+              onPress={() => setModalDevice(null)}
+            >
+              <Text style={modalStyles.cancelText}>{t('cancel')}</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
+
+const modalStyles = StyleSheet.create({
+  overlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
+  },
+  card: {
+    width: '100%',
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.card,
+    padding: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  deviceHeader: {
+    alignItems: 'center',
+    marginBottom: spacing.lg,
+  },
+  iconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: colors.bg.surfaceLight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  deviceName: {
+    ...typography.titleSmall,
+    color: colors.text.primary,
+    textAlign: 'center',
+  },
+  deviceId: {
+    ...typography.caption,
+    color: colors.text.muted,
+    marginTop: 4,
+    fontFamily: 'Menlo',
+  },
+  details: {
+    backgroundColor: colors.bg.surfaceLight,
+    borderRadius: borderRadius.innerCard,
+    padding: spacing.md,
+    marginBottom: spacing.lg,
+    gap: 12,
+  },
+  detailRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  detailLabel: {
+    ...typography.caption,
+    color: colors.text.muted,
+    width: 40,
+  },
+  detailValue: {
+    ...typography.body,
+    color: colors.text.primary,
+    fontFamily: 'Menlo',
+    flex: 1,
+  },
+  trustHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 4,
+    paddingTop: 12,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  trustHintText: {
+    ...typography.caption,
+    color: colors.accent.primary,
+    fontWeight: '600',
+  },
+  connectButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.accent.primary,
+    borderRadius: borderRadius.innerCard,
+    paddingVertical: 14,
+    marginBottom: spacing.sm,
+  },
+  connectButtonText: {
+    ...typography.body,
+    color: colors.bg.primary,
+    fontWeight: '700',
+  },
+  cancelButton: {
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  cancelText: {
+    ...typography.bodySmall,
+    color: colors.text.muted,
+  },
+});
 
 // ---------------------------------------------------------------------------
 // Styles
@@ -675,6 +862,12 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginBottom: spacing.lg,
     position: 'relative',
+  },
+  headerIcon: {
+    width: 36,
+    height: 36,
+    borderRadius: 10,
+    marginRight: spacing.sm,
   },
   headerTitle: {
     ...typography.headerTitle,
@@ -721,9 +914,22 @@ const styles = StyleSheet.create({
   deviceName: {
     ...typography.deviceName,
     color: colors.text.primary,
+    flexShrink: 1,
   },
   deviceNameOffline: {
     color: colors.text.muted,
+  },
+  deviceIdShort: {
+    fontFamily: 'Menlo',
+    fontSize: 11,
+    color: '#FF9800',
+    backgroundColor: 'rgba(255, 152, 0, 0.12)',
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    marginLeft: 6,
+    overflow: 'hidden',
+    fontWeight: '700',
   },
   deviceStatusRow: {
     flexDirection: 'row',
@@ -744,10 +950,7 @@ const styles = StyleSheet.create({
   deviceAddress: {
     ...typography.caption,
     color: colors.text.secondary,
-  },
-  deviceMeta: {
-    ...typography.caption,
-    color: colors.text.muted,
+    flex: 1,
   },
 
   // Empty state
@@ -757,13 +960,32 @@ const styles = StyleSheet.create({
   emptyContent: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
     gap: spacing.sm,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
   },
   emptyText: {
     ...typography.bodySmall,
     color: colors.text.muted,
+  },
+  emptyHint: {
+    ...typography.caption,
+    color: colors.text.muted,
+    textAlign: 'center',
+    marginTop: 6,
+    lineHeight: 16,
+    fontSize: 11,
+  },
+  tapHint: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    marginBottom: spacing.sm,
+  },
+  tapHintText: {
+    ...typography.caption,
+    color: colors.accent.primary,
+    fontWeight: '600',
   },
 
   // WiFi connection card

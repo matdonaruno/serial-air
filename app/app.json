@@ -21,7 +21,9 @@
         "NSLocalNetworkUsageDescription": "Serial Air uses your local network to discover and connect to microcontrollers for serial monitoring.",
         "NSBluetoothAlwaysUsageDescription": "Serial Air uses Bluetooth to discover and connect to nearby ESP32 microcontrollers.",
         "NSBonjourServices": [
-          "_serial-air._tcp"
+          "_serial-air._tcp.",
+          "_serial-air._tcp.local.",
+          "_serial-air._tcp.local"
         ]
       }
     },

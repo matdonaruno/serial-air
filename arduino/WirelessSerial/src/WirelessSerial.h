@@ -14,11 +14,20 @@
   #error "WirelessSerial only supports ESP8266 and ESP32"
 #endif
 
-#ifdef ESP32
-  #include <BLEDevice.h>
-  #include <BLEServer.h>
-  #include <BLEUtils.h>
-  #include <BLE2902.h>
+#if defined(ESP32) && !defined(WS_NO_BLE)
+  #define WS_BLE_ENABLED 1
+  #if __has_include(<NimBLEDevice.h>)
+    #define WS_USE_NIMBLE 1
+    #include <NimBLEDevice.h>
+  #else
+    #define WS_USE_NIMBLE 0
+    #include <BLEDevice.h>
+    #include <BLEServer.h>
+    #include <BLEUtils.h>
+    #include <BLE2902.h>
+  #endif
+#else
+  #define WS_BLE_ENABLED 0
 #endif
 
 #include "DualPrint.h"
@@ -96,7 +105,7 @@ public:
     /// Get the unique device ID (SA-AABBCCDDEEFF format).
     const char* getDeviceId() const;
 
-#ifdef ESP32
+#if WS_BLE_ENABLED
     // ========== BLE (ESP32 only) ==========
 
     /// Start BLE UART service (Nordic UART Service).
@@ -134,7 +143,7 @@ private:
     void _bufferWrite(const uint8_t* data, size_t len);
     void _flushBufferTo(WiFiClient& client);
 
-#ifdef ESP32
+#if WS_BLE_ENABLED
     BLEServer* _bleServer;
     BLECharacteristic* _bleTxChar;
     BLECharacteristic* _bleRxChar;

@@ -1,5 +1,16 @@
 import { SettingsState } from '../types';
 
+/**
+ * Monetization mode flag.
+ * - true:  All features free, no trial/paywall (v1.0 launch)
+ * - false: 7-day trial + $1.99 one-time purchase (future update)
+ *
+ * To enable paid mode, set this to false and ensure the IAP product
+ * "serial_air_pro" is configured in App Store Connect.
+ * See docs/MONETIZATION.md for the full migration guide.
+ */
+export const FREE_MODE = true;
+
 export const DEFAULT_PORT = 23;
 export const MDNS_SERVICE_TYPE = '_serial-air._tcp.';
 export const MAX_LOG_LINES = 10000;

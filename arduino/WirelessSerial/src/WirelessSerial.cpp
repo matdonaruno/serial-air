@@ -1,7 +1,7 @@
 #include "WirelessSerial.h"
 
 // Nordic UART Service UUIDs
-#ifdef ESP32
+#if WS_BLE_ENABLED
 #define NUS_SERVICE_UUID        "6E400001-B5A3-F393-E0A9-E50E24DCCA9E"
 #define NUS_TX_CHARACTERISTIC   "6E400003-B5A3-F393-E0A9-E50E24DCCA9E"
 #define NUS_RX_CHARACTERISTIC   "6E400002-B5A3-F393-E0A9-E50E24DCCA9E"
@@ -42,7 +42,7 @@ WirelessSerial::WirelessSerial()
     , _ringSize(0)
     , _ringHead(0)
     , _ringCount(0)
-#ifdef ESP32
+#if WS_BLE_ENABLED
     , _bleServer(nullptr)
     , _bleTxChar(nullptr)
     , _bleRxChar(nullptr)
@@ -73,6 +73,7 @@ void WirelessSerial::begin(uint16_t port, const char* mdnsName) {
 
     _server = new WiFiServer(port);
     _server->begin();
+    Serial.printf("[WS] TCP server started on port %d (operator bool: %d)\n", port, (bool)*_server);
 
 #ifdef ESP8266
     _server->setNoDelay(true);
@@ -82,7 +83,7 @@ void WirelessSerial::begin(uint16_t port, const char* mdnsName) {
     if (MDNS.begin(mdnsName)) {
         MDNS.addService("serial-air", "tcp", port);
         MDNS.addServiceTxt("serial-air", "tcp", "version", WIRELESS_SERIAL_VERSION);
-        MDNS.addServiceTxt("serial-air", "tcp", "id", _deviceId);
+        MDNS.addServiceTxt("serial-air", "tcp", "id", (const char*)_deviceId);
 #ifdef ESP8266
         MDNS.addServiceTxt("serial-air", "tcp", "device", "ESP8266");
 #elif defined(ESP32)
@@ -98,7 +99,7 @@ void WirelessSerial::stop() {
 
     unmirror();
 
-#ifdef ESP32
+#if WS_BLE_ENABLED
     stopBLE();
 #endif
 
@@ -158,7 +159,7 @@ size_t WirelessSerial::write(uint8_t byte) {
 
 size_t WirelessSerial::write(const uint8_t* buffer, size_t size) {
     bool bleActive = false;
-#ifdef ESP32
+#if WS_BLE_ENABLED
     bleActive = _bleRunning;
 #endif
     if (!_running && !bleActive) return 0;
@@ -176,15 +177,20 @@ size_t WirelessSerial::write(const uint8_t* buffer, size_t size) {
         }
     }
 
-#ifdef ESP32
+#if WS_BLE_ENABLED
     // Send to BLE client in 20-byte chunks
     if (_bleRunning && _bleClientConnected && _bleTxChar) {
         hasClient = true;
         size_t offset = 0;
         while (offset < size) {
             size_t chunk = (size - offset > BLE_MTU_PAYLOAD) ? BLE_MTU_PAYLOAD : (size - offset);
+#if WS_USE_NIMBLE
+            _bleTxChar->setValue(buffer + offset, chunk);
+            _bleTxChar->notify(true);
+#else
             _bleTxChar->setValue(const_cast<uint8_t*>(buffer + offset), chunk);
             _bleTxChar->notify();
+#endif
             offset += chunk;
             if (offset < size) delay(10); // small delay between BLE chunks
         }
@@ -313,8 +319,9 @@ void WirelessSerial::_acceptNewClients() {
         rejected.stop();
     }
 #else // ESP32
-    WiFiClient newClient = _server->available();
+    WiFiClient newClient = _server->accept();
     if (newClient) {
+        Serial.printf("[WS] New client accepted!\n");
         for (uint8_t i = 0; i < _maxClients; i++) {
             if (!_clients[i].connected()) {
                 _clients[i] = newClient;
@@ -339,7 +346,7 @@ void WirelessSerial::_cleanupClients() {
 
 // ========== BLE (ESP32 only) ==========
 
-#ifdef ESP32
+#if WS_BLE_ENABLED
 
 void WirelessSerial::beginBLE(const char* bleName) {
     if (_bleRunning) stopBLE();
@@ -360,7 +367,9 @@ void WirelessSerial::beginBLE(const char* bleName) {
         NUS_TX_CHARACTERISTIC,
         BLECharacteristic::PROPERTY_NOTIFY
     );
+#if !WS_USE_NIMBLE
     _bleTxChar->addDescriptor(new BLE2902());
+#endif
 
     // RX Characteristic (client -> server, write)
     _bleRxChar = pService->createCharacteristic(
@@ -371,11 +380,13 @@ void WirelessSerial::beginBLE(const char* bleName) {
 
     pService->start();
 
-    // Start advertising with device ID in manufacturer data
+    // Start advertising
     BLEAdvertising* pAdvertising = BLEDevice::getAdvertising();
     pAdvertising->addServiceUUID(NUS_SERVICE_UUID);
     pAdvertising->setScanResponse(true);
+#if !WS_USE_NIMBLE
     pAdvertising->setMinPreferred(0x06);
+#endif
     BLEDevice::startAdvertising();
 
     _bleRunning = true;
@@ -400,4 +411,4 @@ uint8_t WirelessSerial::bleClientCount() const {
     return _bleClientConnected ? 1 : 0;
 }
 
-#endif // ESP32
+#endif // WS_BLE_ENABLED

@@ -22,7 +22,7 @@ function TabIcon({
     >
       <Feather
         name={name}
-        size={22}
+        size={26}
         color={focused ? colors.accent.primary : colors.text.muted}
       />
     </View>
@@ -84,9 +84,9 @@ const styles = StyleSheet.create({
   tabBar: {
     backgroundColor: colors.bg.primary,
     borderTopWidth: 0,
-    height: 96,
-    paddingBottom: 28,
-    paddingTop: 12,
+    height: 124,
+    paddingBottom: 36,
+    paddingTop: 16,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: -10 },
     shadowOpacity: 0.2,
@@ -94,9 +94,9 @@ const styles = StyleSheet.create({
     elevation: 20,
   },
   tabIconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: borderRadius.tab,
+    width: 56,
+    height: 56,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
   },

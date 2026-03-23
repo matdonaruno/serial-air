@@ -25,13 +25,6 @@ export class BleDiscovery {
   async startScan(): Promise<void> {
     if (this.scanning) return;
 
-    // Check Bluetooth state
-    const state = await this.manager.state();
-    if (state !== State.PoweredOn) {
-      console.warn('[BleDiscovery] Bluetooth not powered on:', state);
-      return;
-    }
-
     // Request Android permissions if needed
     if (Platform.OS === 'android') {
       const granted = await this._requestAndroidPermissions();
@@ -41,6 +34,24 @@ export class BleDiscovery {
       }
     }
 
+    // On iOS, calling startDeviceScan triggers the Bluetooth permission dialog.
+    // We listen for state changes to start scanning once BLE is ready.
+    const state = await this.manager.state();
+    if (state !== State.PoweredOn) {
+      console.log('[BleDiscovery] BLE state:', state, '— waiting for PoweredOn');
+      this.manager.onStateChange((newState) => {
+        if (newState === State.PoweredOn && !this.scanning) {
+          console.log('[BleDiscovery] BLE now PoweredOn, starting scan');
+          this._startDeviceScan();
+        }
+      }, true);
+      return;
+    }
+
+    this._startDeviceScan();
+  }
+
+  private _startDeviceScan(): void {
     this.scanning = true;
     this.discoveredIds.clear();
 
