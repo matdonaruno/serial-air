@@ -59,7 +59,7 @@ void setup() {
 
     Serial.println();
     Serial.println("╔══════════════════════════════════╗");
-    Serial.println("║  Serial Air Test Firmware v0.7   ║");
+    Serial.println("║  Serial Air Test Firmware v0.8   ║");
     Serial.println("║  ESP32-C3 Super Mini             ║");
     Serial.println("╚══════════════════════════════════╝");
     Serial.println();
@@ -82,11 +82,11 @@ void setup() {
     Serial.println();
 
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("error: WiFi failed! Restarting...");
-        ESP.restart();
+        Serial.println("warn: WiFi failed — running BLE only");
+    } else {
+        Serial.printf("ok: Connected! IP: %s\n", WiFi.localIP().toString().c_str());
+        Serial.printf("RSSI: %d dBm\n", WiFi.RSSI());
     }
-    Serial.printf("ok: Connected! IP: %s\n", WiFi.localIP().toString().c_str());
-    Serial.printf("RSSI: %d dBm\n", WiFi.RSSI());
 
     // Enable ring buffer (keeps data while no client is connected)
     ws.enableBuffer(2048);
