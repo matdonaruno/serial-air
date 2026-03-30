@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,17 @@ import {
   ScrollView,
   StyleSheet,
   Alert,
+  Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
+import * as FileSystem from 'expo-file-system';
+import * as Sharing from 'expo-sharing';
+import * as MailComposer from 'expo-mail-composer';
+import QRCode from 'react-native-qrcode-svg';
 import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
 import { t } from '../src/i18n';
 
@@ -396,12 +401,60 @@ export default function CodeGeneratorScreen() {
     [boardId, ssid, password, security, devicePassword]
   );
 
-  const handleCopy = async () => {
+  const [showQR, setShowQR] = useState(false);
+
+  const handleCopy = useCallback(async () => {
     await Clipboard.setStringAsync(code);
     await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
-  };
+  }, [code]);
+
+  const handleShare = useCallback(async () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const ext = board.platform === 'arduino' ? 'ino' : 'py';
+      const filename = `SerialAirTest.${ext}`;
+      const path = `${FileSystem.cacheDirectory}${filename}`;
+      await FileSystem.writeAsStringAsync(path, code, { encoding: FileSystem.EncodingType.UTF8 });
+      await Sharing.shareAsync(path, { mimeType: 'text/plain', dialogTitle: t('codegen_share_subject') });
+    } catch {
+      Alert.alert('Error', 'Failed to share file.');
+    }
+  }, [code, board]);
+
+  const handleEmail = useCallback(async () => {
+    try {
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      const available = await MailComposer.isAvailableAsync();
+      if (!available) {
+        Alert.alert('Error', 'Email is not available on this device.');
+        return;
+      }
+      const ext = board.platform === 'arduino' ? 'ino' : 'py';
+      const filename = `SerialAirTest.${ext}`;
+      const path = `${FileSystem.cacheDirectory}${filename}`;
+      await FileSystem.writeAsStringAsync(path, code, { encoding: FileSystem.EncodingType.UTF8 });
+      await MailComposer.composeAsync({
+        subject: t('codegen_share_subject'),
+        body: code,
+        attachments: [path],
+      });
+    } catch {
+      Alert.alert('Error', 'Failed to compose email.');
+    }
+  }, [code, board]);
+
+  // QR content: compact config for pasting into existing sketch
+  const qrContent = useMemo(() => {
+    const parts: string[] = [];
+    if (ssid) parts.push(`SSID:${ssid}`);
+    if (password) parts.push(`PASS:${password}`);
+    if (security !== 'none') parts.push(`SEC:${security}`);
+    if (security === 'password' && devicePassword) parts.push(`DPASS:${devicePassword}`);
+    parts.push(`BOARD:${boardId}`);
+    return parts.join('\n');
+  }, [ssid, password, security, devicePassword, boardId]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -562,17 +615,33 @@ export default function CodeGeneratorScreen() {
           </ScrollView>
         </View>
 
-        {/* Copy Button */}
+        {/* Transfer buttons */}
         <Pressable style={styles.copyButton} onPress={handleCopy}>
-          <Feather
-            name={copied ? 'check' : 'clipboard'}
-            size={18}
-            color={colors.white}
-          />
+          <Feather name={copied ? 'check' : 'clipboard'} size={18} color={colors.white} />
           <Text style={styles.copyButtonText}>
             {copied ? t('codegen_copied') : t('codegen_copy')}
           </Text>
         </Pressable>
+
+        <View style={styles.transferRow}>
+          <Pressable style={styles.transferBtn} onPress={handleShare}>
+            <Feather name="share" size={18} color={colors.accent.primary} />
+            <Text style={styles.transferBtnText}>{t('codegen_share')}</Text>
+          </Pressable>
+
+          <Pressable style={styles.transferBtn} onPress={handleEmail}>
+            <Feather name="mail" size={18} color={colors.accent.primary} />
+            <Text style={styles.transferBtnText}>{t('codegen_email')}</Text>
+          </Pressable>
+
+          <Pressable style={styles.transferBtn} onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            setShowQR(true);
+          }}>
+            <Feather name="maximize" size={18} color={colors.accent.primary} />
+            <Text style={styles.transferBtnText}>{t('codegen_qr')}</Text>
+          </Pressable>
+        </View>
 
         {/* Instructions */}
         <View style={styles.stepsCard}>
@@ -603,6 +672,30 @@ export default function CodeGeneratorScreen() {
           )}
         </View>
       </ScrollView>
+
+      {/* QR Code Modal */}
+      <Modal visible={showQR} transparent animationType="fade" onRequestClose={() => setShowQR(false)}>
+        <Pressable style={styles.qrOverlay} onPress={() => setShowQR(false)}>
+          <Pressable style={styles.qrCard} onPress={() => {}}>
+            <Text style={styles.qrTitle}>{t('codegen_qr_title')}</Text>
+            <View style={styles.qrContainer}>
+              <QRCode
+                value={qrContent}
+                size={220}
+                backgroundColor="white"
+                color="black"
+              />
+            </View>
+            <Text style={styles.qrHint}>{t('codegen_qr_hint')}</Text>
+            <View style={styles.qrContentPreview}>
+              <Text style={styles.qrContentText}>{qrContent}</Text>
+            </View>
+            <Pressable style={styles.qrClose} onPress={() => setShowQR(false)}>
+              <Text style={styles.qrCloseText}>{t('ok')}</Text>
+            </Pressable>
+          </Pressable>
+        </Pressable>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -795,6 +888,83 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 12,
     elevation: 6,
+  },
+  transferRow: {
+    flexDirection: 'row',
+    gap: 10,
+    marginBottom: spacing.lg,
+  },
+  transferBtn: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.innerCard,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  transferBtnText: {
+    ...typography.caption,
+    color: colors.accent.primary,
+    fontWeight: '600',
+  },
+  qrOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: spacing.lg,
+  },
+  qrCard: {
+    width: '100%',
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.card,
+    padding: spacing.lg,
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+  },
+  qrTitle: {
+    ...typography.titleSmall,
+    color: colors.text.primary,
+    marginBottom: spacing.md,
+  },
+  qrContainer: {
+    backgroundColor: 'white',
+    padding: spacing.md,
+    borderRadius: borderRadius.innerCard,
+    marginBottom: spacing.md,
+  },
+  qrHint: {
+    ...typography.caption,
+    color: colors.text.secondary,
+    textAlign: 'center',
+    marginBottom: spacing.md,
+  },
+  qrContentPreview: {
+    backgroundColor: colors.bg.surfaceLight,
+    borderRadius: borderRadius.small,
+    padding: spacing.sm,
+    width: '100%',
+    marginBottom: spacing.md,
+  },
+  qrContentText: {
+    fontFamily: 'Menlo',
+    fontSize: 11,
+    color: colors.text.muted,
+    textAlign: 'center',
+  },
+  qrClose: {
+    paddingVertical: 10,
+    paddingHorizontal: 24,
+  },
+  qrCloseText: {
+    ...typography.body,
+    color: colors.accent.primary,
+    fontWeight: '600',
   },
   copyButtonText: {
     ...typography.body,
