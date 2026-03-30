@@ -338,6 +338,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.status.connected,
   },
   bottomSpacer: {
-    height: spacing.xxl,
+    height: 140,
   },
 });

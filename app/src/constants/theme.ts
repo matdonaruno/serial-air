@@ -33,8 +33,8 @@ export const colors = {
   // Text
   text: {
     primary: '#E8E8F0',
-    secondary: '#8888A0',
-    muted: '#555570',
+    secondary: '#AAAABE',
+    muted: '#8888A0',
     timestamp: '#6A6A85',
     dim: '#D1D1E0',
   },

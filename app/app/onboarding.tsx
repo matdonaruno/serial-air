@@ -83,6 +83,7 @@ export default function OnboardingScreen() {
   );
 
   return (
+    <View style={styles.containerOuter}>
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
         <Pressable onPress={handleSkip} hitSlop={12}>
@@ -134,10 +135,15 @@ export default function OnboardingScreen() {
         </Pressable>
       </View>
     </SafeAreaView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  containerOuter: {
+    flex: 1,
+    backgroundColor: colors.bg.primary,
+  },
   container: {
     flex: 1,
     backgroundColor: colors.bg.primary,

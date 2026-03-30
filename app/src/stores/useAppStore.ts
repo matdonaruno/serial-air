@@ -16,6 +16,7 @@ interface AppState {
 
   loadState: () => Promise<void>;
   completeOnboarding: () => void;
+  resetOnboarding: () => void;
   incrementLaunchCount: () => void;
   setReviewPrompted: () => void;
   shouldPromptReview: () => boolean;
@@ -54,6 +55,11 @@ export const useAppStore = create<AppState>((set, get) => ({
 
   completeOnboarding: () => {
     set({ hasOnboarded: true });
+    _persist(get());
+  },
+
+  resetOnboarding: () => {
+    set({ hasOnboarded: false });
     _persist(get());
   },
 

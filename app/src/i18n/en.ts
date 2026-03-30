@@ -200,6 +200,14 @@ const en = {
   plotter_export: 'Export',
   plotter_export_error: 'Failed to export chart.',
 
+  // Dev
+  dev_title: 'DEV',
+  dev_replay_onboarding: 'Replay Onboarding',
+  dev_replay_coach: 'Replay Coach Marks',
+  dev_replay_coach_done: 'Coach marks reset. Restart the app.',
+  dev_reset_splash: 'Reset Splash',
+  dev_reset_splash_msg: 'Kill and reopen the app to see the splash screen.',
+
   // Coach marks
   coach_ok: 'Got it',
   coach_next: 'Next',

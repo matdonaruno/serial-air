@@ -559,7 +559,7 @@ export default function HomeScreen() {
               value={manualAutoReconnect}
               onValueChange={setManualAutoReconnect}
               trackColor={{ false: colors.bg.surfaceLight, true: colors.accent.glow }}
-              thumbColor={manualAutoReconnect ? colors.accent.primary : colors.text.muted}
+              thumbColor={manualAutoReconnect ? colors.accent.primary : colors.text.secondary}
             />
           </View>
 
@@ -877,7 +877,7 @@ const styles = StyleSheet.create({
   // Section headers
   sectionHeader: {
     ...typography.sectionHeader,
-    color: colors.text.muted,
+    color: colors.text.secondary,
     marginBottom: spacing.md,
     marginTop: spacing.lg,
   },
@@ -965,11 +965,11 @@ const styles = StyleSheet.create({
   },
   emptyText: {
     ...typography.bodySmall,
-    color: colors.text.muted,
+    color: colors.text.secondary,
   },
   emptyHint: {
     ...typography.caption,
-    color: colors.text.muted,
+    color: colors.text.secondary,
     textAlign: 'center',
     marginTop: 6,
     lineHeight: 16,
@@ -1131,6 +1131,6 @@ const styles = StyleSheet.create({
 
   // Bottom spacer
   bottomSpacer: {
-    height: spacing.xxl,
+    height: 140,
   },
 });

@@ -27,6 +27,7 @@ import {
 } from '../../src/constants/theme';
 import { t } from '../../src/i18n';
 import { FREE_MODE } from '../../src/constants/defaults';
+import { resetCoachMarks } from '../../src/components/CoachMark';
 
 // --- Cycle helpers ---
 
@@ -256,27 +257,27 @@ export default function SettingsScreen() {
         </NeuCard>
 
         {/* CONNECTION Section */}
-        <Text style={styles.sectionHeader}>CONNECTION</Text>
+        <Text style={styles.sectionHeader}>{t('settings_connection')}</Text>
         <NeuCard style={styles.card}>
-          <SettingRow label="Default Port">
+          <SettingRow label={t('settings_default_port')}>
             <Text style={styles.rowValue}>{defaultPort}</Text>
           </SettingRow>
 
-          <SettingRow label="Auto-reconnect">
+          <SettingRow label={t('settings_auto_reconnect')}>
             <NeuToggle
               value={autoReconnect}
               onValueChange={(v) => updateSetting('autoReconnect', v)}
             />
           </SettingRow>
 
-          <SettingRow label="Reconnect Interval">
+          <SettingRow label={t('settings_reconnect_interval')}>
             <ValueBadge
               value={formatMs(reconnectInterval)}
               onPress={handleCycleReconnectInterval}
             />
           </SettingRow>
 
-          <SettingRow label="Timeout">
+          <SettingRow label={t('settings_timeout')}>
             <ValueBadge
               value={formatMs(connectionTimeout)}
               onPress={handleCycleTimeout}
@@ -284,7 +285,7 @@ export default function SettingsScreen() {
           </SettingRow>
 
           <LinkRow
-            label="Trusted Devices"
+            label={t('settings_trusted_devices')}
             icon="shield"
             onPress={() => router.push('/trusted-devices')}
             isLast
@@ -328,46 +329,46 @@ export default function SettingsScreen() {
         )}
 
         {/* ABOUT Section */}
-        <Text style={styles.sectionHeader}>ABOUT</Text>
+        <Text style={styles.sectionHeader}>{t('settings_about')}</Text>
         <NeuCard style={styles.card}>
-          <SettingRow label="Version">
+          <SettingRow label={t('settings_version')}>
             <Text style={styles.rowValue}>{appVersion}</Text>
           </SettingRow>
 
           <LinkRow
-            label="Arduino Library"
+            label={t('settings_arduino_library')}
             icon="external-link"
             onPress={handleOpenArduinoLibrary}
           />
 
           <LinkRow
-            label="GitHub"
+            label={t('settings_github')}
             icon="external-link"
             onPress={handleOpenGitHub}
           />
 
           <LinkRow
-            label="Rate this app"
+            label={t('settings_rate_app')}
             icon="star"
             onPress={handleRateApp}
           />
 
           <LinkRow
-            label="Privacy Policy"
+            label={t('settings_privacy_policy')}
             icon="external-link"
-            onPress={() => Linking.openURL('https://serialair.netlify.app/privacy')}
+            onPress={() => Linking.openURL('https://umemasait.com/serial-air/privacy.html')}
           />
 
           <LinkRow
-            label="Terms of Service"
+            label={t('settings_terms')}
             icon="external-link"
-            onPress={() => Linking.openURL('https://serialair.netlify.app/terms')}
+            onPress={() => Linking.openURL('https://umemasait.com/serial-air/terms.html')}
             isLast
           />
         </NeuCard>
 
         {/* DANGER ZONE Section */}
-        <Text style={styles.sectionHeader}>DANGER ZONE</Text>
+        <Text style={styles.sectionHeader}>{t('settings_danger_zone')}</Text>
         <Pressable
           style={({ pressed }) => [
             styles.dangerButton,
@@ -385,9 +386,42 @@ export default function SettingsScreen() {
             style={styles.dangerIcon}
           />
           <Text style={styles.dangerButtonText}>
-            Reset to Factory Defaults
+            {t('settings_reset')}
           </Text>
         </Pressable>
+
+        {/* DEV Section (only in __DEV__) */}
+        {__DEV__ && (
+          <>
+            <Text style={styles.sectionHeader}>{t('dev_title')}</Text>
+            <NeuCard style={styles.card}>
+              <LinkRow
+                label={t('dev_replay_onboarding')}
+                icon="play"
+                onPress={() => {
+                  useAppStore.getState().resetOnboarding();
+                  router.replace('/onboarding' as any);
+                }}
+              />
+              <LinkRow
+                label={t('dev_replay_coach')}
+                icon="message-circle"
+                onPress={async () => {
+                  await resetCoachMarks();
+                  Alert.alert(t('ok'), t('dev_replay_coach_done'));
+                }}
+              />
+              <LinkRow
+                label={t('dev_reset_splash')}
+                icon="zap"
+                onPress={() => {
+                  Alert.alert(t('dev_reset_splash'), t('dev_reset_splash_msg'));
+                }}
+                isLast
+              />
+            </NeuCard>
+          </>
+        )}
 
         {/* Bottom spacer for tab bar */}
         <View style={styles.bottomSpacer} />
@@ -491,6 +525,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomSpacer: {
-    height: spacing.xxl,
+    height: 140,
   },
 });

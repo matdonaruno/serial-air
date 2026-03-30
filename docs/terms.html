@@ -8,463 +8,317 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        *, *::before, *::after {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
-            background: #1a050a;
-            color: #e0e0e0;
-            line-height: 1.8;
-            overflow-x: hidden;
-            min-height: 100vh;
+            background: #100510; color: #f0f0f0; line-height: 1.8;
+            overflow-x: hidden; min-height: 100vh;
         }
-
-        canvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .container {
-            position: relative;
-            z-index: 1;
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px 60px;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 80px 0 60px;
-        }
-
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 20px 60px; }
+        .hero { text-align: center; padding: 80px 0 40px; }
         .hero h1 {
-            font-size: 3rem;
-            font-weight: 800;
+            font-size: 3rem; font-weight: 800;
             background: linear-gradient(135deg, #ff2a6d, #d300c5, #ff2a6d);
             background-size: 200% 200%;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            animation: gradientShift 4s ease infinite;
-            margin-bottom: 8px;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; animation: gradientShift 4s ease infinite; margin-bottom: 8px;
         }
+        .hero .subtitle { font-size: 1rem; color: rgba(255,42,109,0.5); font-weight: 300; letter-spacing: 2px; margin-bottom: 16px; }
+        .hero .last-updated { font-size: 0.85rem; color: rgba(255,255,255,0.35); }
+        @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
 
-        .hero .subtitle {
-            font-family: 'Noto Sans JP', sans-serif;
-            font-size: 1rem;
-            color: rgba(255, 42, 109, 0.5);
-            font-weight: 300;
-            letter-spacing: 2px;
-            margin-bottom: 16px;
+        .lang-switch { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; }
+        .lang-btn {
+            padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(255,42,109,0.2);
+            background: rgba(255,42,109,0.05); color: rgba(255,255,255,0.5); font-size: 0.85rem;
+            cursor: pointer; transition: all 0.3s;
         }
-
-        .hero .last-updated {
-            font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.35);
-        }
-
-        @keyframes gradientShift {
-            0%, 100% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-        }
+        .lang-btn.active { background: rgba(255,42,109,0.15); color: #ff2a6d; border-color: rgba(255,42,109,0.4); font-weight: 600; }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
 
         .card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 42, 109, 0.08);
-            border-radius: 30px;
-            padding: 40px;
-            margin-bottom: 30px;
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,42,109,0.08); border-radius: 30px; padding: 40px; margin-bottom: 30px;
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
         }
-
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(255, 42, 109, 0.08);
-            border-color: rgba(255, 42, 109, 0.15);
-        }
-
-        h2 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 24px;
-            padding-left: 20px;
-            border-left: 3px solid #ff2a6d;
-            line-height: 1.4;
-        }
-
-        h3 {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #ff2a6d;
-            margin-top: 28px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        h3::after {
-            content: '';
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, rgba(255, 42, 109, 0.3), transparent);
-        }
-
-        p {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 14px;
-            font-weight: 300;
-            font-size: 0.95rem;
-        }
-
-        ul {
-            list-style: none;
-            padding: 0;
-            margin: 14px 0;
-        }
-
-        ul li {
-            background: rgba(255, 42, 109, 0.03);
-            border: 1px solid rgba(255, 42, 109, 0.06);
-            border-radius: 12px;
-            padding: 12px 18px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 300;
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(255,42,109,0.08); border-color: rgba(255,42,109,0.15); }
+        h2 { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 24px; padding-left: 20px; border-left: 3px solid #ff2a6d; line-height: 1.4; }
+        h3 { font-size: 1.1rem; font-weight: 600; color: #ff2a6d; margin-top: 28px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+        h3::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(255,42,109,0.3), transparent); }
+        p { color: rgba(255,255,255,0.7); margin-bottom: 14px; font-weight: 300; font-size: 0.95rem; }
+        ul, ol { list-style: none; padding: 0; margin: 14px 0; }
+        ul li, ol li {
+            background: rgba(255,42,109,0.03); border: 1px solid rgba(255,42,109,0.06); border-radius: 12px;
+            padding: 12px 18px; margin-bottom: 8px; font-size: 0.9rem; color: rgba(255,255,255,0.7); font-weight: 300;
             transition: border-color 0.2s ease, background 0.2s ease;
         }
-
-        ul li:hover {
-            border-color: rgba(255, 42, 109, 0.15);
-            background: rgba(255, 42, 109, 0.05);
-        }
-
-        ul li::before {
-            content: '\2726';
-            color: #ff2a6d;
-            margin-right: 10px;
-            font-size: 0.7rem;
-        }
-
-        ol {
-            list-style: none;
-            padding: 0;
-            margin: 14px 0;
-            counter-reset: item;
-        }
-
-        ol li {
-            counter-increment: item;
-            background: rgba(255, 42, 109, 0.03);
-            border: 1px solid rgba(255, 42, 109, 0.06);
-            border-radius: 12px;
-            padding: 12px 18px;
-            margin-bottom: 8px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.7);
-            font-weight: 300;
-            transition: border-color 0.2s ease, background 0.2s ease;
-        }
-
-        ol li:hover {
-            border-color: rgba(255, 42, 109, 0.15);
-            background: rgba(255, 42, 109, 0.05);
-        }
-
-        ol li::before {
-            content: counter(item, decimal-leading-zero) '.';
-            color: #ff2a6d;
-            font-weight: 600;
-            margin-right: 12px;
-            font-size: 0.85rem;
-        }
-
-        .important-box {
-            background: rgba(255, 42, 109, 0.04);
-            border: 1px solid rgba(255, 42, 109, 0.25);
-            border-radius: 16px;
-            padding: 24px 28px;
-            margin: 24px 0;
-            box-shadow: 0 0 30px rgba(255, 42, 109, 0.06);
-        }
-
-        .important-box p {
-            color: rgba(255, 255, 255, 0.85);
-            font-weight: 400;
-            margin-bottom: 0;
-        }
-
-        .important-box .label {
-            color: #ff2a6d;
-            font-weight: 600;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            margin-bottom: 8px;
-            display: block;
-        }
-
+        ul li:hover, ol li:hover { border-color: rgba(255,42,109,0.15); background: rgba(255,42,109,0.05); }
+        ul li::before { content: '■'; color: #ff2a6d; margin-right: 10px; font-size: 0.5rem; vertical-align: middle; }
         .contact-card {
-            text-align: center;
-            background: rgba(255, 42, 109, 0.03);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 42, 109, 0.1);
-            border-radius: 30px;
-            padding: 40px;
-            margin-top: 40px;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-align: center; background: rgba(255,42,109,0.03); backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,42,109,0.1); border-radius: 30px; padding: 40px; margin-top: 40px;
         }
-
-        .contact-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 20px 60px rgba(255, 42, 109, 0.08);
-        }
-
-        .contact-card h2 {
-            border-left: none;
-            padding-left: 0;
-            text-align: center;
-        }
-
-        .contact-card a {
-            color: #ff2a6d;
-            text-decoration: none;
-            font-weight: 500;
-            transition: opacity 0.2s ease;
-        }
-
-        .contact-card a:hover {
-            opacity: 0.75;
-        }
-
-        footer {
-            text-align: center;
-            padding: 40px 0 20px;
-            color: rgba(255, 255, 255, 0.2);
-            font-size: 0.8rem;
-            font-weight: 300;
-        }
-
+        .contact-card h2 { border-left: none; padding-left: 0; text-align: center; }
+        .contact-card a { color: #ff2a6d; text-decoration: none; font-weight: 500; }
+        footer { text-align: center; padding: 40px 0 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; }
         @media (max-width: 768px) {
-            .hero { padding: 50px 0 40px; }
-            .hero h1 { font-size: 2rem; }
+            .hero { padding: 50px 0 30px; } .hero h1 { font-size: 2rem; }
             .card { padding: 28px 22px; border-radius: 22px; }
-            .container { padding: 20px 16px 40px; }
-            h2 { font-size: 1.25rem; }
         }
     </style>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
-
     <div class="container">
         <div class="hero">
             <h1>Terms of Service</h1>
             <div class="subtitle">利用規約</div>
-            <div class="last-updated">Last updated: March 18, 2026</div>
+            <div class="last-updated">Last updated / 最終更新: March 18, 2026</div>
         </div>
 
-        <!-- 1. Introduction -->
-        <div class="card">
-            <h2>1. Acceptance of Terms</h2>
-            <p>By downloading, installing, or using Serial Air ("the App"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, do not use the App. These Terms constitute a legal agreement between you and the developer.</p>
+        <div class="lang-switch">
+            <div class="lang-btn active" onclick="switchLang('en')">English</div>
+            <div class="lang-btn" onclick="switchLang('ja')">日本語</div>
         </div>
 
-        <!-- 2. Service Description -->
-        <div class="card">
-            <h2>2. Service Description</h2>
-            <p>Serial Air is a wireless serial monitor application that enables communication with ESP8266 and ESP32 microcontrollers via WiFi (TCP/IP) and Bluetooth Low Energy (BLE). The App discovers devices on your local network using mDNS and provides a serial terminal interface for monitoring and sending data to connected microcontrollers.</p>
-            <ul>
-                <li>WiFi-based serial communication over your local network</li>
-                <li>Bluetooth Low Energy (BLE) device connectivity</li>
-                <li>Automatic device discovery via mDNS</li>
-                <li>Serial terminal with send and receive capabilities</li>
-            </ul>
-        </div>
-
-        <!-- 3. License -->
-        <div class="card">
-            <h2>3. License</h2>
-            <p>Subject to your compliance with these Terms, the developer grants you a limited, non-exclusive, non-transferable, revocable license to download, install, and use the App on devices that you own or control, strictly in accordance with these Terms and any applicable usage rules set forth by the App Store.</p>
-        </div>
-
-        <!-- 4. Purchase Terms -->
-        <div class="card">
-            <h2>4. Purchase Terms</h2>
-
-            <h3>4.1 Free Trial</h3>
-            <p>Serial Air offers a 7-day free trial with full functionality. No payment is required during the trial period.</p>
-
-            <h3>4.2 One-Time Purchase</h3>
-            <ul>
-                <li>Serial Air is available as a one-time purchase of $1.99 USD (non-consumable)</li>
-                <li>All payment transactions are processed through the Apple App Store</li>
-                <li>The developer does not directly process or store any payment information</li>
-            </ul>
-
-            <h3>4.3 Refund Policy</h3>
-            <p>Refunds are handled in accordance with the Apple App Store refund policies. The developer does not process refunds directly. Please contact Apple Support for refund requests.</p>
-        </div>
-
-        <!-- 5. User Responsibilities -->
-        <div class="card">
-            <h2>5. User Responsibilities</h2>
-            <ul>
-                <li>Use the App only for lawful purposes and in compliance with all applicable laws and regulations</li>
-                <li>You are responsible for the security of your own local network and connected devices</li>
-                <li>Ensure your microcontroller firmware and hardware are properly configured before connecting</li>
-            </ul>
-
-            <div class="important-box">
-                <span class="label">Important</span>
-                <p>Serial Air is not designed or intended for use in safety-critical, life-support, medical, or mission-critical applications. Do not rely on this App for any system where failure could result in personal injury, death, or significant property damage.</p>
+        <!-- ENGLISH -->
+        <div id="lang-en" class="lang-content active">
+            <div class="card">
+                <h2>1. Acceptance</h2>
+                <p>By using Serial Air ("the App"), you agree to these Terms of Service. If you do not agree, do not use the App.</p>
+            </div>
+            <div class="card">
+                <h2>2. Service Description</h2>
+                <p>Serial Air is a wireless serial monitor application that connects to microcontrollers via WiFi and Bluetooth for real-time serial data monitoring.</p>
+            </div>
+            <div class="card">
+                <h2>3. License</h2>
+                <p>We grant you a limited, non-exclusive, non-transferable, revocable license to use the App for personal and commercial purposes in accordance with these Terms.</p>
+            </div>
+            <div class="card">
+                <h2>4. Purchase Terms</h2>
+                <ul>
+                    <li>7-day free trial period</li>
+                    <li>One-time purchase (non-consumable) via App Store / Google Play</li>
+                    <li>Refunds subject to Apple/Google platform policies</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>5. User Responsibilities</h2>
+                <ul>
+                    <li>Use the App only for lawful purposes</li>
+                    <li>You are responsible for your own network security</li>
+                    <li>Not intended for safety-critical or medical applications</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>6. Prohibited Activities</h2>
+                <ul>
+                    <li>Reverse engineering or decompiling the App</li>
+                    <li>Unauthorized access to other users' devices</li>
+                    <li>Redistribution or resale of the App</li>
+                    <li>Use in safety-critical systems without independent validation</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>7. Intellectual Property</h2>
+                <p>All rights, title, and interest in the App are owned by the developer. This license does not transfer any ownership rights.</p>
+            </div>
+            <div class="card">
+                <h2>8. Network Communication &amp; Security</h2>
+                <h3>8.1 Communication Methods</h3>
+                <p>The App uses the following communication protocols:</p>
+                <ul>
+                    <li><strong>WiFi (TCP):</strong> Unencrypted TCP socket connections over your local network</li>
+                    <li><strong>Bluetooth Low Energy (BLE):</strong> Nordic UART Service without application-level encryption</li>
+                    <li><strong>mDNS:</strong> Multicast DNS for device discovery on local networks</li>
+                </ul>
+                <h3>8.2 Security Limitations</h3>
+                <ul>
+                    <li>Serial data is transmitted in plaintext and is not encrypted by the App</li>
+                    <li>Any device on the same network or within BLE range may intercept data</li>
+                    <li>The Trusted Devices feature provides identification only, not cryptographic authentication</li>
+                    <li>The App does not implement TLS, SSL, or any transport-layer encryption</li>
+                </ul>
+                <h3>8.3 User Responsibility for Security</h3>
+                <ul>
+                    <li>You are solely responsible for securing your WiFi network and controlling physical access to BLE range</li>
+                    <li>Do not transmit passwords, credentials, personal data, or trade secrets via serial connections</li>
+                    <li>Use of the App on public or unsecured networks is at your own risk</li>
+                    <li>You are responsible for ensuring that connected devices are not compromised</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>9. Disclaimer of Warranties</h2>
+                <p>THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+                <ul>
+                    <li>Serial data transmission may not be 100% accurate or complete</li>
+                    <li>WiFi and BLE connections may be interrupted, delayed, or fail without notice</li>
+                    <li>We do not guarantee the security of data transmitted through the App</li>
+                    <li>We are not responsible for any hardware damage, data loss, or system malfunction resulting from use of the App</li>
+                    <li>We do not warrant that the App is free from vulnerabilities, errors, or security flaws</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>10. Limitation of Liability</h2>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW, THE DEVELOPER SHALL NOT BE LIABLE FOR:</p>
+                <ul>
+                    <li>Any unauthorized access to or interception of data transmitted via the App</li>
+                    <li>Any damages resulting from security breaches, hacking, or unauthorized access to connected devices</li>
+                    <li>Any indirect, incidental, special, consequential, or punitive damages</li>
+                    <li>Any loss of data, profits, or business opportunities</li>
+                    <li>Any damages arising from use of the App in safety-critical, medical, industrial, or mission-critical applications</li>
+                </ul>
+                <p>In jurisdictions where limitation of liability for negligence is restricted, our liability is limited to the amount paid for the App.</p>
+            </div>
+            <div class="card">
+                <h2>11. Service Changes</h2>
+                <p>We may modify, suspend, or discontinue the App at any time with or without notice.</p>
+            </div>
+            <div class="card">
+                <h2>12. Governing Law</h2>
+                <p>These Terms are governed by the laws of Japan. Any disputes shall be subject to the exclusive jurisdiction of the Tokyo District Court.</p>
+            </div>
+            <div class="contact-card">
+                <h2>13. Contact</h2>
+                <p>Masashi Umetani<br><a href="mailto:support@serialair.app">support@serialair.app</a></p>
             </div>
         </div>
 
-        <!-- 6. Prohibited Activities -->
-        <div class="card">
-            <h2>6. Prohibited Activities</h2>
-            <p>You agree not to engage in any of the following activities:</p>
-            <ol>
-                <li>Reverse engineering, decompiling, disassembling, or attempting to derive the source code of the App</li>
-                <li>Using the App to gain unauthorized access to other people's devices, networks, or systems</li>
-                <li>Redistributing, sublicensing, renting, leasing, or lending the App to third parties</li>
-                <li>Using the App in safety-critical, life-support, or medical systems without independent validation and verification</li>
-                <li>Removing, altering, or obscuring any proprietary notices or labels on the App</li>
-                <li>Using the App to transmit malicious data or interfere with the operation of connected devices</li>
-            </ol>
-        </div>
-
-        <!-- 7. Intellectual Property -->
-        <div class="card">
-            <h2>7. Intellectual Property</h2>
-            <p>All rights, title, and interest in and to the App, including but not limited to its design, code, graphics, user interface, and documentation, are and shall remain the exclusive property of the developer. These Terms do not grant you any rights to use the developer's trademarks, logos, or brand features.</p>
-        </div>
-
-        <!-- 8. Disclaimer of Warranties -->
-        <div class="card">
-            <h2>8. Disclaimer of Warranties</h2>
-
-            <div class="important-box">
-                <span class="label">Disclaimer</span>
-                <p>THE APP IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.</p>
+        <!-- JAPANESE -->
+        <div id="lang-ja" class="lang-content">
+            <div class="card">
+                <h2>第1条（同意）</h2>
+                <p>Serial Air（以下「本アプリ」）を使用することにより、本利用規約に同意したものとします。同意いただけない場合は、本アプリの使用を中止してください。</p>
             </div>
-
-            <ul>
-                <li>The App is not guaranteed to be suitable for any specific purpose or use case</li>
-                <li>Serial data transmission may not be 100% accurate or complete; data loss or corruption may occur</li>
-                <li>The developer is not responsible for any damage to hardware, firmware, or connected devices arising from use of the App</li>
-                <li>Network connectivity and device discovery depend on your local network configuration and may not always function as expected</li>
-            </ul>
-        </div>
-
-        <!-- 9. Limitation of Liability -->
-        <div class="card">
-            <h2>9. Limitation of Liability</h2>
-            <p>To the maximum extent permitted by applicable law, in no event shall the developer be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of profits, data, or goodwill, arising out of or in connection with your use of or inability to use the App, regardless of the theory of liability.</p>
-            <p>The developer's total cumulative liability shall not exceed the amount you paid for the App.</p>
-        </div>
-
-        <!-- 10. Service Changes -->
-        <div class="card">
-            <h2>10. Changes to the Service</h2>
-            <p>The developer reserves the right to modify, suspend, or discontinue the App or any part thereof at any time, with or without notice. The developer shall not be liable to you or any third party for any modification, suspension, or discontinuance of the App.</p>
-        </div>
-
-        <!-- 11. Termination -->
-        <div class="card">
-            <h2>11. Termination</h2>
-            <p>The developer may terminate or suspend your access to the App immediately, without prior notice or liability, for any reason, including without limitation if you breach these Terms. Upon termination, your right to use the App will cease immediately.</p>
-        </div>
-
-        <!-- 12. Governing Law -->
-        <div class="card">
-            <h2>12. Governing Law &amp; Jurisdiction</h2>
-            <p>These Terms shall be governed by and construed in accordance with the laws of Japan, without regard to its conflict of law provisions. Any disputes arising under or in connection with these Terms shall be subject to the exclusive jurisdiction of the Tokyo District Court.</p>
-        </div>
-
-        <!-- 13. Contact -->
-        <div class="contact-card">
-            <h2>13. Contact Us</h2>
-            <p>If you have any questions about these Terms of Service, please contact us:</p>
-            <p style="margin-top: 16px;">
-                <strong style="color: #fff;">Masashi Umetani</strong><br>
-                <a href="mailto:support@serialair.app">support@serialair.app</a>
-            </p>
+            <div class="card">
+                <h2>第2条（サービスの概要）</h2>
+                <p>Serial Airは、WiFiおよびBluetoothを介してマイクロコントローラに接続し、リアルタイムでシリアルデータを監視するワイヤレスシリアルモニターアプリです。</p>
+            </div>
+            <div class="card">
+                <h2>第3条（ライセンス）</h2>
+                <p>本規約に従い、個人および商用目的で本アプリを使用するための限定的、非独占的、譲渡不能、取消可能なライセンスを付与します。</p>
+            </div>
+            <div class="card">
+                <h2>第4条（購入条件）</h2>
+                <ul>
+                    <li>7日間の無料トライアル期間</li>
+                    <li>App Store / Google Play経由の買い切り購入</li>
+                    <li>返金はApple/Googleのプラットフォームポリシーに従います</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>第5条（ユーザーの責任）</h2>
+                <ul>
+                    <li>合法的な目的にのみ本アプリを使用すること</li>
+                    <li>自身のネットワークセキュリティに責任を持つこと</li>
+                    <li>安全性が重要なシステムや医療用途には使用しないこと</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>第6条（禁止事項）</h2>
+                <ul>
+                    <li>本アプリのリバースエンジニアリングまたは逆コンパイル</li>
+                    <li>他者のデバイスへの不正アクセス</li>
+                    <li>本アプリの再配布または転売</li>
+                    <li>独立した検証なしに安全性が重要なシステムでの使用</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>第7条（知的財産権）</h2>
+                <p>本アプリに関するすべての権利、権原および利益は開発者に帰属します。本ライセンスはいかなる所有権も移転しません。</p>
+            </div>
+            <div class="card">
+                <h2>第8条（ネットワーク通信とセキュリティ）</h2>
+                <h3>8.1 通信方式</h3>
+                <p>本アプリは以下の通信プロトコルを使用します：</p>
+                <ul>
+                    <li><strong>WiFi（TCP）：</strong>ローカルネットワーク上の暗号化されていないTCPソケット接続</li>
+                    <li><strong>Bluetooth Low Energy（BLE）：</strong>アプリケーションレベルの暗号化なしのNordic UART Service</li>
+                    <li><strong>mDNS：</strong>ローカルネットワーク上のデバイス検出用マルチキャストDNS</li>
+                </ul>
+                <h3>8.2 セキュリティの制限</h3>
+                <ul>
+                    <li>シリアルデータは平文で送受信され、本アプリによる暗号化は行われません</li>
+                    <li>同一ネットワーク上またはBLE通信範囲内のデバイスがデータを傍受する可能性があります</li>
+                    <li>信頼済みデバイス機能は識別のみを提供し、暗号学的認証は行いません</li>
+                    <li>本アプリはTLS、SSL、その他のトランスポート層暗号化を実装していません</li>
+                </ul>
+                <h3>8.3 セキュリティに関するユーザーの責任</h3>
+                <ul>
+                    <li>WiFiネットワークの保護およびBLE通信範囲の物理的管理はユーザーの責任です</li>
+                    <li>シリアル接続経由でパスワード、認証情報、個人データ、機密情報を送信しないでください</li>
+                    <li>公開または保護されていないネットワークでの使用はユーザー自身のリスクです</li>
+                    <li>接続するデバイスが侵害されていないことの確認はユーザーの責任です</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>第9条（免責事項）</h2>
+                <p>本アプリは「現状のまま」および「利用可能な状態で」提供され、商品性、特定目的への適合性、非侵害を含むがこれに限定されない、明示または黙示のいかなる種類の保証もありません。</p>
+                <ul>
+                    <li>シリアルデータの送受信は100%正確または完全であることを保証しません</li>
+                    <li>WiFiおよびBLE接続は予告なく中断、遅延、または失敗する可能性があります</li>
+                    <li>本アプリを通じて送信されるデータのセキュリティを保証しません</li>
+                    <li>本アプリの使用に起因するハードウェアの損傷、データの損失、システムの不具合について責任を負いません</li>
+                    <li>本アプリに脆弱性、エラー、セキュリティ上の欠陥がないことを保証しません</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>第10条（責任の制限）</h2>
+                <p>適用法令が許容する最大限の範囲において、開発者は以下について一切責任を負いません：</p>
+                <ul>
+                    <li>本アプリを通じて送信されたデータへの不正アクセスまたは傍受</li>
+                    <li>セキュリティ侵害、ハッキング、または接続デバイスへの不正アクセスに起因する損害</li>
+                    <li>間接的、付随的、特別、結果的、または懲罰的損害</li>
+                    <li>データ、利益、または事業機会の喪失</li>
+                    <li>安全性が重要なシステム、医療、産業、またはミッションクリティカルなアプリケーションでの使用に起因する損害</li>
+                </ul>
+                <p>過失に対する責任制限が制限される法域においては、当社の責任は本アプリに支払われた金額を上限とします。</p>
+            </div>
+            <div class="card">
+                <h2>第11条（サービスの変更）</h2>
+                <p>運営者は、予告の有無にかかわらず、いつでも本アプリを変更、停止、または廃止することができます。</p>
+            </div>
+            <div class="card">
+                <h2>第12条（準拠法および管轄裁判所）</h2>
+                <p>本規約は日本法に準拠します。紛争については東京地方裁判所を第一審の専属的合意管轄裁判所とします。</p>
+            </div>
+            <div class="contact-card">
+                <h2>第13条（お問い合わせ）</h2>
+                <p>梅谷 将志<br><a href="mailto:support@serialair.app">support@serialair.app</a></p>
+            </div>
         </div>
 
         <footer>
-            Enacted March 18, 2026. &copy; 2026 Serial Air
+            <p>Enacted / 制定: March 18, 2026</p>
+            <p>&copy; 2026 Serial Air</p>
         </footer>
     </div>
 
     <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('.lang-btn').forEach(el => { if(el.textContent.includes(lang==='ja'?'日本語':'English')) el.classList.add('active'); });
+        }
+        if (navigator.language.startsWith('ja')) switchLang('ja');
+
         const canvas = document.getElementById('particleCanvas');
         const ctx = canvas.getContext('2d');
         let particles = [];
-
-        function resize() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        resize();
-        window.addEventListener('resize', resize);
-
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
         class Particle {
-            constructor() {
-                this.reset();
-            }
-            reset() {
-                this.x = Math.random() * canvas.width;
-                this.y = Math.random() * canvas.height;
-                this.size = Math.random() * 120 + 40;
-                this.speedX = (Math.random() - 0.5) * 0.3;
-                this.speedY = (Math.random() - 0.5) * 0.3;
-                this.opacity = Math.random() * 0.07 + 0.02;
-                this.color = Math.random() > 0.5 ? '140, 30, 180' : '60, 20, 220';
-            }
-            update() {
-                this.x += this.speedX;
-                this.y += this.speedY;
-                if (this.x < -this.size || this.x > canvas.width + this.size ||
-                    this.y < -this.size || this.y > canvas.height + this.size) {
-                    this.reset();
-                }
-            }
-            draw() {
-                const gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
-                gradient.addColorStop(0, `rgba(${this.color}, ${this.opacity})`);
-                gradient.addColorStop(1, `rgba(${this.color}, 0)`);
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = gradient;
-                ctx.fill();
-            }
+            constructor() { this.reset(); }
+            reset() { this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.size=Math.random()*100+40; this.speedX=(Math.random()-0.5)*0.4; this.speedY=(Math.random()-0.5)*0.4; this.opacity=Math.random()*0.06+0.02; this.color=Math.random()>0.5?'211,0,197':'0,210,255'; }
+            update() { this.x+=this.speedX; this.y+=this.speedY; if(this.x<-this.size||this.x>canvas.width+this.size||this.y<-this.size||this.y>canvas.height+this.size) this.reset(); }
+            draw() { const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size); g.addColorStop(0,`rgba(${this.color},${this.opacity})`); g.addColorStop(1,`rgba(${this.color},0)`); ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=g; ctx.fill(); }
         }
-
-        for (let i = 0; i < 15; i++) {
-            particles.push(new Particle());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
-        }
+        for(let i=0;i<15;i++) particles.push(new Particle());
+        function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); }
         animate();
     </script>
 </body>

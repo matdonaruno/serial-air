@@ -202,6 +202,14 @@ const ja: typeof en = {
   plotter_export: 'エクスポート',
   plotter_export_error: 'チャートのエクスポートに失敗しました。',
 
+  // Dev
+  dev_title: '開発',
+  dev_replay_onboarding: 'オンボーディングを再表示',
+  dev_replay_coach: 'ガイダンスをリセット',
+  dev_replay_coach_done: 'リセット完了。アプリを再起動してください。',
+  dev_reset_splash: 'スプラッシュを確認',
+  dev_reset_splash_msg: 'アプリを終了→再起動でスプラッシュが表示されます。',
+
   // Coach marks
   coach_ok: 'OK',
   coach_next: '次へ',

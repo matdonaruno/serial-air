@@ -158,11 +158,11 @@ export default function PaywallScreen() {
         </Pressable>
 
         <View style={styles.legalLinks}>
-          <Pressable onPress={() => Linking.openURL('https://serialair.netlify.app/terms')}>
+          <Pressable onPress={() => Linking.openURL('https://umemasait.com/serial-air/terms.html')}>
             <Text style={styles.legalText}>{t('paywall_terms')}</Text>
           </Pressable>
           <Text style={styles.legalDot}>&bull;</Text>
-          <Pressable onPress={() => Linking.openURL('https://serialair.netlify.app/privacy')}>
+          <Pressable onPress={() => Linking.openURL('https://umemasait.com/serial-air/privacy.html')}>
             <Text style={styles.legalText}>{t('paywall_privacy')}</Text>
           </Pressable>
         </View>
