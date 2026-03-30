@@ -27,6 +27,7 @@ export const DEFAULT_SETTINGS: SettingsState = {
   autoReconnect: true,
   reconnectInterval: RECONNECT_INTERVAL_MS,
   connectionTimeout: CONNECTION_TIMEOUT_MS,
+  securityMode: 'none' as const,
   autoSave: false,
   maxFileSize: 10 * 1024 * 1024, // 10MB
 };

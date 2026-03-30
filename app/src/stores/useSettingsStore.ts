@@ -43,6 +43,7 @@ export const useSettingsStore = create<SettingsStore>((set, get) => ({
       autoReconnect: state.autoReconnect,
       reconnectInterval: state.reconnectInterval,
       connectionTimeout: state.connectionTimeout,
+      securityMode: state.securityMode,
       autoSave: state.autoSave,
       maxFileSize: state.maxFileSize,
     };

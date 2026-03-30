@@ -148,6 +148,7 @@ export default function SettingsScreen() {
     autoReconnect,
     reconnectInterval,
     connectionTimeout,
+    securityMode,
     updateSetting,
     resetSettings,
   } = useSettingsStore();
@@ -290,6 +291,29 @@ export default function SettingsScreen() {
             onPress={() => router.push('/trusted-devices')}
             isLast
           />
+        </NeuCard>
+
+        {/* SECURITY Section */}
+        <Text style={styles.sectionHeader}>{t('settings_security')}</Text>
+        <NeuCard style={styles.card}>
+          <SettingRow label={t('settings_security_mode')} isLast>
+            <View style={styles.securityModes}>
+              {(['none', 'pairing', 'password'] as const).map((mode) => (
+                <Pressable
+                  key={mode}
+                  style={[styles.securityModeBtn, securityMode === mode && styles.securityModeBtnActive]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    updateSetting('securityMode', mode);
+                  }}
+                >
+                  <Text style={[styles.securityModeText, securityMode === mode && styles.securityModeTextActive]}>
+                    {mode === 'none' ? t('settings_security_none') : mode === 'pairing' ? t('settings_security_pairing') : t('settings_security_password')}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </SettingRow>
         </NeuCard>
 
         {/* PURCHASE Section (hidden in FREE_MODE) */}
@@ -502,6 +526,30 @@ const styles = StyleSheet.create({
   },
   valueBadgeTextDisabled: {
     color: colors.text.muted,
+  },
+  securityModes: {
+    flexDirection: 'row',
+    gap: 6,
+  },
+  securityModeBtn: {
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: borderRadius.small,
+    borderWidth: 1,
+    borderColor: colors.border,
+    backgroundColor: colors.bg.surfaceLight,
+  },
+  securityModeBtnActive: {
+    borderColor: colors.accent.glow,
+    backgroundColor: colors.bg.surfaceRaised,
+  },
+  securityModeText: {
+    ...typography.caption,
+    color: colors.text.muted,
+    fontWeight: '600',
+  },
+  securityModeTextActive: {
+    color: colors.accent.primary,
   },
   dangerButton: {
     flexDirection: 'row',

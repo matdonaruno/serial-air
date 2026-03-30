@@ -51,6 +51,9 @@ WirelessSerial::WirelessSerial()
 #endif
 {
     _deviceId[0] = '\0';
+    _pairingEnabled = false;
+    _password[0] = '\0';
+    memset(_clientAuthenticated, 0, sizeof(_clientAuthenticated));
 }
 
 WirelessSerial::~WirelessSerial() {
@@ -221,6 +224,17 @@ bool WirelessSerial::isRunning() const {
     return _running;
 }
 
+// ========== Security ==========
+
+void WirelessSerial::enablePairing() {
+    _pairingEnabled = true;
+}
+
+void WirelessSerial::setPassword(const char* password) {
+    strncpy(_password, password, sizeof(_password) - 1);
+    _password[sizeof(_password) - 1] = '\0';
+}
+
 void WirelessSerial::setMaxClients(uint8_t maxClients) {
     if (maxClients > WIRELESS_SERIAL_MAX_CLIENTS_LIMIT) {
         maxClients = WIRELESS_SERIAL_MAX_CLIENTS_LIMIT;
@@ -309,23 +323,23 @@ void WirelessSerial::_acceptNewClients() {
             if (!_clients[i].connected()) {
                 _clients[i] = _server->accept();
                 _clients[i].setNoDelay(true);
-                // Flush buffered data to new client
+                _clientAuthenticated[i] = !_pairingEnabled && _password[0] == '\0';
+                _sendSecurityChallenge(_clients[i], i);
                 _flushBufferTo(_clients[i]);
                 return;
             }
         }
-        // No free slot, reject
         WiFiClient rejected = _server->accept();
         rejected.stop();
     }
 #else // ESP32
     WiFiClient newClient = _server->accept();
     if (newClient) {
-        Serial.printf("[WS] New client accepted!\n");
         for (uint8_t i = 0; i < _maxClients; i++) {
             if (!_clients[i].connected()) {
                 _clients[i] = newClient;
-                // Flush buffered data to new client
+                _clientAuthenticated[i] = !_pairingEnabled && _password[0] == '\0';
+                _sendSecurityChallenge(_clients[i], i);
                 _flushBufferTo(_clients[i]);
                 return;
             }
@@ -340,7 +354,30 @@ void WirelessSerial::_cleanupClients() {
     for (uint8_t i = 0; i < _maxClients; i++) {
         if (_clients[i] && !_clients[i].connected()) {
             _clients[i].stop();
+            _clientAuthenticated[i] = false;
         }
+    }
+}
+
+void WirelessSerial::_sendSecurityChallenge(WiFiClient& client, uint8_t idx) {
+    // Send device fingerprint (always, for fingerprint verification)
+    char fp[128];
+    snprintf(fp, sizeof(fp), "\x01FP:{\"id\":\"%s\",\"heap\":%lu,\"version\":\"%s\"}\n",
+             _deviceId, (unsigned long)ESP.getFreeHeap(), WIRELESS_SERIAL_VERSION);
+    client.print(fp);
+
+    if (_pairingEnabled) {
+        // Generate random 4-digit pairing code
+        uint16_t code = random(1000, 10000);
+        char msg[32];
+        snprintf(msg, sizeof(msg), "\x01PAIR:%04d\n", code);
+        client.print(msg);
+        // Also print to Serial for user to see
+        Serial.printf("[WS] Pairing code: %04d\n", code);
+    } else if (_password[0] != '\0') {
+        client.print("\x01AUTH:REQUIRED\n");
+    } else {
+        _clientAuthenticated[idx] = true;
     }
 }
 

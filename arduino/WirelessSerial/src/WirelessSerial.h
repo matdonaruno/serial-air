@@ -85,6 +85,17 @@ public:
     /// Whether the server is running.
     bool isRunning() const;
 
+    // ========== Security ==========
+
+    /// Enable pairing code verification on new connections.
+    /// A random 4-digit code is printed to Serial and sent to the client.
+    /// Client must respond with the same code to complete connection.
+    void enablePairing();
+
+    /// Set a password required for connection.
+    /// Client must send the correct password to complete connection.
+    void setPassword(const char* password);
+
     // ========== Configuration ==========
 
     /// Set maximum number of clients (default: 3, max: 5).
@@ -123,6 +134,10 @@ public:
 
 private:
     char _deviceId[16];
+    bool _pairingEnabled;
+    char _password[32];
+    bool _clientAuthenticated[WIRELESS_SERIAL_MAX_CLIENTS_LIMIT];
+
     WiFiServer* _server;
     WiFiClient _clients[WIRELESS_SERIAL_MAX_CLIENTS_LIMIT];
     uint8_t _maxClients;
@@ -142,6 +157,7 @@ private:
     void _cleanupClients();
     void _bufferWrite(const uint8_t* data, size_t len);
     void _flushBufferTo(WiFiClient& client);
+    void _sendSecurityChallenge(WiFiClient& client, uint8_t idx);
 
 #if WS_BLE_ENABLED
     BLEServer* _bleServer;

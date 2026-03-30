@@ -10,13 +10,23 @@ export interface Device {
   lastSeen: Date;
 }
 
+export interface DeviceFingerprint {
+  heapSize?: number;
+  libraryVersion?: string;
+  deviceType?: string;
+}
+
 export interface TrustedDevice {
   deviceId: string;
   name: string;
   trustedAt: Date;
   lastSeen: Date;
   connectionType: 'wifi' | 'ble';
+  fingerprint?: DeviceFingerprint;
+  password?: string; // stored for password mode
 }
+
+export type SecurityMode = 'none' | 'pairing' | 'password';
 
 export interface LogLine {
   id: number;
@@ -67,6 +77,9 @@ export interface SettingsState {
   autoReconnect: boolean;
   reconnectInterval: number;
   connectionTimeout: number;
+
+  // Security
+  securityMode: SecurityMode;
 
   // Log
   autoSave: boolean;
