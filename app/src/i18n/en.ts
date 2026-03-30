@@ -139,6 +139,22 @@ const en = {
   onboarding_slide7_subtitle: 'Save & share',
   onboarding_slide7_desc: 'Tap the save icon to export your serial log as a text file. Share it via AirDrop, email, or any app.',
 
+  // Onboarding - Security
+  onboarding_security_title: 'Stay Secure',
+  onboarding_security_subtitle: 'Before you start',
+  onboarding_safe_title: 'Safe Usage',
+  onboarding_safe_1: 'Use WPA2/WPA3 secured WiFi networks',
+  onboarding_safe_2: 'Only connect to devices you own or trust',
+  onboarding_safe_3: 'Use the Trusted Devices feature to verify identity',
+  onboarding_safe_4: 'Keep your microcontroller firmware updated',
+  onboarding_risk_title: 'Avoid These',
+  onboarding_risk_1: 'Transmitting passwords or credentials via serial',
+  onboarding_risk_2: 'Using on public or open WiFi networks',
+  onboarding_risk_3: 'Connecting to unknown or unverified devices',
+  onboarding_risk_4: 'Sending sensitive data without network encryption',
+  onboarding_security_note: 'Serial data is transmitted unencrypted. WiFi (TCP) and BLE connections do not use application-level encryption.',
+  onboarding_agree: 'I Understand & Agree',
+
   // Trusted Devices
   trusted_title: 'TRUSTED DEVICES',
   trusted_empty: 'No trusted devices yet',

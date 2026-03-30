@@ -141,6 +141,22 @@ const ja: typeof en = {
   onboarding_slide7_subtitle: '保存＆共有',
   onboarding_slide7_desc: '保存アイコンをタップしてシリアルログをテキストファイルとしてエクスポート。AirDrop、メール等で共有可能。',
 
+  // Onboarding - Security
+  onboarding_security_title: 'セキュリティガイド',
+  onboarding_security_subtitle: 'ご利用前に',
+  onboarding_safe_title: '安全な使い方',
+  onboarding_safe_1: 'WPA2/WPA3で保護されたWiFiを使用',
+  onboarding_safe_2: '自分が所有・信頼するデバイスのみ接続',
+  onboarding_safe_3: '信頼済みデバイス機能でデバイスを確認',
+  onboarding_safe_4: 'マイクロコントローラのファームウェアを最新に',
+  onboarding_risk_title: '避けるべきこと',
+  onboarding_risk_1: 'シリアル経由でパスワードや認証情報を送信',
+  onboarding_risk_2: '公共のWiFiやオープンネットワークでの使用',
+  onboarding_risk_3: '不明・未確認のデバイスへの接続',
+  onboarding_risk_4: 'ネットワーク暗号化なしで機密データを送信',
+  onboarding_security_note: 'シリアルデータは暗号化されません。WiFi（TCP）およびBLE接続はアプリレベルの暗号化を使用しません。',
+  onboarding_agree: '理解して同意する',
+
   // Trusted Devices
   trusted_title: '信頼済みデバイス',
   trusted_empty: '信頼済みデバイスはまだありません',

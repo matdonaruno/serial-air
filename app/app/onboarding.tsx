@@ -30,6 +30,7 @@ interface Slide {
   title: string;
   subtitle: string;
   description: string;
+  isSecurity?: boolean;
 }
 
 function getSlides(): Slide[] {
@@ -41,6 +42,7 @@ function getSlides(): Slide[] {
     { icon: 'terminal', title: t('onboarding_slide5_title'), subtitle: t('onboarding_slide5_subtitle'), description: t('onboarding_slide5_desc') },
     { icon: 'send', title: t('onboarding_slide6_title'), subtitle: t('onboarding_slide6_subtitle'), description: t('onboarding_slide6_desc') },
     { icon: 'download', title: t('onboarding_slide7_title'), subtitle: t('onboarding_slide7_subtitle'), description: t('onboarding_slide7_desc') },
+    { icon: 'shield', title: t('onboarding_security_title'), subtitle: t('onboarding_security_subtitle'), description: '', isSecurity: true },
   ];
 }
 
@@ -71,16 +73,56 @@ export default function OnboardingScreen() {
     router.replace('/' as any);
   };
 
-  const renderSlide = ({ item }: ListRenderItemInfo<Slide>) => (
-    <View style={[styles.slide, { width: SCREEN_WIDTH }]}>
-      <View style={styles.iconCircle}>
-        <Feather name={item.icon} size={40} color={colors.accent.primary} />
+  const renderSlide = ({ item }: ListRenderItemInfo<Slide>) => {
+    if (item.isSecurity) {
+      return (
+        <View style={[styles.slide, styles.securitySlide, { width: SCREEN_WIDTH }]}>
+          <View style={styles.securityIconCircle}>
+            <Feather name="shield" size={32} color={colors.status.connected} />
+          </View>
+          <Text style={styles.title}>{item.title}</Text>
+          <Text style={styles.subtitle}>{item.subtitle}</Text>
+
+          {/* Safe usage */}
+          <View style={styles.securitySection}>
+            <View style={styles.securitySectionHeader}>
+              <Feather name="check-circle" size={16} color={colors.status.connected} />
+              <Text style={styles.securitySectionTitle}>{t('onboarding_safe_title')}</Text>
+            </View>
+            <Text style={styles.securityItem}>{t('onboarding_safe_1')}</Text>
+            <Text style={styles.securityItem}>{t('onboarding_safe_2')}</Text>
+            <Text style={styles.securityItem}>{t('onboarding_safe_3')}</Text>
+            <Text style={styles.securityItem}>{t('onboarding_safe_4')}</Text>
+          </View>
+
+          {/* Risky usage */}
+          <View style={styles.securitySection}>
+            <View style={styles.securitySectionHeader}>
+              <Feather name="alert-triangle" size={16} color={colors.status.disconnected} />
+              <Text style={[styles.securitySectionTitle, { color: colors.status.disconnected }]}>{t('onboarding_risk_title')}</Text>
+            </View>
+            <Text style={styles.securityItem}>{t('onboarding_risk_1')}</Text>
+            <Text style={styles.securityItem}>{t('onboarding_risk_2')}</Text>
+            <Text style={styles.securityItem}>{t('onboarding_risk_3')}</Text>
+            <Text style={styles.securityItem}>{t('onboarding_risk_4')}</Text>
+          </View>
+
+          <Text style={styles.securityNote}>{t('onboarding_security_note')}</Text>
+        </View>
+      );
+    }
+
+    return (
+      <View style={[styles.slide, { width: SCREEN_WIDTH }]}>
+        <View style={styles.iconCircle}>
+          <Feather name={item.icon} size={40} color={colors.accent.primary} />
+        </View>
+        <Text style={styles.title}>{item.title}</Text>
+        <Text style={styles.subtitle}>{item.subtitle}</Text>
+        <Text style={styles.description}>{item.description}</Text>
       </View>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.subtitle}>{item.subtitle}</Text>
-      <Text style={styles.description}>{item.description}</Text>
-    </View>
-  );
+    );
+  };
 
   return (
     <View style={styles.containerOuter}>
@@ -123,15 +165,15 @@ export default function OnboardingScreen() {
 
       {/* Next / Get Started button */}
       <View style={styles.bottomRow}>
-        <Pressable style={styles.nextButton} onPress={handleNext}>
-          <Text style={styles.nextButtonText}>
-            {isLast ? t('onboarding_get_started') : t('onboarding_next')}
-          </Text>
+        <Pressable style={[styles.nextButton, isLast && styles.agreeButton]} onPress={handleNext}>
           <Feather
-            name={isLast ? 'check' : 'arrow-right'}
+            name={isLast ? 'shield' : 'arrow-right'}
             size={18}
             color={colors.white}
           />
+          <Text style={styles.nextButtonText}>
+            {isLast ? t('onboarding_agree') : t('onboarding_next')}
+          </Text>
         </Pressable>
       </View>
     </SafeAreaView>
@@ -242,5 +284,57 @@ const styles = StyleSheet.create({
     color: colors.white,
     fontWeight: '700',
     letterSpacing: 1,
+  },
+  agreeButton: {
+    backgroundColor: colors.status.connected,
+    shadowColor: colors.status.connected,
+  },
+
+  // Security slide
+  securitySlide: {
+    justifyContent: 'flex-start',
+    paddingTop: 40,
+  },
+  securityIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.md,
+  },
+  securitySection: {
+    width: '100%',
+    marginBottom: spacing.md,
+  },
+  securitySectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  securitySectionTitle: {
+    ...typography.bodySmall,
+    color: colors.status.connected,
+    fontWeight: '700',
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
+  securityItem: {
+    ...typography.caption,
+    color: colors.text.secondary,
+    paddingLeft: 24,
+    paddingVertical: 3,
+    lineHeight: 20,
+  },
+  securityNote: {
+    ...typography.caption,
+    color: colors.text.muted,
+    textAlign: 'center',
+    marginTop: spacing.sm,
+    paddingHorizontal: spacing.md,
+    lineHeight: 18,
+    fontStyle: 'italic',
   },
 });
