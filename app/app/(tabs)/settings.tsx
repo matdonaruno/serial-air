@@ -315,6 +315,13 @@ export default function SettingsScreen() {
             </View>
           </SettingRow>
         </NeuCard>
+        <Text style={styles.securityHint}>
+          {securityMode === 'none'
+            ? t('settings_security_hint_none')
+            : securityMode === 'pairing'
+            ? t('settings_security_hint_pairing')
+            : t('settings_security_hint_password')}
+        </Text>
 
         {/* PURCHASE Section (hidden in FREE_MODE) */}
         {!FREE_MODE && (
@@ -550,6 +557,13 @@ const styles = StyleSheet.create({
   },
   securityModeTextActive: {
     color: colors.accent.primary,
+  },
+  securityHint: {
+    ...typography.caption,
+    color: colors.text.muted,
+    marginTop: 8,
+    marginHorizontal: spacing.xs,
+    lineHeight: 18,
   },
   dangerButton: {
     flexDirection: 'row',

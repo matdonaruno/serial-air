@@ -85,7 +85,27 @@ const BOARDS: BoardDef[] = [
   },
 ];
 
-function generateCode(boardId: string, ssid: string, password: string): string {
+type SecurityOption = 'none' | 'pairing' | 'password';
+
+function getSecuritySnippet(security: SecurityOption, devicePassword: string, platform: string): string {
+  if (platform !== 'arduino') return '';
+  if (security === 'pairing') {
+    return `
+    // Security: Pairing Code mode
+    // A 4-digit code will be shown on Serial monitor when a client connects.
+    // The Serial Air app will ask you to verify this code.
+    ws.enablePairing();`;
+  }
+  if (security === 'password') {
+    return `
+    // Security: Password mode
+    // Only clients that know this password can connect.
+    ws.setPassword("${devicePassword || 'changeme'}");`;
+  }
+  return '';
+}
+
+function generateCode(boardId: string, ssid: string, password: string, security: SecurityOption = 'none', devicePassword: string = ''): string {
   switch (boardId) {
     case 'esp8266':
       return `/**
@@ -112,7 +132,7 @@ void setup() {
     Serial.println();
     Serial.print("IP: "); Serial.println(WiFi.localIP());
 
-    ws.begin();
+    ws.begin();${getSecuritySnippet(security, devicePassword, 'arduino')}
     output = ws.mirror(Serial);
     output->println("Serial Air ready!");
 }
@@ -154,7 +174,7 @@ void setup() {
     Serial.println();
     Serial.print("IP: "); Serial.println(WiFi.localIP());
 
-    ws.begin();
+    ws.begin();${getSecuritySnippet(security, devicePassword, 'arduino')}
     output = ws.mirror(Serial);
     output->println("Serial Air ready!");
     output->print("Device ID: ");
@@ -366,12 +386,14 @@ export default function CodeGeneratorScreen() {
   const [ssid, setSsid] = useState('');
   const [password, setPassword] = useState('');
   const [copied, setCopied] = useState(false);
+  const [security, setSecurity] = useState<SecurityOption>('none');
+  const [devicePassword, setDevicePassword] = useState('');
 
   const board = BOARDS.find((b) => b.id === boardId)!;
 
   const code = useMemo(
-    () => generateCode(boardId, ssid || 'YOUR_WIFI_SSID', password || 'YOUR_WIFI_PASSWORD'),
-    [boardId, ssid, password]
+    () => generateCode(boardId, ssid || 'YOUR_WIFI_SSID', password || 'YOUR_WIFI_PASSWORD', security, devicePassword),
+    [boardId, ssid, password, security, devicePassword]
   );
 
   const handleCopy = async () => {
@@ -467,6 +489,53 @@ export default function CodeGeneratorScreen() {
               <Feather name="shield" size={14} color={colors.text.muted} />
               <Text style={styles.infoText}>{t('codegen_creds_info')}</Text>
             </View>
+          </>
+        )}
+
+        {/* Security (Arduino only) */}
+        {board.platform === 'arduino' && (
+          <>
+            <Text style={styles.sectionLabel}>{t('codegen_security')}</Text>
+            <View style={styles.boardGrid}>
+              {(['none', 'pairing', 'password'] as const).map((mode) => (
+                <Pressable
+                  key={mode}
+                  style={[styles.boardButton, { flexBasis: '30%' as any }, security === mode && styles.boardButtonActive]}
+                  onPress={() => {
+                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                    setSecurity(mode);
+                  }}
+                >
+                  <Feather
+                    name={mode === 'none' ? 'unlock' : mode === 'pairing' ? 'hash' : 'lock'}
+                    size={18}
+                    color={security === mode ? colors.accent.primary : colors.text.muted}
+                  />
+                  <Text style={[styles.boardName, security === mode && styles.boardNameActive]}>
+                    {mode === 'none' ? t('codegen_security_none') : mode === 'pairing' ? t('codegen_security_pairing') : t('codegen_security_password')}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+            <Text style={styles.securityHintText}>
+              {security === 'none' ? t('codegen_security_hint_none') : security === 'pairing' ? t('codegen_security_hint_pairing') : t('codegen_security_hint_password')}
+            </Text>
+            {security === 'password' && (
+              <View style={[styles.inputCard, { marginTop: spacing.sm }]}>
+                <View style={styles.inputRow}>
+                  <Feather name="lock" size={18} color={colors.text.muted} style={styles.inputIcon} />
+                  <TextInput
+                    style={styles.textInput}
+                    placeholder={t('codegen_security_password_placeholder')}
+                    placeholderTextColor={colors.text.muted}
+                    value={devicePassword}
+                    onChangeText={setDevicePassword}
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                  />
+                </View>
+              </View>
+            )}
           </>
         )}
 
@@ -631,6 +700,12 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
     textAlign: 'center',
     fontSize: 10,
+  },
+  securityHintText: {
+    ...typography.caption,
+    color: colors.text.muted,
+    marginBottom: spacing.sm,
+    lineHeight: 18,
   },
   platformBadge: {
     alignSelf: 'flex-start',
