@@ -80,8 +80,6 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
         onConnect: () => {
           set({ status: 'connected', error: null, connectedAt: new Date() });
           useAppStore.getState().incrementConnectionCount();
-          // Delay review request to not interrupt the user immediately
-          setTimeout(() => maybeRequestReview(), 5000);
         },
         onData: (data: string) => {
           useLogStore.getState().addLine(data);
@@ -94,6 +92,7 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
           if (state.status !== 'disconnected') {
             set({ status: 'disconnected', connectedAt: null });
           }
+          maybeRequestReview();
         },
         onReconnecting: (_attempt: number) => {
           set({ status: 'reconnecting' });
@@ -139,7 +138,6 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
         onConnect: () => {
           set({ status: 'connected', error: null, connectedAt: new Date() });
           useAppStore.getState().incrementConnectionCount();
-          setTimeout(() => maybeRequestReview(), 5000);
         },
         onData: (data: string) => {
           useLogStore.getState().addLine(data);
@@ -152,6 +150,7 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
           if (state.status !== 'disconnected') {
             set({ status: 'disconnected', connectedAt: null });
           }
+          maybeRequestReview();
         },
       }
     );
