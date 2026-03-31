@@ -435,7 +435,7 @@ export default function CodeGeneratorScreen() {
         await FileSystem.writeAsStringAsync(path, code, { encoding: FileSystem.EncodingType.UTF8 });
         await Sharing.shareAsync(path, { mimeType: 'text/plain', dialogTitle: t('codegen_share_subject') });
       } catch {
-        Alert.alert('Error', 'Failed to share file.');
+        Alert.alert(t('error'), t('codegen_share_error'));
       }
     });
   }, [code, board, confirmAndRun]);
@@ -446,7 +446,7 @@ export default function CodeGeneratorScreen() {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       const available = await MailComposer.isAvailableAsync();
       if (!available) {
-        Alert.alert('Error', 'Email is not available on this device.');
+        Alert.alert(t('error'), t('codegen_email_unavailable'));
         return;
       }
       const ext = board.platform === 'arduino' ? 'ino' : 'py';
@@ -459,7 +459,7 @@ export default function CodeGeneratorScreen() {
         attachments: [path],
       });
     } catch {
-      Alert.alert('Error', 'Failed to compose email.');
+      Alert.alert(t('error'), t('codegen_email_error'));
     }
     });
   }, [code, board, confirmAndRun]);

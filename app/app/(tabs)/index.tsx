@@ -365,12 +365,12 @@ export default function HomeScreen() {
     // Validate IPv4 format
     const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
     if (!ipRegex.test(ip) || ip.split('.').some((n) => parseInt(n, 10) > 255)) {
-      Alert.alert('Invalid IP', 'Please enter a valid IPv4 address.');
+      Alert.alert(t('validation_invalid_ip'), t('validation_invalid_ip_msg'));
       return;
     }
     const port = manualPort.trim() ? parseInt(manualPort.trim(), 10) : defaultPort;
     if (isNaN(port) || port < 1 || port > 65535) {
-      Alert.alert('Invalid Port', 'Port must be between 1 and 65535.');
+      Alert.alert(t('validation_invalid_port'), t('validation_invalid_port_msg'));
       return;
     }
     connectToDevice(ip, port);
