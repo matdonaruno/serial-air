@@ -16,5 +16,9 @@ module.exports = {
     '^expo-haptics$': '<rootDir>/src/__tests__/__mocks__/expo-haptics.ts',
     '^react-native-ble-plx$':
       '<rootDir>/src/__tests__/__mocks__/react-native-ble-plx.ts',
+    '^expo-store-review$':
+      '<rootDir>/src/__tests__/__mocks__/expo-store-review.ts',
+    '^expo-constants$':
+      '<rootDir>/src/__tests__/__mocks__/expo-constants.ts',
   },
 };

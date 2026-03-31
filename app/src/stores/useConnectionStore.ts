@@ -6,6 +6,8 @@ import { TcpConnection } from '../services/TcpConnection';
 import { BleConnection } from '../services/BleConnection';
 import { useLogStore } from './useLogStore';
 import { useSettingsStore } from './useSettingsStore';
+import { useAppStore } from './useAppStore';
+import { maybeRequestReview } from '../services/ReviewService';
 
 // Shared BleManager singleton — may fail on simulator or devices without BLE
 let _bleManager: BleManager | null = null;
@@ -77,6 +79,9 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
       {
         onConnect: () => {
           set({ status: 'connected', error: null, connectedAt: new Date() });
+          useAppStore.getState().incrementConnectionCount();
+          // Delay review request to not interrupt the user immediately
+          setTimeout(() => maybeRequestReview(), 5000);
         },
         onData: (data: string) => {
           useLogStore.getState().addLine(data);
@@ -133,6 +138,8 @@ export const useConnectionStore = create<ConnectionStore>((set, get) => ({
       {
         onConnect: () => {
           set({ status: 'connected', error: null, connectedAt: new Date() });
+          useAppStore.getState().incrementConnectionCount();
+          setTimeout(() => maybeRequestReview(), 5000);
         },
         onData: (data: string) => {
           useLogStore.getState().addLine(data);
