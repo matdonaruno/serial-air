@@ -107,11 +107,21 @@ output = ws.mirror(Serial);
 **Important**: BLE adds ~1.2MB to flash usage. You must change:
 - Arduino IDE → Tools → **Partition Scheme** → **"Huge APP (3MB No OTA)"**
 
-### Size comparison
-| Mode | Flash Usage | Notes |
-|------|------------|-------|
-| WiFi only (default) | ~270KB | Fits default partition, plenty of room for user code |
-| WiFi + BLE | ~1.5MB | Needs Huge APP partition (3MB available) |
+### Size comparison (ESP32)
+| Mode | Flash Usage | User Code Space | Notes |
+|------|------------|----------------|-------|
+| WiFi only (default) | ~935KB (71%) | **~375KB free** | Fits default partition |
+| WiFi + BLE | ~1.7MB (55%) | **~1.4MB free** | Needs Huge APP (3MB) |
+
+Note: ~884KB is the ESP32 WiFi stack itself. WirelessSerial adds only ~22-50KB.
+ESP8266 is much smaller: ~272KB (25%) total.
+
+### Optional: strip mDNS or security
+```cpp
+#define WS_NO_MDNS 1      // Skip mDNS (manual IP only, saves ~29KB on ESP8266)
+#define WS_NO_SECURITY 1  // Remove pairing/password support
+#include <WirelessSerial.h>
+```
 
 ### ESP32-C3 specific
 - Auto-detects NimBLE vs Bluedroid

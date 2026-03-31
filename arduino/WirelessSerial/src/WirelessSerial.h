@@ -6,18 +6,34 @@
 
 #ifdef ESP8266
   #include <ESP8266WiFi.h>
-  #include <ESP8266mDNS.h>
+  #ifndef WS_NO_MDNS
+    #include <ESP8266mDNS.h>
+  #endif
 #elif defined(ESP32)
   #include <WiFi.h>
-  #include <ESPmDNS.h>
+  #ifndef WS_NO_MDNS
+    #include <ESPmDNS.h>
+  #endif
 #else
   #error "WirelessSerial only supports ESP8266 and ESP32"
 #endif
 
-// BLE is OFF by default to keep sketch size small (~270KB WiFi-only vs ~1.5MB with BLE).
-// To enable BLE, add this BEFORE #include <WirelessSerial.h>:
-//   #define WS_ENABLE_BLE 1
-// Also requires: Partition Scheme → "Huge APP (3MB No OTA)" in Arduino IDE.
+// ========== Build Options (define BEFORE #include <WirelessSerial.h>) ==========
+//
+// BLE is OFF by default to keep sketch size small.
+//   #define WS_ENABLE_BLE 1      // +1.2MB flash, needs "Huge APP" partition
+//
+// mDNS is ON by default for auto-discovery.
+//   #define WS_NO_MDNS 1         // -29KB, manual IP connection only
+//
+// Security (pairing/password) is ON by default.
+//   #define WS_NO_SECURITY 1     // Removes enablePairing()/setPassword()
+//
+// Size guide (ESP32):
+//   Default (WiFi + mDNS + Security):  ~935KB (71%)
+//   Lite (WiFi only, no mDNS):         ~884KB (67%)
+//   Full (WiFi + BLE):                ~1.5MB (needs Huge APP)
+// =============================================================================
 #if defined(ESP32) && defined(WS_ENABLE_BLE)
   #define WS_BLE_ENABLED 1
   #if __has_include(<NimBLEDevice.h>)
@@ -89,16 +105,15 @@ public:
     /// Whether the server is running.
     bool isRunning() const;
 
+#ifndef WS_NO_SECURITY
     // ========== Security ==========
 
     /// Enable pairing code verification on new connections.
-    /// A random 4-digit code is printed to Serial and sent to the client.
-    /// Client must respond with the same code to complete connection.
     void enablePairing();
 
     /// Set a password required for connection.
-    /// Client must send the correct password to complete connection.
     void setPassword(const char* password);
+#endif
 
     // ========== Configuration ==========
 
@@ -138,9 +153,11 @@ public:
 
 private:
     char _deviceId[16];
+#ifndef WS_NO_SECURITY
     bool _pairingEnabled;
     char _password[32];
     bool _clientAuthenticated[WIRELESS_SERIAL_MAX_CLIENTS_LIMIT];
+#endif
 
     WiFiServer* _server;
     WiFiClient _clients[WIRELESS_SERIAL_MAX_CLIENTS_LIMIT];
@@ -161,7 +178,9 @@ private:
     void _cleanupClients();
     void _bufferWrite(const uint8_t* data, size_t len);
     void _flushBufferTo(WiFiClient& client);
+#ifndef WS_NO_SECURITY
     void _sendSecurityChallenge(WiFiClient& client, uint8_t idx);
+#endif
 
 #if WS_BLE_ENABLED
     BLEServer* _bleServer;
