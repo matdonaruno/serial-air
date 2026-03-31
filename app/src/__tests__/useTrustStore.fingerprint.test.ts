@@ -138,12 +138,23 @@ describe('TrustStore - Fingerprint', () => {
   });
 
   describe('updatePassword', () => {
-    it('should store password for a trusted device', () => {
+    it('should store password in SecureStore', async () => {
+      const SecureStore = require('expo-secure-store');
       useTrustStore.getState().trustDevice(baseDevice);
-      useTrustStore.getState().updatePassword('SA-AABBCCDDEEFF', 'secret123');
+      await useTrustStore.getState().updatePassword('SA-AABBCCDDEEFF', 'secret123');
 
-      const device = useTrustStore.getState().getTrustedDevice('SA-AABBCCDDEEFF');
-      expect(device?.password).toBe('secret123');
+      expect(SecureStore.setItemAsync).toHaveBeenCalledWith(
+        'serial-air:pass:SA-AABBCCDDEEFF',
+        'secret123'
+      );
+    });
+
+    it('should retrieve password from SecureStore', async () => {
+      const SecureStore = require('expo-secure-store');
+      (SecureStore.getItemAsync as jest.Mock).mockResolvedValueOnce('secret123');
+
+      const password = await useTrustStore.getState().getPassword('SA-AABBCCDDEEFF');
+      expect(password).toBe('secret123');
     });
   });
 

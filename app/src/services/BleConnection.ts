@@ -102,6 +102,9 @@ export class BleConnection implements Connection {
 
   private _processData(text: string): void {
     this.buffer += text;
+    if (this.buffer.length > 65536) {
+      this.buffer = this.buffer.slice(-32768);
+    }
     const lines = this.buffer.split('\n');
     this.buffer = lines.pop() || '';
 

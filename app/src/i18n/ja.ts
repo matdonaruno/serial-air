@@ -192,6 +192,7 @@ const ja: typeof en = {
   codegen_qr_title: 'PCでスキャン',
   codegen_qr_hint: 'WiFi+セキュリティ設定のQRです。スケッチに貼り付けてください。',
   codegen_share_subject: 'Serial Air テストスケッチ',
+  codegen_creds_warning: 'WiFi認証情報が含まれています。信頼できる相手にのみ共有してください。',
   codegen_step_arduino_1: 'Arduino IDEを開く',
   codegen_step_arduino_2: '新しいスケッチにコードを貼り付け',
   codegen_step_arduino_3: (board: string) => `ボードを選択: ${board}`,

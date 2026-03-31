@@ -23,7 +23,7 @@ export interface TrustedDevice {
   lastSeen: Date;
   connectionType: 'wifi' | 'ble';
   fingerprint?: DeviceFingerprint;
-  password?: string; // stored for password mode
+  // Passwords stored in iOS Keychain via expo-secure-store (not here)
 }
 
 export type SecurityMode = 'none' | 'pairing' | 'password';

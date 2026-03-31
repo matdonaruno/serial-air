@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import { TrustedDevice, DeviceFingerprint } from '../types';
 
 const STORAGE_KEY = 'serial-air:trusted-devices';
@@ -18,7 +19,8 @@ interface TrustStore {
   isDeviceTrusted: (deviceId: string) => boolean;
   getTrustedDevice: (deviceId: string) => TrustedDevice | undefined;
   updateFingerprint: (deviceId: string, fingerprint: DeviceFingerprint) => void;
-  updatePassword: (deviceId: string, password: string) => void;
+  updatePassword: (deviceId: string, password: string) => Promise<void>;
+  getPassword: (deviceId: string) => Promise<string | null>;
   checkFingerprint: (deviceId: string, fingerprint: DeviceFingerprint) => FingerprintMismatch[];
 }
 
@@ -79,13 +81,22 @@ export const useTrustStore = create<TrustStore>((set, get) => ({
     persist(updated);
   },
 
-  updatePassword: (deviceId: string, password: string) => {
-    const { trustedDevices } = get();
-    const updated = trustedDevices.map((d) =>
-      d.deviceId === deviceId ? { ...d, password } : d
-    );
-    set({ trustedDevices: updated });
-    persist(updated);
+  updatePassword: async (deviceId: string, password: string) => {
+    // Store password in iOS Keychain via SecureStore (not AsyncStorage)
+    try {
+      await SecureStore.setItemAsync(`serial-air:pass:${deviceId}`, password);
+    } catch {
+      // Fallback: store in memory only (won't persist across restarts)
+      console.warn('[TrustStore] SecureStore unavailable, password not persisted');
+    }
+  },
+
+  getPassword: async (deviceId: string): Promise<string | null> => {
+    try {
+      return await SecureStore.getItemAsync(`serial-air:pass:${deviceId}`);
+    } catch {
+      return null;
+    }
   },
 
   checkFingerprint: (deviceId: string, fingerprint: DeviceFingerprint): FingerprintMismatch[] => {

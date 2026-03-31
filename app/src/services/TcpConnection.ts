@@ -69,6 +69,11 @@ export class TcpConnection implements Connection {
         const text = typeof data === 'string' ? data : data.toString('utf8');
         this.buffer += text;
 
+        // Prevent unbounded buffer growth (max 64KB)
+        if (this.buffer.length > 65536) {
+          this.buffer = this.buffer.slice(-32768);
+        }
+
         const lines = this.buffer.split('\n');
         // Keep the last incomplete line in the buffer
         this.buffer = lines.pop() || '';

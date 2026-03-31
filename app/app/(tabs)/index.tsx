@@ -362,8 +362,17 @@ export default function HomeScreen() {
   const handleManualConnect = useCallback(() => {
     const ip = manualIp.trim();
     if (!ip) return;
+    // Validate IPv4 format
+    const ipRegex = /^(\d{1,3}\.){3}\d{1,3}$/;
+    if (!ipRegex.test(ip) || ip.split('.').some((n) => parseInt(n, 10) > 255)) {
+      Alert.alert('Invalid IP', 'Please enter a valid IPv4 address.');
+      return;
+    }
     const port = manualPort.trim() ? parseInt(manualPort.trim(), 10) : defaultPort;
-    if (isNaN(port)) return;
+    if (isNaN(port) || port < 1 || port > 65535) {
+      Alert.alert('Invalid Port', 'Port must be between 1 and 65535.');
+      return;
+    }
     connectToDevice(ip, port);
   }, [manualIp, manualPort, defaultPort, connectToDevice]);
 

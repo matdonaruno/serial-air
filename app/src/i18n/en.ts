@@ -190,6 +190,7 @@ const en = {
   codegen_qr_title: 'Scan with your PC',
   codegen_qr_hint: 'This QR contains WiFi + security config. Paste into your sketch.',
   codegen_share_subject: 'Serial Air Test Sketch',
+  codegen_creds_warning: 'This contains your WiFi credentials. Share only with trusted recipients.',
   codegen_step_arduino_1: 'Open Arduino IDE',
   codegen_step_arduino_2: 'Paste the code into a new sketch',
   codegen_step_arduino_3: (board: string) => `Select board: ${board}`,

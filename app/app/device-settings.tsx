@@ -20,9 +20,9 @@ import {
 } from '../src/constants/theme';
 
 export default function DeviceSettingsScreen() {
-  const [ssid, setSsid] = useState('Serial_Air_One');
-  const [password, setPassword] = useState('password123');
-  const [staticIp, setStaticIp] = useState('192.168.1.142');
+  const [ssid, setSsid] = useState('');
+  const [password, setPassword] = useState('');
+  const [staticIp, setStaticIp] = useState('');
   const [baudRate, setBaudRate] = useState('115200');
   const [showPassword, setShowPassword] = useState(false);
   const [autoReconnect, setAutoReconnect] = useState(true);

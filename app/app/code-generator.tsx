@@ -410,20 +410,34 @@ export default function CodeGeneratorScreen() {
     setTimeout(() => setCopied(false), 2000);
   }, [code]);
 
-  const handleShare = useCallback(async () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const ext = board.platform === 'arduino' ? 'ino' : 'py';
-      const filename = `SerialAirTest.${ext}`;
-      const path = `${FileSystem.cacheDirectory}${filename}`;
-      await FileSystem.writeAsStringAsync(path, code, { encoding: FileSystem.EncodingType.UTF8 });
-      await Sharing.shareAsync(path, { mimeType: 'text/plain', dialogTitle: t('codegen_share_subject') });
-    } catch {
-      Alert.alert('Error', 'Failed to share file.');
+  const confirmAndRun = useCallback((action: () => Promise<void>) => {
+    if (ssid || password) {
+      Alert.alert(t('codegen_share_subject'), t('codegen_creds_warning'), [
+        { text: t('cancel'), style: 'cancel' },
+        { text: 'OK', onPress: action },
+      ]);
+    } else {
+      action();
     }
-  }, [code, board]);
+  }, [ssid, password]);
+
+  const handleShare = useCallback(async () => {
+    confirmAndRun(async () => {
+      try {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+        const ext = board.platform === 'arduino' ? 'ino' : 'py';
+        const filename = `SerialAirTest.${ext}`;
+        const path = `${FileSystem.cacheDirectory}${filename}`;
+        await FileSystem.writeAsStringAsync(path, code, { encoding: FileSystem.EncodingType.UTF8 });
+        await Sharing.shareAsync(path, { mimeType: 'text/plain', dialogTitle: t('codegen_share_subject') });
+      } catch {
+        Alert.alert('Error', 'Failed to share file.');
+      }
+    });
+  }, [code, board, confirmAndRun]);
 
   const handleEmail = useCallback(async () => {
+    confirmAndRun(async () => {
     try {
       Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       const available = await MailComposer.isAvailableAsync();
@@ -443,7 +457,8 @@ export default function CodeGeneratorScreen() {
     } catch {
       Alert.alert('Error', 'Failed to compose email.');
     }
-  }, [code, board]);
+    });
+  }, [code, board, confirmAndRun]);
 
   // QR content: compact config for pasting into existing sketch
   const qrContent = useMemo(() => {
@@ -535,6 +550,7 @@ export default function CodeGeneratorScreen() {
                   onChangeText={setPassword}
                   autoCapitalize="none"
                   autoCorrect={false}
+                  secureTextEntry
                 />
               </View>
             </View>

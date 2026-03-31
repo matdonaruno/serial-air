@@ -18,6 +18,8 @@ module.exports = {
       '<rootDir>/src/__tests__/__mocks__/react-native-ble-plx.ts',
     '^expo-store-review$':
       '<rootDir>/src/__tests__/__mocks__/expo-store-review.ts',
+    '^expo-secure-store$':
+      '<rootDir>/src/__tests__/__mocks__/expo-secure-store.ts',
     '^expo-constants$':
       '<rootDir>/src/__tests__/__mocks__/expo-constants.ts',
   },

@@ -192,12 +192,6 @@ export default function SettingsScreen() {
     );
   }, [resetSettings]);
 
-  const handleOpenArduinoLibrary = useCallback(() => {
-    Linking.openURL(
-      'https://github.com/matdonaruno/serial-air/tree/main/arduino/WirelessSerial'
-    );
-  }, []);
-
   const handleOpenGitHub = useCallback(() => {
     Linking.openURL('https://github.com/matdonaruno/serial-air');
   }, []);
@@ -359,6 +353,19 @@ export default function SettingsScreen() {
           </>
         )}
 
+        {/* RATE Section */}
+        <Pressable
+          style={({ pressed }) => [styles.rateCard, pressed && styles.rateCardPressed]}
+          onPress={() => {
+            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+            handleRateApp();
+          }}
+        >
+          <Feather name="star" size={20} color={colors.accent.primary} />
+          <Text style={styles.rateText}>{t('settings_rate_app')}</Text>
+          <Feather name="chevron-right" size={18} color={colors.text.muted} />
+        </Pressable>
+
         {/* ABOUT Section */}
         <Text style={styles.sectionHeader}>{t('settings_about')}</Text>
         <NeuCard style={styles.card}>
@@ -367,21 +374,9 @@ export default function SettingsScreen() {
           </SettingRow>
 
           <LinkRow
-            label={t('settings_arduino_library')}
-            icon="external-link"
-            onPress={handleOpenArduinoLibrary}
-          />
-
-          <LinkRow
             label={t('settings_github')}
             icon="external-link"
             onPress={handleOpenGitHub}
-          />
-
-          <LinkRow
-            label={t('settings_rate_app')}
-            icon="star"
-            onPress={handleRateApp}
           />
 
           <LinkRow
@@ -533,6 +528,27 @@ const styles = StyleSheet.create({
   },
   valueBadgeTextDisabled: {
     color: colors.text.muted,
+  },
+  rateCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.card,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: 16,
+    marginTop: spacing.lg,
+    borderWidth: 1,
+    borderColor: colors.accent.glow,
+    gap: 12,
+  },
+  rateCardPressed: {
+    opacity: 0.8,
+  },
+  rateText: {
+    ...typography.body,
+    color: colors.accent.primary,
+    fontWeight: '600',
+    flex: 1,
   },
   securityModes: {
     flexDirection: 'row',
