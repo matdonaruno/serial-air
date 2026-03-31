@@ -170,6 +170,18 @@ const en = {
 
   // Code Generator
   codegen_title: 'TEST CODE',
+  codegen_install_lib: 'INSTALL LIBRARY',
+  codegen_install_hint: 'Install the WirelessSerial library first:',
+  codegen_ide_arduino: 'Arduino IDE',
+  codegen_ide_platformio: 'PlatformIO',
+  codegen_ide_cli: 'Arduino CLI',
+  codegen_install_arduino_1: 'Sketch → Include Library → Add .ZIP Library',
+  codegen_install_arduino_2: 'Select the downloaded ZIP from GitHub',
+  codegen_install_arduino_url: 'Download ZIP from GitHub',
+  codegen_install_pio_1: 'Add to platformio.ini:',
+  codegen_install_pio_code: 'lib_deps = https://github.com/matdonaruno/serial-air.git',
+  codegen_install_cli_1: 'Run in terminal:',
+  codegen_install_cli_code: 'arduino-cli lib install --git-url https://github.com/matdonaruno/serial-air.git',
   codegen_select_board: 'SELECT BOARD',
   codegen_wifi_creds: 'WIFI CREDENTIALS',
   codegen_generated: 'GENERATED CODE',

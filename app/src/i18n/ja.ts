@@ -172,6 +172,18 @@ const ja: typeof en = {
 
   // Code Generator
   codegen_title: 'テストコード',
+  codegen_install_lib: 'ライブラリをインストール',
+  codegen_install_hint: 'まずWirelessSerialライブラリをインストール:',
+  codegen_ide_arduino: 'Arduino IDE',
+  codegen_ide_platformio: 'PlatformIO',
+  codegen_ide_cli: 'Arduino CLI',
+  codegen_install_arduino_1: 'スケッチ → ライブラリをインクルード → .ZIP形式のライブラリをインストール',
+  codegen_install_arduino_2: 'GitHubからダウンロードしたZIPを選択',
+  codegen_install_arduino_url: 'GitHubからZIPをダウンロード',
+  codegen_install_pio_1: 'platformio.iniに追加:',
+  codegen_install_pio_code: 'lib_deps = https://github.com/matdonaruno/serial-air.git',
+  codegen_install_cli_1: 'ターミナルで実行:',
+  codegen_install_cli_code: 'arduino-cli lib install --git-url https://github.com/matdonaruno/serial-air.git',
   codegen_select_board: 'ボードを選択',
   codegen_wifi_creds: 'WiFi認証情報',
   codegen_generated: '生成されたコード',

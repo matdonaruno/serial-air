@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Alert,
   Modal,
+  Linking,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
@@ -390,6 +391,79 @@ while True:
   }
 }
 
+const GITHUB_ZIP_URL = 'https://github.com/matdonaruno/serial-air/archive/refs/heads/main.zip';
+const GITHUB_GIT_URL = 'https://github.com/matdonaruno/serial-air.git';
+
+function LibInstallTabs() {
+  const [activeTab, setActiveTab] = useState<'arduino' | 'pio' | 'cli'>('arduino');
+
+  return (
+    <View style={styles.installCard}>
+      {/* Tab buttons */}
+      <View style={styles.installTabRow}>
+        {(['arduino', 'pio', 'cli'] as const).map((tab) => (
+          <Pressable
+            key={tab}
+            style={[styles.installTab, activeTab === tab && styles.installTabActive]}
+            onPress={() => setActiveTab(tab)}
+          >
+            <Text style={[styles.installTabText, activeTab === tab && styles.installTabTextActive]}>
+              {tab === 'arduino' ? t('codegen_ide_arduino') : tab === 'pio' ? t('codegen_ide_platformio') : t('codegen_ide_cli')}
+            </Text>
+          </Pressable>
+        ))}
+      </View>
+
+      {/* Tab content */}
+      <View style={styles.installContent}>
+        {activeTab === 'arduino' && (
+          <>
+            <Text style={styles.installStep}>1. {t('codegen_install_arduino_1')}</Text>
+            <Text style={styles.installStep}>2. {t('codegen_install_arduino_2')}</Text>
+            <Pressable
+              style={styles.installLinkBtn}
+              onPress={() => Linking.openURL(GITHUB_ZIP_URL)}
+            >
+              <Feather name="download" size={14} color={colors.accent.primary} />
+              <Text style={styles.installLinkText}>{t('codegen_install_arduino_url')}</Text>
+            </Pressable>
+          </>
+        )}
+        {activeTab === 'pio' && (
+          <>
+            <Text style={styles.installStep}>{t('codegen_install_pio_1')}</Text>
+            <Pressable
+              style={styles.installCodeBlock}
+              onPress={async () => {
+                await Clipboard.setStringAsync(`lib_deps = ${GITHUB_GIT_URL}`);
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }}
+            >
+              <Text style={styles.installCode}>{t('codegen_install_pio_code')}</Text>
+              <Feather name="copy" size={14} color={colors.text.muted} />
+            </Pressable>
+          </>
+        )}
+        {activeTab === 'cli' && (
+          <>
+            <Text style={styles.installStep}>{t('codegen_install_cli_1')}</Text>
+            <Pressable
+              style={styles.installCodeBlock}
+              onPress={async () => {
+                await Clipboard.setStringAsync(t('codegen_install_cli_code'));
+                Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+              }}
+            >
+              <Text style={styles.installCode}>{t('codegen_install_cli_code')}</Text>
+              <Feather name="copy" size={14} color={colors.text.muted} />
+            </Pressable>
+          </>
+        )}
+      </View>
+    </View>
+  );
+}
+
 export default function CodeGeneratorScreen() {
   const [boardId, setBoardId] = useState('esp32');
   const [ssid, setSsid] = useState('');
@@ -500,6 +574,11 @@ export default function CodeGeneratorScreen() {
         <Text style={styles.introText}>
           {t('codegen_intro')}
         </Text>
+
+        {/* Library Installation */}
+        <Text style={styles.sectionLabel}>{t('codegen_install_lib')}</Text>
+        <Text style={styles.installHint}>{t('codegen_install_hint')}</Text>
+        <LibInstallTabs />
 
         {/* Board Selection */}
         <Text style={styles.sectionLabel}>{t('codegen_select_board')}</Text>
@@ -813,6 +892,81 @@ const styles = StyleSheet.create({
     color: colors.text.muted,
     textAlign: 'center',
     fontSize: 10,
+  },
+  installHint: {
+    ...typography.caption,
+    color: colors.text.secondary,
+    marginBottom: spacing.sm,
+  },
+  installCard: {
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.card,
+    borderWidth: 1,
+    borderColor: colors.borderLight,
+    overflow: 'hidden',
+    marginBottom: spacing.md,
+  },
+  installTabRow: {
+    flexDirection: 'row',
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  installTab: {
+    flex: 1,
+    alignItems: 'center',
+    paddingVertical: 10,
+  },
+  installTabActive: {
+    borderBottomWidth: 2,
+    borderBottomColor: colors.accent.primary,
+  },
+  installTabText: {
+    ...typography.caption,
+    color: colors.text.muted,
+    fontWeight: '600',
+  },
+  installTabTextActive: {
+    color: colors.accent.primary,
+  },
+  installContent: {
+    padding: spacing.md,
+  },
+  installStep: {
+    ...typography.caption,
+    color: colors.text.secondary,
+    lineHeight: 20,
+    marginBottom: 6,
+  },
+  installLinkBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginTop: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: colors.bg.surfaceLight,
+    borderRadius: borderRadius.small,
+    alignSelf: 'flex-start',
+  },
+  installLinkText: {
+    ...typography.caption,
+    color: colors.accent.primary,
+    fontWeight: '600',
+  },
+  installCodeBlock: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    backgroundColor: colors.bg.surfaceLight,
+    borderRadius: borderRadius.small,
+    padding: 10,
+    marginTop: 6,
+  },
+  installCode: {
+    fontFamily: 'Menlo',
+    fontSize: 10,
+    color: colors.text.secondary,
+    flex: 1,
   },
   securityHintText: {
     ...typography.caption,
