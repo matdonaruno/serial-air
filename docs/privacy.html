@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Serial Air</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Montserrat', 'Noto Sans JP', sans-serif;
+            background: #050510; color: #e0e0e0; line-height: 1.8;
+            overflow-x: hidden; min-height: 100vh;
+        }
+        canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .container { position: relative; z-index: 1; max-width: 900px; margin: 0 auto; padding: 40px 20px 60px; }
+        .hero { text-align: center; padding: 80px 0 40px; }
+        .hero h1 {
+            font-size: 3rem; font-weight: 800;
+            background: linear-gradient(135deg, #00d2ff, #0080ff, #00d2ff);
+            background-size: 200% 200%;
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            background-clip: text; animation: gradientShift 4s ease infinite; margin-bottom: 8px;
+        }
+        .hero .subtitle { font-size: 1rem; color: rgba(0,210,255,0.5); font-weight: 300; letter-spacing: 2px; margin-bottom: 16px; }
+        .hero .last-updated { font-size: 0.85rem; color: rgba(255,255,255,0.35); }
+        @keyframes gradientShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+
+        /* Language switcher */
+        .lang-switch { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; }
+        .lang-btn {
+            padding: 8px 20px; border-radius: 20px; border: 1px solid rgba(0,210,255,0.2);
+            background: rgba(0,210,255,0.05); color: rgba(255,255,255,0.5); font-size: 0.85rem;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .lang-btn.active { background: rgba(0,210,255,0.15); color: #00d2ff; border-color: rgba(0,210,255,0.4); font-weight: 600; }
+        .lang-content { display: none; }
+        .lang-content.active { display: block; }
+
+        .card {
+            background: rgba(255,255,255,0.03); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,210,255,0.08); border-radius: 30px; padding: 40px; margin-bottom: 30px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 20px 60px rgba(0,210,255,0.08); border-color: rgba(0,210,255,0.15); }
+        h2 { font-size: 1.5rem; font-weight: 700; color: #fff; margin-bottom: 24px; padding-left: 20px; border-left: 3px solid #00d2ff; line-height: 1.4; }
+        h3 { font-size: 1.1rem; font-weight: 600; color: #00d2ff; margin-top: 28px; margin-bottom: 14px; display: flex; align-items: center; gap: 12px; }
+        h3::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(0,210,255,0.3), transparent); }
+        p { color: rgba(255,255,255,0.7); margin-bottom: 14px; font-weight: 300; font-size: 0.95rem; }
+        ul { list-style: none; padding: 0; margin: 14px 0; }
+        ul li {
+            background: rgba(0,210,255,0.03); border: 1px solid rgba(0,210,255,0.06); border-radius: 12px;
+            padding: 12px 18px; margin-bottom: 8px; font-size: 0.9rem; color: rgba(255,255,255,0.7); font-weight: 300;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        ul li:hover { border-color: rgba(0,210,255,0.15); background: rgba(0,210,255,0.05); }
+        ul li::before { content: '\2726'; color: #00d2ff; margin-right: 10px; font-size: 0.7rem; }
+        .important-box {
+            background: rgba(0,210,255,0.04); border: 1px solid rgba(0,210,255,0.25); border-radius: 16px;
+            padding: 24px 28px; margin: 24px 0; box-shadow: 0 0 30px rgba(0,210,255,0.06);
+        }
+        .important-box p { color: rgba(255,255,255,0.85); font-weight: 400; margin-bottom: 0; }
+        .important-box .label { color: #00d2ff; font-weight: 600; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 8px; display: block; }
+        .contact-card {
+            text-align: center; background: rgba(0,210,255,0.03); backdrop-filter: blur(20px);
+            border: 1px solid rgba(0,210,255,0.1); border-radius: 30px; padding: 40px; margin-top: 40px;
+            transition: transform 0.3s ease;
+        }
+        .contact-card:hover { transform: translateY(-5px); }
+        .contact-card h2 { border-left: none; padding-left: 0; text-align: center; }
+        .contact-card a { color: #00d2ff; text-decoration: none; font-weight: 500; }
+        footer { text-align: center; padding: 40px 0 20px; color: rgba(255,255,255,0.2); font-size: 0.8rem; }
+        @media (max-width: 768px) {
+            .hero { padding: 50px 0 30px; } .hero h1 { font-size: 2rem; }
+            .card { padding: 28px 22px; border-radius: 22px; } .container { padding: 20px 16px 40px; }
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particleCanvas"></canvas>
+    <div class="container">
+        <div class="hero">
+            <h1>Privacy Policy</h1>
+            <div class="subtitle">プライバシーポリシー</div>
+            <div class="last-updated">Last updated / 最終更新: March 18, 2026</div>
+        </div>
+
+        <div class="lang-switch">
+            <div class="lang-btn active" onclick="switchLang('en')">English</div>
+            <div class="lang-btn" onclick="switchLang('ja')">日本語</div>
+        </div>
+
+        <!-- ENGLISH -->
+        <div id="lang-en" class="lang-content active">
+            <div class="card">
+                <h2>1. Introduction</h2>
+                <p>Serial Air respects your privacy. This Privacy Policy explains how we handle information when you use our wireless serial monitor application. Your data stays on your device.</p>
+            </div>
+            <div class="card">
+                <h2>2. Information We Collect</h2>
+                <h3>2.1 Device Connection Data</h3>
+                <p>The following information is handled locally on your device:</p>
+                <ul>
+                    <li>IP addresses (local network only, never transmitted externally)</li>
+                    <li>Device names discovered via mDNS</li>
+                    <li>Device identifiers (MAC address-based)</li>
+                    <li>Connection timestamps</li>
+                </ul>
+                <h3>2.2 Purchase Information</h3>
+                <ul>
+                    <li>Purchase status stored locally on your device</li>
+                    <li>All payment transactions handled entirely by Apple/Google</li>
+                </ul>
+                <h3>2.3 Local Settings</h3>
+                <ul>
+                    <li>App preferences (display, connection defaults)</li>
+                    <li>Trusted device list</li>
+                </ul>
+                <div class="important-box">
+                    <span class="label">Important</span>
+                    <p>Serial Air does NOT collect, transmit, or store any personal data on external servers. All data remains on your device.</p>
+                </div>
+            </div>
+            <div class="card">
+                <h2>3. How We Use Information</h2>
+                <ul>
+                    <li>Connecting to devices over WiFi and Bluetooth</li>
+                    <li>Discovering devices on your local network</li>
+                    <li>Persisting your preferences between sessions</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>4. Third-Party Services</h2>
+                <p>Only Apple App Store / Google Play for in-app purchases. No analytics, no tracking, no advertising SDKs.</p>
+            </div>
+            <div class="card">
+                <h2>5. Data Storage &amp; Security</h2>
+                <ul>
+                    <li>All data stored locally via AsyncStorage</li>
+                    <li>No cloud servers or external databases</li>
+                    <li>All data deleted when the app is uninstalled</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>6. Network Communication &amp; Security</h2>
+                <h3>6.1 Communication Methods</h3>
+                <p>Serial Air communicates with devices using the following protocols:</p>
+                <ul>
+                    <li><strong>WiFi (TCP):</strong> Unencrypted TCP socket connection over your local network. Data is transmitted in plaintext between your device and the microcontroller.</li>
+                    <li><strong>Bluetooth Low Energy (BLE):</strong> Nordic UART Service (NUS) over BLE. Data is transmitted using standard BLE pairing without application-level encryption.</li>
+                    <li><strong>mDNS:</strong> Device discovery uses multicast DNS on your local network to find compatible devices.</li>
+                </ul>
+                <h3>6.2 Security Considerations</h3>
+                <div class="important-box">
+                    <span class="label">Important</span>
+                    <p>Serial Air does not encrypt serial data in transit. Any device on the same local network (WiFi) or within BLE range may potentially intercept transmitted data. Do not transmit sensitive, confidential, or personally identifiable information through serial connections.</p>
+                </div>
+                <h3>6.3 User Responsibility</h3>
+                <ul>
+                    <li>You are responsible for securing your own WiFi network (WPA2/WPA3 recommended)</li>
+                    <li>Ensure physical proximity control for BLE connections</li>
+                    <li>Do not transmit passwords, credentials, or sensitive data via serial connections</li>
+                    <li>The Trusted Devices feature helps identify known devices but does not provide cryptographic authentication</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>7. Children's Privacy</h2>
+                <p>Not directed at children under 13. No personal data collected from any user.</p>
+            </div>
+            <div class="card">
+                <h2>9. Changes to This Policy</h2>
+                <p>Changes communicated through app updates. Continued use constitutes acceptance.</p>
+            </div>
+            <div class="contact-card">
+                <h2>10. Contact</h2>
+                <p>Masashi Umetani<br><a href="mailto:support@serialair.app">support@serialair.app</a></p>
+            </div>
+        </div>
+
+        <!-- JAPANESE -->
+        <div id="lang-ja" class="lang-content">
+            <div class="card">
+                <h2>1. はじめに</h2>
+                <p>Serial Airはお客様のプライバシーを尊重します。本ポリシーは、ワイヤレスシリアルモニターアプリにおける情報の取り扱いについて説明します。お客様のデータはデバイス上にのみ保存されます。</p>
+            </div>
+            <div class="card">
+                <h2>2. 収集する情報</h2>
+                <h3>2.1 デバイス接続データ</h3>
+                <p>以下の情報はお客様のデバイス上でローカルに処理されます：</p>
+                <ul>
+                    <li>IPアドレス（ローカルネットワークのみ、外部送信なし）</li>
+                    <li>mDNSで検出されたデバイス名</li>
+                    <li>デバイス識別子（MACアドレスベース）</li>
+                    <li>接続タイムスタンプ</li>
+                </ul>
+                <h3>2.2 購入情報</h3>
+                <ul>
+                    <li>購入状態はデバイス上にローカル保存</li>
+                    <li>決済はすべてApple/Googleが処理</li>
+                </ul>
+                <h3>2.3 ローカル設定</h3>
+                <ul>
+                    <li>アプリ設定（表示、接続のデフォルト値）</li>
+                    <li>信頼済みデバイスリスト</li>
+                </ul>
+                <div class="important-box">
+                    <span class="label">重要</span>
+                    <p>Serial Airは個人データを外部サーバーに収集・送信・保存することはありません。すべてのデータはお客様のデバイス上にのみ存在します。</p>
+                </div>
+            </div>
+            <div class="card">
+                <h2>3. 情報の利用目的</h2>
+                <ul>
+                    <li>WiFiおよびBluetooth経由でのデバイス接続</li>
+                    <li>ローカルネットワーク上のデバイス検出</li>
+                    <li>セッション間の設定保持</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>4. 第三者サービス</h2>
+                <p>アプリ内課金のためのApple App Store / Google Playのみ。分析ツール、トラッキング、広告SDKは一切使用していません。</p>
+            </div>
+            <div class="card">
+                <h2>5. データの保管とセキュリティ</h2>
+                <ul>
+                    <li>すべてのデータはAsyncStorageでローカルに保存</li>
+                    <li>クラウドサーバーや外部データベースは不使用</li>
+                    <li>アプリをアンインストールするとすべてのデータが削除されます</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>6. ネットワーク通信とセキュリティ</h2>
+                <h3>6.1 通信方式</h3>
+                <p>Serial Airは以下のプロトコルでデバイスと通信します：</p>
+                <ul>
+                    <li><strong>WiFi（TCP）：</strong>ローカルネットワーク上の暗号化されていないTCPソケット接続。デバイスとマイクロコントローラ間のデータは平文で送受信されます。</li>
+                    <li><strong>Bluetooth Low Energy（BLE）：</strong>Nordic UART Service（NUS）によるBLE通信。アプリケーションレベルの暗号化なしの標準BLEペアリングを使用します。</li>
+                    <li><strong>mDNS：</strong>ローカルネットワーク上のマルチキャストDNSを使用してデバイスを検出します。</li>
+                </ul>
+                <h3>6.2 セキュリティに関する注意</h3>
+                <div class="important-box">
+                    <span class="label">重要</span>
+                    <p>Serial Airは通信中のシリアルデータを暗号化しません。同一ローカルネットワーク上（WiFi）またはBLE通信範囲内のデバイスがデータを傍受できる可能性があります。シリアル接続を通じて機密情報、個人情報、パスワード等を送信しないでください。</p>
+                </div>
+                <h3>6.3 ユーザーの責任</h3>
+                <ul>
+                    <li>WiFiネットワークのセキュリティ確保はユーザーの責任です（WPA2/WPA3推奨）</li>
+                    <li>BLE接続時は物理的な近接管理を行ってください</li>
+                    <li>シリアル接続経由でパスワード、認証情報、機密データを送信しないでください</li>
+                    <li>信頼済みデバイス機能はデバイスの識別を支援しますが、暗号学的な認証は提供しません</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h2>7. お子様のプライバシー</h2>
+                <p>13歳未満のお子様を対象としていません。いかなるユーザーからも個人データを収集しません。</p>
+            </div>
+            <div class="card">
+                <h2>8. 本ポリシーの変更</h2>
+                <p>変更はアプリのアップデートを通じてお知らせします。変更後の利用継続は同意とみなされます。</p>
+            </div>
+            <div class="contact-card">
+                <h2>9. お問い合わせ</h2>
+                <p>梅谷 将志<br><a href="mailto:support@serialair.app">support@serialair.app</a></p>
+            </div>
+        </div>
+
+        <footer>&copy; 2026 Serial Air</footer>
+    </div>
+
+    <script>
+        function switchLang(lang) {
+            document.querySelectorAll('.lang-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.lang-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById('lang-' + lang).classList.add('active');
+            document.querySelectorAll('.lang-btn').forEach(el => { if(el.textContent.includes(lang==='ja'?'日本語':'English')) el.classList.add('active'); });
+        }
+        // Auto-detect language
+        if (navigator.language.startsWith('ja')) switchLang('ja');
+
+        const canvas = document.getElementById('particleCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+        resize(); window.addEventListener('resize', resize);
+        class Particle {
+            constructor() { this.reset(); }
+            reset() { this.x=Math.random()*canvas.width; this.y=Math.random()*canvas.height; this.size=Math.random()*120+40; this.speedX=(Math.random()-0.5)*0.3; this.speedY=(Math.random()-0.5)*0.3; this.opacity=Math.random()*0.07+0.02; this.color=Math.random()>0.5?'0,210,255':'0,60,180'; }
+            update() { this.x+=this.speedX; this.y+=this.speedY; if(this.x<-this.size||this.x>canvas.width+this.size||this.y<-this.size||this.y>canvas.height+this.size) this.reset(); }
+            draw() { const g=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.size); g.addColorStop(0,`rgba(${this.color},${this.opacity})`); g.addColorStop(1,`rgba(${this.color},0)`); ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=g; ctx.fill(); }
+        }
+        for(let i=0;i<15;i++) particles.push(new Particle());
+        function animate() { ctx.clearRect(0,0,canvas.width,canvas.height); particles.forEach(p=>{p.update();p.draw();}); requestAnimationFrame(animate); }
+        animate();
+    </script>
+</body>
+</html>
