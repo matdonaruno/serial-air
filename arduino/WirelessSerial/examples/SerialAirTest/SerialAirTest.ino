@@ -21,8 +21,9 @@
  *   board = esp32-c3-devkitm-1
  */
 
-// BLE enabled — requires Partition Scheme: "Huge APP (3MB No OTA)"
-// #define WS_NO_BLE 1
+// Uncomment to enable BLE (adds ~1.2MB flash).
+// Requires: Arduino IDE → Tools → Partition Scheme → "Huge APP (3MB No OTA)"
+#define WS_ENABLE_BLE 1
 
 #include <WiFi.h>
 #include <WirelessSerial.h>

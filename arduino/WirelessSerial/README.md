@@ -85,22 +85,36 @@ void loop() {
 | `clientCount()` | Connected TCP clients |
 | `isRunning()` | Server status |
 
-## BLE Support
+## BLE Support (Optional)
 
-BLE uses the Nordic UART Service (NUS) for compatibility with standard BLE UART apps.
+BLE is **disabled by default** to keep sketch size small (~270KB WiFi-only).
+To enable BLE, add `#define WS_ENABLE_BLE 1` **before** the include:
 
 ```cpp
-// ESP32: WiFi + BLE
+// Step 1: Enable BLE
+#define WS_ENABLE_BLE 1
+
+// Step 2: Include library
+#include <WirelessSerial.h>
+
+// Step 3: In setup(), start BLE
 ws.begin();
 ws.beginBLE();  // Uses device ID as BLE name
 output = ws.mirror(Serial);
 // Data now goes to Serial + WiFi + BLE
 ```
 
-**ESP32-C3 notes:**
-- Requires partition scheme "Huge APP (3MB No OTA)"
+**Important**: BLE adds ~1.2MB to flash usage. You must change:
+- Arduino IDE → Tools → **Partition Scheme** → **"Huge APP (3MB No OTA)"**
+
+### Size comparison
+| Mode | Flash Usage | Notes |
+|------|------------|-------|
+| WiFi only (default) | ~270KB | Fits default partition, plenty of room for user code |
+| WiFi + BLE | ~1.5MB | Needs Huge APP partition (3MB available) |
+
+### ESP32-C3 specific
 - Auto-detects NimBLE vs Bluedroid
-- Use `#define WS_NO_BLE 1` before include to disable BLE and save flash
 - WiFi fix: `WiFi.setTxPower(WIFI_POWER_8_5dBm)` for stable connection
 - TCP fix: uses `server->accept()` for Arduino Core 3.x compatibility
 

@@ -151,11 +151,15 @@ void loop() {
 
     case 'esp32':
       return `/**
- * Serial Air — ESP32 Test
+ * Serial Air — ESP32 Test (WiFi)
  * Board: ESP32 / ESP32-C3 / ESP32-S3
  * IDE: Arduino IDE → Board: "ESP32 Dev Module"
  * Note: For ESP32-C3, set USB CDC On Boot: Enabled
+ *
+ * To add BLE: uncomment the line below and change
+ * Partition Scheme to "Huge APP (3MB No OTA)"
  */
+// #define WS_ENABLE_BLE 1  // Uncomment for BLE (+1.2MB flash)
 #include <WiFi.h>
 #include <WirelessSerial.h>
 

@@ -4,8 +4,12 @@
  * Mirrors Serial output to both TCP (WiFi) and BLE (Nordic UART Service).
  * Connect with the Serial Air iOS app via WiFi or Bluetooth.
  *
- * Hardware: ESP32 (not ESP8266 — BLE requires ESP32)
+ * Hardware: ESP32/C3/S3 (not ESP8266 — BLE requires ESP32)
+ * Partition: "Huge APP (3MB No OTA)" required
  */
+
+// Enable BLE support (adds ~1.2MB flash)
+#define WS_ENABLE_BLE 1
 
 #include <WiFi.h>
 #include <WirelessSerial.h>

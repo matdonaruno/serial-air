@@ -14,7 +14,11 @@
   #error "WirelessSerial only supports ESP8266 and ESP32"
 #endif
 
-#if defined(ESP32) && !defined(WS_NO_BLE)
+// BLE is OFF by default to keep sketch size small (~270KB WiFi-only vs ~1.5MB with BLE).
+// To enable BLE, add this BEFORE #include <WirelessSerial.h>:
+//   #define WS_ENABLE_BLE 1
+// Also requires: Partition Scheme → "Huge APP (3MB No OTA)" in Arduino IDE.
+#if defined(ESP32) && defined(WS_ENABLE_BLE)
   #define WS_BLE_ENABLED 1
   #if __has_include(<NimBLEDevice.h>)
     #define WS_USE_NIMBLE 1
