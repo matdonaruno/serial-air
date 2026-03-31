@@ -14,7 +14,7 @@ import { colors } from '../../src/constants/theme';
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
 
 const TAB_COUNT = 4;
-const TAB_ICONS: FeatherIconName[] = ['home', 'terminal', 'bar-chart-2', 'settings'];
+const TAB_ICONS: FeatherIconName[] = ['home', 'send', 'terminal', 'settings'];
 
 const SPRING_CONFIG = { damping: 18, stiffness: 180, mass: 0.8 };
 

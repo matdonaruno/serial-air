@@ -286,8 +286,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   agreeButton: {
-    backgroundColor: colors.status.connected,
-    shadowColor: colors.status.connected,
+    // Same accent color as other buttons
   },
 
   // Security slide

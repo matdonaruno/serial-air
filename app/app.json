@@ -53,7 +53,8 @@
         {
           "username": "serial-air"
         }
-      ]
+      ],
+      "expo-secure-store"
     ],
     "experiments": {
       "typedRoutes": true
