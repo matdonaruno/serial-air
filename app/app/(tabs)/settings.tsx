@@ -290,32 +290,36 @@ export default function SettingsScreen() {
         {/* SECURITY Section */}
         <Text style={styles.sectionHeader}>{t('settings_security')}</Text>
         <NeuCard style={styles.card}>
-          <SettingRow label={t('settings_security_mode')} isLast>
-            <View style={styles.securityModes}>
-              {(['none', 'pairing', 'password'] as const).map((mode) => (
-                <Pressable
-                  key={mode}
-                  style={[styles.securityModeBtn, securityMode === mode && styles.securityModeBtnActive]}
-                  onPress={() => {
-                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-                    updateSetting('securityMode', mode);
-                  }}
-                >
-                  <Text style={[styles.securityModeText, securityMode === mode && styles.securityModeTextActive]}>
-                    {mode === 'none' ? t('settings_security_none') : mode === 'pairing' ? t('settings_security_pairing') : t('settings_security_password')}
-                  </Text>
-                </Pressable>
-              ))}
-            </View>
-          </SettingRow>
+          <Text style={styles.securityLabel}>{t('settings_security_mode')}</Text>
+          <Text style={styles.securityHint}>
+            {securityMode === 'none'
+              ? t('settings_security_hint_none')
+              : securityMode === 'pairing'
+              ? t('settings_security_hint_pairing')
+              : t('settings_security_hint_password')}
+          </Text>
+          <View style={styles.securityModes}>
+            {(['none', 'pairing', 'password'] as const).map((mode) => (
+              <Pressable
+                key={mode}
+                style={[styles.securityModeBtn, securityMode === mode && styles.securityModeBtnActive]}
+                onPress={() => {
+                  Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+                  updateSetting('securityMode', mode);
+                }}
+              >
+                <Feather
+                  name={mode === 'none' ? 'unlock' : mode === 'pairing' ? 'hash' : 'lock'}
+                  size={16}
+                  color={securityMode === mode ? colors.accent.primary : colors.text.muted}
+                />
+                <Text style={[styles.securityModeText, securityMode === mode && styles.securityModeTextActive]}>
+                  {mode === 'none' ? t('settings_security_none') : mode === 'pairing' ? t('settings_security_pairing') : t('settings_security_password')}
+                </Text>
+              </Pressable>
+            ))}
+          </View>
         </NeuCard>
-        <Text style={styles.securityHint}>
-          {securityMode === 'none'
-            ? t('settings_security_hint_none')
-            : securityMode === 'pairing'
-            ? t('settings_security_hint_pairing')
-            : t('settings_security_hint_password')}
-        </Text>
 
         {/* PURCHASE Section (hidden in FREE_MODE) */}
         {!FREE_MODE && (
@@ -550,14 +554,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     flex: 1,
   },
+  securityLabel: {
+    ...typography.body,
+    color: colors.text.primary,
+    marginBottom: 6,
+  },
+  securityHint: {
+    ...typography.caption,
+    color: colors.text.muted,
+    lineHeight: 18,
+    marginBottom: spacing.md,
+  },
   securityModes: {
     flexDirection: 'row',
-    gap: 6,
+    gap: 10,
   },
   securityModeBtn: {
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: borderRadius.small,
+    flex: 1,
+    alignItems: 'center',
+    gap: 4,
+    paddingVertical: 12,
+    borderRadius: borderRadius.innerCard,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.bg.surfaceLight,
@@ -573,13 +590,6 @@ const styles = StyleSheet.create({
   },
   securityModeTextActive: {
     color: colors.accent.primary,
-  },
-  securityHint: {
-    ...typography.caption,
-    color: colors.text.muted,
-    marginTop: 8,
-    marginHorizontal: spacing.xs,
-    lineHeight: 18,
   },
   dangerButton: {
     flexDirection: 'row',
