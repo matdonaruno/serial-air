@@ -25,6 +25,7 @@ import {
   borderRadius,
   layout,
 } from '../../src/constants/theme';
+import * as Clipboard from 'expo-clipboard';
 import { t } from '../../src/i18n';
 import { FREE_MODE } from '../../src/constants/defaults';
 import { resetCoachMarks } from '../../src/components/CoachMark';
@@ -192,8 +193,23 @@ export default function SettingsScreen() {
     );
   }, [resetSettings]);
 
+  const LIBRARY_URL = 'https://github.com/matdonaruno/serial-air';
+
   const handleOpenGitHub = useCallback(() => {
-    Linking.openURL('https://github.com/matdonaruno/serial-air');
+    Alert.alert(t('settings_github'), t('settings_github_action'), [
+      {
+        text: t('settings_github_open'),
+        onPress: () => Linking.openURL(LIBRARY_URL),
+      },
+      {
+        text: t('settings_github_copy'),
+        onPress: async () => {
+          await Clipboard.setStringAsync(LIBRARY_URL);
+          Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+        },
+      },
+      { text: t('cancel'), style: 'cancel' },
+    ]);
   }, []);
 
   const handleRateApp = useCallback(async () => {
