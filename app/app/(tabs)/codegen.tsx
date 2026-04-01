@@ -19,8 +19,8 @@ import * as FileSystem from 'expo-file-system';
 import * as Sharing from 'expo-sharing';
 import * as MailComposer from 'expo-mail-composer';
 import QRCode from 'react-native-qrcode-svg';
-import { colors, spacing, borderRadius, typography, neuShadow } from '../src/constants/theme';
-import { t } from '../src/i18n';
+import { colors, spacing, borderRadius, typography, neuShadow, layout } from '../../src/constants/theme';
+import { t } from '../../src/i18n';
 
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
 
@@ -567,16 +567,7 @@ export default function CodeGeneratorScreen() {
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <Pressable onPress={() => {
-          Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-          router.back();
-        }} hitSlop={12}>
-          <View style={styles.backButton}>
-            <Feather name="arrow-left" size={20} color={colors.text.secondary} />
-          </View>
-        </Pressable>
         <Text style={styles.headerTitle}>{t('codegen_title')}</Text>
-        <View style={{ width: 36 }} />
       </View>
 
       <ScrollView
@@ -759,7 +750,15 @@ export default function CodeGeneratorScreen() {
         {/* Instructions */}
         <View style={styles.stepsCard}>
           <Text style={styles.stepsTitle}>{t('codegen_next_steps')}</Text>
-          {board.platform === 'arduino' ? (
+          {boardId === 'arduino-r4-wifi' ? (
+            <>
+              <StepItem number="1" text={t('codegen_step_arduino_1')} />
+              <StepItem number="2" text={t('codegen_step_arduino_2')} />
+              <StepItem number="3" text={t('codegen_step_arduino_3')('Arduino UNO R4 WiFi')} />
+              <StepItem number="4" text={t('codegen_step_arduino_4')} />
+              <StepItem number="5" text={t('codegen_step_arduino_5')} />
+            </>
+          ) : board.platform === 'arduino' ? (
             <>
               <StepItem number="1" text={t('codegen_step_arduino_1')} />
               <StepItem number="2" text={t('codegen_step_arduino_2')} />
@@ -784,6 +783,7 @@ export default function CodeGeneratorScreen() {
             </>
           )}
         </View>
+        <View style={styles.bottomSpacer} />
       </ScrollView>
 
       {/* QR Code Modal */}
@@ -830,11 +830,10 @@ const styles = StyleSheet.create({
     backgroundColor: colors.bg.primary,
   },
   header: {
-    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    height: layout.headerHeight,
   },
   backButton: {
     width: 36,
@@ -1192,6 +1191,7 @@ const styles = StyleSheet.create({
     color: colors.accent.primary,
     fontWeight: '700',
   },
+  bottomSpacer: { height: 140 },
   stepText: {
     ...typography.bodySmall,
     color: colors.text.secondary,

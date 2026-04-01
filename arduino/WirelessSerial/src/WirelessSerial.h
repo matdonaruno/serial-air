@@ -14,8 +14,13 @@
   #ifndef WS_NO_MDNS
     #include <ESPmDNS.h>
   #endif
+#elif defined(ARDUINO_UNOR4_WIFI)
+  #include <WiFiS3.h>
+  // R4 WiFi: mDNS not supported, use manual IP connection
+  #define WS_NO_MDNS 1
+  #define WS_NO_SECURITY 1  // No ESP.getFreeHeap() on R4
 #else
-  #error "WirelessSerial only supports ESP8266 and ESP32"
+  #error "WirelessSerial supports ESP8266, ESP32, and Arduino UNO R4 WiFi"
 #endif
 
 // ========== Build Options (define BEFORE #include <WirelessSerial.h>) ==========

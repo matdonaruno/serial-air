@@ -185,6 +185,7 @@ Copy to your Arduino libraries directory:
 | ESP32 | ✅ | ✅ | All variants |
 | ESP32-C3 | ✅ | ✅ | Needs Huge APP partition, TX power fix |
 | ESP32-S3 | ✅ | ✅ | |
+| Arduino UNO R4 WiFi | ✅ | — | No mDNS, manual IP connection |
 
 ## License
 

@@ -165,6 +165,7 @@ export default function MonitorTabScreen() {
   const status = useConnectionStore((s) => s.status);
   const currentDevice = useConnectionStore((s) => s.currentDevice);
   const sendCommand = useConnectionStore((s) => s.sendCommand);
+  const disconnect = useConnectionStore((s) => s.disconnect);
   const connectionType = useConnectionStore((s) => s.connectionType);
   const connectedAt = useConnectionStore((s) => s.connectedAt);
 
@@ -182,13 +183,29 @@ export default function MonitorTabScreen() {
   const isConnected = status === 'connected';
   const [uptimeStr, setUptimeStr] = useState('');
 
+  // Power button pulse animation
+  const powerOpacity = useSharedValue(1);
+  useEffect(() => {
+    if (isConnected) {
+      powerOpacity.value = withRepeat(
+        withSequence(
+          withTiming(0.3, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+          withTiming(1, { duration: 1000, easing: Easing.inOut(Easing.ease) }),
+        ), -1, false,
+      );
+    } else {
+      powerOpacity.value = 1;
+    }
+  }, [isConnected]);
+  const powerAnimStyle = useAnimatedStyle(() => ({ opacity: powerOpacity.value }));
+
   // Plotter state
   const [plotterSeries, setPlotterSeries] = useState<DataSeries[]>([]);
   const lastLineIdRef = useRef(0);
   const screenWidth = Dimensions.get('window').width;
   const chartWidth = screenWidth - layout.screenPaddingH * 2 - 32;
   const chartHeight = 220;
-  const chartPadding = { top: 16, right: 12, bottom: 24, left: 45 };
+  const chartPadding = { top: 16, right: 45, bottom: 24, left: 45 };
   const plotWidth = chartWidth - chartPadding.left - chartPadding.right;
   const plotHeight = chartHeight - chartPadding.top - chartPadding.bottom;
 
@@ -247,24 +264,51 @@ export default function MonitorTabScreen() {
     Keyboard.dismiss();
   }, [commandText, sendCommand]);
 
+  const handleDisconnect = useCallback(() => {
+    Alert.alert(
+      t('monitor_disconnect_title'),
+      t('monitor_disconnect_msg'),
+      [
+        { text: t('cancel'), style: 'cancel' },
+        {
+          text: t('monitor_disconnect_button'),
+          style: 'destructive',
+          onPress: () => disconnect(),
+        },
+      ],
+    );
+  }, [disconnect]);
+
   const renderLogLine = useCallback(
     ({ item }: { item: LogLine }) => <LogLineRow item={item} showTimestamp={showTimestamp} />,
     [showTimestamp],
   );
   const keyExtractor = useCallback((item: LogLine) => String(item.id), []);
 
-  const allValues = plotterSeries.flatMap((s) => s.values);
-  let yMin = 0, yMax = 1;
-  if (allValues.length > 0) {
-    yMin = Math.min(...allValues); yMax = Math.max(...allValues);
-    if (yMin === yMax) { yMin -= 1; yMax += 1; }
-    const pad = (yMax - yMin) * 0.1; yMin -= pad; yMax += pad;
-  }
   const hasPlotData = plotterSeries.some((s) => s.values.length > 1);
-  const yLabels = Array.from({ length: 5 }, (_, i) => ({
-    val: yMin + ((yMax - yMin) * i) / 4,
+
+  // Per-channel min/max for independent scaling
+  const channelRanges = plotterSeries.map((s) => {
+    if (s.values.length === 0) return { min: 0, max: 1 };
+    let mn = Math.min(...s.values);
+    let mx = Math.max(...s.values);
+    if (mn === mx) { mn -= 1; mx += 1; }
+    const pad = (mx - mn) * 0.1;
+    return { min: mn - pad, max: mx + pad };
+  });
+
+  // Left axis: first channel, Right axis: second channel (if exists)
+  const leftRange = channelRanges[0] || { min: 0, max: 1 };
+  const rightRange = channelRanges.length > 1 ? channelRanges[1] : null;
+
+  const yLabelsLeft = Array.from({ length: 5 }, (_, i) => ({
+    val: leftRange.min + ((leftRange.max - leftRange.min) * i) / 4,
     y: chartPadding.top + plotHeight - (plotHeight * i) / 4,
   }));
+  const yLabelsRight = rightRange ? Array.from({ length: 5 }, (_, i) => ({
+    val: rightRange.min + ((rightRange.max - rightRange.min) * i) / 4,
+    y: chartPadding.top + plotHeight - (plotHeight * i) / 4,
+  })) : null;
 
   if (!isConnected) {
     return (
@@ -288,6 +332,11 @@ export default function MonitorTabScreen() {
             <Text style={styles.headerDevice} numberOfLines={1}>{currentDevice?.name ?? 'Device'}</Text>
             {uptimeStr ? <Text style={styles.headerUptime}>{uptimeStr}</Text> : null}
           </View>
+          <Pressable onPress={handleDisconnect} style={styles.powerBtn}>
+            <Animated.View style={[styles.powerGlow, powerAnimStyle]}>
+              <Feather name="power" size={20} color={colors.status.connected} />
+            </Animated.View>
+          </Pressable>
           <View style={styles.modeToggle}>
             <Pressable style={[styles.modeBtn, mode === 'monitor' && styles.modeBtnActive]} onPress={() => setMode('monitor')}>
               <Feather name="terminal" size={16} color={mode === 'monitor' ? colors.accent.primary : colors.text.muted} />
@@ -327,17 +376,23 @@ export default function MonitorTabScreen() {
             ) : (
               <>
                 <Svg width={chartWidth} height={chartHeight}>
-                  {yLabels.map((l, i) => (
-                    <React.Fragment key={i}>
+                  {yLabelsLeft.map((l, i) => (
+                    <React.Fragment key={'L' + i}>
                       <Line x1={chartPadding.left} y1={l.y} x2={chartPadding.left + plotWidth} y2={l.y} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
-                      <SvgText x={chartPadding.left - 8} y={l.y + 4} fill={colors.text.muted} fontSize={10} fontFamily="Menlo" textAnchor="end">{l.val.toFixed(l.val % 1 === 0 ? 0 : 1)}</SvgText>
+                      <SvgText x={chartPadding.left - 8} y={l.y + 4} fill={plotterSeries[0]?.color || colors.text.muted} fontSize={9} fontFamily="Menlo" textAnchor="end">{l.val.toFixed(l.val % 1 === 0 ? 0 : 1)}</SvgText>
+                    </React.Fragment>
+                  ))}
+                  {yLabelsRight && yLabelsRight.map((l, i) => (
+                    <React.Fragment key={'R' + i}>
+                      <SvgText x={chartPadding.left + plotWidth + 8} y={l.y + 4} fill={plotterSeries[1]?.color || colors.text.muted} fontSize={9} fontFamily="Menlo" textAnchor="start">{l.val.toFixed(l.val % 1 === 0 ? 0 : 1)}</SvgText>
                     </React.Fragment>
                   ))}
                   {plotterSeries.map((s, si) => {
                     if (s.values.length < 2) return null;
+                    const range = channelRanges[si] || { min: 0, max: 1 };
                     const points = s.values.map((val, i) => {
                       const x = chartPadding.left + (plotWidth * i) / (s.values.length - 1);
-                      const y = chartPadding.top + plotHeight - ((val - yMin) / (yMax - yMin)) * plotHeight;
+                      const y = chartPadding.top + plotHeight - ((val - range.min) / (range.max - range.min)) * plotHeight;
                       return `${x},${y}`;
                     }).join(' ');
                     return <Polyline key={si} points={points} fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />;
@@ -404,6 +459,12 @@ const styles = StyleSheet.create({
   legendLabel: { ...typography.caption, color: colors.text.secondary, fontWeight: '600' },
   legendValue: { fontFamily: 'Menlo', fontSize: 12, color: colors.text.primary },
   inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md, paddingTop: spacing.sm, gap: spacing.sm, marginBottom: 80 },
+  powerBtn: { padding: 4 },
+  powerGlow: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: 'rgba(76, 175, 80, 0.15)',
+    alignItems: 'center', justifyContent: 'center',
+  },
   inputWrapper: { flex: 1 },
   inputMono: { fontFamily: 'Menlo', fontSize: 14 },
 });

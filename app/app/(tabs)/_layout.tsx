@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Tabs } from 'expo-router';
-import { View, StyleSheet, Pressable, Dimensions } from 'react-native';
+import { View, StyleSheet, Pressable, Dimensions, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Feather } from '@expo/vector-icons';
 import Animated, {
@@ -10,15 +10,23 @@ import Animated, {
 } from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { colors } from '../../src/constants/theme';
+import { useConnectionStore } from '../../src/stores/useConnectionStore';
+import { t } from '../../src/i18n';
 
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
 
-const TAB_COUNT = 4;
-const TAB_ICONS: FeatherIconName[] = ['home', 'send', 'terminal', 'settings'];
+const TAB_COUNT = 5;
+const TAB_ICONS: FeatherIconName[] = ['home', 'terminal', 'send', 'box', 'settings'];
 
 const SPRING_CONFIG = { damping: 18, stiffness: 180, mass: 0.8 };
 
 function CustomTabBar({ state, navigation }: any) {
+  const connectionStatus = useConnectionStore((s) => s.status);
+  const disconnect = useConnectionStore((s) => s.disconnect);
+  const isConnected = connectionStatus === 'connected';
+
+  // Monitor tab is index 1 (analytics)
+  const MONITOR_TAB_INDEX = 1;
   const insets = useSafeAreaInsets();
   const screenWidth = Dimensions.get('window').width;
   const tabWidth = screenWidth / TAB_COUNT;
@@ -54,6 +62,32 @@ function CustomTabBar({ state, navigation }: any) {
               icon={iconName}
               focused={focused}
               onPress={() => {
+                // If leaving monitor tab while connected, ask to disconnect
+                const COMMANDS_TAB_INDEX = 2;
+                if (state.index === MONITOR_TAB_INDEX && !focused && isConnected && index !== COMMANDS_TAB_INDEX) {
+                  Alert.alert(
+                    t('monitor_disconnect_title'),
+                    t('monitor_disconnect_msg'),
+                    [
+                      { text: t('cancel'), style: 'cancel' },
+                      {
+                        text: t('monitor_keep_connection'),
+                        onPress: () => {
+                          navigation.navigate(route.name);
+                        },
+                      },
+                      {
+                        text: t('monitor_disconnect_button'),
+                        style: 'destructive',
+                        onPress: () => {
+                          disconnect();
+                          navigation.navigate(route.name);
+                        },
+                      },
+                    ],
+                  );
+                  return;
+                }
                 const event = navigation.emit({
                   type: 'tabPress',
                   target: route.key,
@@ -115,8 +149,9 @@ export default function TabLayout() {
       }}
     >
       <Tabs.Screen name="index" options={{ title: 'Home' }} />
-      <Tabs.Screen name="terminal" options={{ title: 'Commands' }} />
       <Tabs.Screen name="analytics" options={{ title: 'Monitor' }} />
+      <Tabs.Screen name="terminal" options={{ title: 'Commands' }} />
+      <Tabs.Screen name="codegen" options={{ title: 'Code' }} />
       <Tabs.Screen name="settings" options={{ title: 'Settings' }} />
     </Tabs>
   );

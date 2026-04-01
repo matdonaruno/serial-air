@@ -637,7 +637,7 @@ export default function HomeScreen() {
           style={styles.codeGenButton}
           onPress={() => {
             Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            router.push('/code-generator');
+            router.push('/(tabs)/codegen' as any);
           }}
         >
           <View style={styles.codeGenIcon}>

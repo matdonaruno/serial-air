@@ -78,7 +78,11 @@ void WirelessSerial::begin(uint16_t port, const char* mdnsName) {
 
     _server = new WiFiServer(port);
     _server->begin();
+#if defined(ESP8266) || defined(ESP32)
     Serial.printf("[WS] TCP server started on port %d\n", port);
+#else
+    Serial.print("[WS] TCP server started on port "); Serial.println(port);
+#endif
 
 #ifdef ESP8266
     _server->setNoDelay(true);

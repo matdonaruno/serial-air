@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
+import { Swipeable } from 'react-native-gesture-handler';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import * as Haptics from 'expo-haptics';
 
 import { NeuCard, NeuButton, NeuInput } from '../../src/components/neumorphic';
@@ -101,15 +103,9 @@ export default function TerminalScreen() {
     <SafeAreaView style={styles.safeArea} edges={['top']}>
       {/* Header */}
       <View style={styles.header}>
+        <View style={{ width: layout.actionButtonSize }} />
         <Text style={styles.headerTitle}>{t('macros_title')}</Text>
-        <NeuButton
-          icon={showAdd ? 'x' : 'plus'}
-          onPress={() => {
-            Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-            setShowAdd(!showAdd);
-          }}
-          size={layout.actionButtonSize}
-        />
+        <View style={{ width: layout.actionButtonSize }} />
       </View>
 
       {/* Connection status */}
@@ -120,15 +116,33 @@ export default function TerminalScreen() {
         </Text>
       </View>
 
+      <GestureHandlerRootView style={styles.flex}>
       <ScrollView
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
+        {/* New command button */}
+        {!showAdd && (
+          <Pressable
+            style={styles.newCmdBtn}
+            onPress={() => {
+              Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+              setShowAdd(true);
+            }}
+          >
+            <Feather name="plus" size={18} color={colors.accent.primary} />
+            <Text style={styles.newCmdText}>{t('macros_add')}</Text>
+          </Pressable>
+        )}
+
         {/* Add form */}
         {showAdd && (
           <NeuCard style={styles.addCard}>
+            <Pressable style={styles.addCloseBtn} onPress={() => setShowAdd(false)}>
+              <Feather name="x" size={18} color={colors.text.muted} />
+            </Pressable>
             <NeuInput
               icon="tag"
               placeholder={t('macros_name_placeholder')}
@@ -169,7 +183,19 @@ export default function TerminalScreen() {
           </NeuCard>
         ) : (
           macros.map((macro) => (
-            <NeuCard key={macro.id} style={styles.macroCard}>
+            <Swipeable
+              key={macro.id}
+              renderRightActions={() => (
+                <Pressable
+                  style={styles.swipeDelete}
+                  onPress={() => handleDelete(macro)}
+                >
+                  <Feather name="trash-2" size={20} color={colors.white} />
+                </Pressable>
+              )}
+              overshootRight={false}
+            >
+            <NeuCard style={styles.macroCard}>
               <View style={styles.macroRow}>
                 <Pressable
                   style={styles.macroInfo}
@@ -195,15 +221,18 @@ export default function TerminalScreen() {
                 </Pressable>
               </View>
             </NeuCard>
+            </Swipeable>
           ))
         )}
 
         <View style={styles.bottomSpacer} />
       </ScrollView>
+      </GestureHandlerRootView>
 
       <CoachMark
         id="macros"
         steps={[
+          { icon: 'repeat', title: t('coach_macros_0_title'), description: t('coach_macros_0_desc') },
           { icon: 'zap', title: t('coach_macros_1_title'), description: t('coach_macros_1_desc') },
           { icon: 'trash-2', title: t('coach_macros_2_title'), description: t('coach_macros_2_desc') },
         ]}
@@ -214,6 +243,7 @@ export default function TerminalScreen() {
 }
 
 const styles = StyleSheet.create({
+  flex: { flex: 1 },
   safeArea: {
     flex: 1,
     backgroundColor: colors.bg.primary,
@@ -261,6 +291,31 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingHorizontal: layout.screenPaddingH,
   },
+  newCmdBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    backgroundColor: colors.bg.surface,
+    borderRadius: borderRadius.innerCard,
+    paddingVertical: 14,
+    marginBottom: spacing.md,
+    borderWidth: 1,
+    borderColor: colors.accent.glow,
+    borderStyle: 'dashed',
+  },
+  newCmdText: {
+    ...typography.bodySmall,
+    color: colors.accent.primary,
+    fontWeight: '600',
+  },
+  addCloseBtn: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    zIndex: 1,
+    padding: 4,
+  },
   addCard: {
     gap: spacing.md,
     marginBottom: spacing.md,
@@ -300,6 +355,15 @@ const styles = StyleSheet.create({
     ...typography.caption,
     color: colors.text.muted,
     textAlign: 'center',
+  },
+  swipeDelete: {
+    backgroundColor: colors.danger,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: 80,
+    borderRadius: borderRadius.card,
+    marginBottom: spacing.sm,
+    marginLeft: spacing.sm,
   },
   macroCard: {
     marginBottom: spacing.sm,

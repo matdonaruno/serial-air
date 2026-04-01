@@ -101,6 +101,7 @@ const ja: typeof en = {
   monitor_disconnect_title: '切断しますか？',
   monitor_disconnect_msg: 'このデバイスとの接続を切断しますか？',
   monitor_disconnect_button: '切断',
+  monitor_keep_connection: '接続を維持',
 
   // Paywall
   paywall_title: 'Serial Airを解除',
@@ -300,10 +301,12 @@ const ja: typeof en = {
   coach_home_2_desc: 'タップして接続。初回は信頼確認が表示されます。',
   coach_home_3_title: '接続ステータス',
   coach_home_3_desc: '上部バナーに接続状態と接続時間をリアルタイム表示。',
+  coach_macros_0_title: 'コマンドマクロ',
+  coach_macros_0_desc: '繰り返し送信するコマンドを保存。毎回入力する手間が省けます！',
   coach_macros_1_title: 'クイックコマンド',
   coach_macros_1_desc: 'よく使うコマンドを保存。+で追加、送信ボタンで即実行。',
-  coach_macros_2_title: '長押しで削除',
-  coach_macros_2_desc: 'コマンドを長押しで削除できます。',
+  coach_macros_2_title: 'スワイプまたは長押し',
+  coach_macros_2_desc: 'コマンドを左スワイプまたは長押しで削除できます。',
   coach_plotter_1_title: 'シリアルプロッター',
   coach_plotter_1_desc: '数値データをリアルタイムでグラフ表示。スマホ版Serial Plotter。',
   coach_plotter_2_title: 'データフォーマット',

@@ -99,6 +99,7 @@ const en = {
   monitor_disconnect_title: 'Disconnect?',
   monitor_disconnect_msg: 'Are you sure you want to disconnect from this device?',
   monitor_disconnect_button: 'Disconnect',
+  monitor_keep_connection: 'Keep Connected',
 
   // Paywall
   paywall_title: 'Unlock Serial Air',
@@ -298,10 +299,12 @@ const en = {
   coach_home_2_desc: 'Tap a device to connect. New devices ask for trust confirmation first.',
   coach_home_3_title: 'Connection Status',
   coach_home_3_desc: 'The top banner shows live connection status and uptime.',
+  coach_macros_0_title: 'Command Macros',
+  coach_macros_0_desc: 'Save commands you send repeatedly. No need to type the same thing over and over!',
   coach_macros_1_title: 'Quick Commands',
   coach_macros_1_desc: 'Save commands you use often. Tap + to add, then Send to fire instantly.',
-  coach_macros_2_title: 'Long Press to Delete',
-  coach_macros_2_desc: 'Long press a command to remove it.',
+  coach_macros_2_title: 'Swipe or Long Press',
+  coach_macros_2_desc: 'Swipe left or long press a command to delete it.',
   coach_plotter_1_title: 'Serial Plotter',
   coach_plotter_1_desc: 'Visualize numeric serial data in real time — like Serial Plotter on your phone.',
   coach_plotter_2_title: 'Data Format',
