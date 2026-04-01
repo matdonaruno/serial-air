@@ -305,7 +305,7 @@ export default function HomeScreen() {
         deviceName: device.name,
         lastConnected: new Date(),
       });
-      router.push('/monitor');
+      router.push('/(tabs)/analytics' as any);
     },
     [connect, connectBLE, addRecentConnection, router],
   );

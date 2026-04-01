@@ -1,48 +1,73 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   View,
   Text,
+  FlatList,
   StyleSheet,
   SafeAreaView,
-  Dimensions,
+  Pressable,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Alert,
-  PanResponder,
+  Dimensions,
 } from 'react-native';
 import Svg, { Polyline, Line, Text as SvgText } from 'react-native-svg';
-import ViewShot, { captureRef } from 'react-native-view-shot';
-import * as Sharing from 'expo-sharing';
-import { useRouter } from 'expo-router';
-import { Feather } from '@expo/vector-icons';
+import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+  withSequence,
+  Easing,
+} from 'react-native-reanimated';
+import { Feather } from '@expo/vector-icons';
 
-import { NeuButton } from '../../src/components/neumorphic';
+import { NeuButton, NeuContainer, NeuInput } from '../../src/components/neumorphic';
 import { useConnectionStore } from '../../src/stores/useConnectionStore';
 import { useLogStore } from '../../src/stores/useLogStore';
+import { useSettingsStore } from '../../src/stores/useSettingsStore';
+import { formatTimestamp } from '../../src/utils/formatTimestamp';
+import { exportLogToText } from '../../src/utils/logExporter';
 import { t } from '../../src/i18n';
-import { CoachMark } from '../../src/components/CoachMark';
+import { LogLine } from '../../src/types';
 import {
   colors,
   spacing,
   typography,
-  layout,
   borderRadius,
+  layout,
+  animation,
 } from '../../src/constants/theme';
 
-const MAX_POINTS = 100;
-const CHART_COLORS = [
-  '#00d2ff', // cyan
-  '#4caf50', // green
-  '#ff9800', // orange
-  '#e91e63', // pink
-  '#9c27b0', // purple
-  '#ffeb3b', // yellow
-];
+// ---------------------------------------------------------------------------
+// Helpers
+// ---------------------------------------------------------------------------
 
-// Parse numeric values from a serial line
-// Supports: "25.5", "temp:25.5", "a:1 b:2 c:3", "1,2,3"
+function getLineColor(text: string): string {
+  const lower = text.toLowerCase();
+  if (lower.includes('error') || lower.includes('fail')) return colors.log.error;
+  if (lower.includes('warn')) return colors.log.warning;
+  if (lower.includes('success') || lower.includes('ok') || lower.includes('done'))
+    return colors.log.success;
+  return colors.text.primary;
+}
+
+function formatUptime(connectedAt: Date | null): string {
+  if (!connectedAt) return '';
+  const diffMs = new Date().getTime() - new Date(connectedAt).getTime();
+  const totalSecs = Math.floor(diffMs / 1000);
+  const hrs = Math.floor(totalSecs / 3600);
+  const mins = Math.floor((totalSecs % 3600) / 60);
+  const secs = totalSecs % 60;
+  const pad = (n: number) => String(n).padStart(2, '0');
+  return `${pad(hrs)}:${pad(mins)}:${pad(secs)}`;
+}
+
 function parseNumbers(text: string): number[] {
   const numbers: number[] = [];
-  // Try key:value pairs first
   const kvMatches = text.match(/[\w]+:\s*(-?\d+\.?\d*)/g);
   if (kvMatches && kvMatches.length > 0) {
     for (const kv of kvMatches) {
@@ -51,7 +76,6 @@ function parseNumbers(text: string): number[] {
     }
     return numbers;
   }
-  // Try comma/space separated numbers
   const parts = text.split(/[,\s\t|]+/);
   for (const part of parts) {
     const val = parseFloat(part.trim());
@@ -60,401 +84,326 @@ function parseNumbers(text: string): number[] {
   return numbers;
 }
 
-interface DataSeries {
-  values: number[];
-  label: string;
-  color: string;
+// ---------------------------------------------------------------------------
+// Sub-components
+// ---------------------------------------------------------------------------
+
+function StatusDot() {
+  const opacity = useSharedValue(1);
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(0.3, { duration: animation.statusPulse.duration / 2, easing: Easing.inOut(Easing.ease) }),
+        withTiming(1, { duration: animation.statusPulse.duration / 2, easing: Easing.inOut(Easing.ease) }),
+      ), -1, false,
+    );
+  }, []);
+  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <Animated.View style={[styles.statusDot, animStyle]}>
+      <View style={styles.statusDotInner} />
+    </Animated.View>
+  );
 }
 
-export default function AnalyticsScreen() {
-  const router = useRouter();
+const LogLineRow = React.memo(
+  ({ item, showTimestamp }: { item: LogLine; showTimestamp: boolean }) => {
+    const lineColor = getLineColor(item.text);
+    const handleLongPress = useCallback(async () => {
+      const copyText = showTimestamp
+        ? `${formatTimestamp(item.timestamp)} ${item.text}`
+        : item.text;
+      await Clipboard.setStringAsync(copyText);
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    }, [item, showTimestamp]);
+    return (
+      <Pressable onLongPress={handleLongPress} style={styles.logLine}>
+        {showTimestamp && <Text style={styles.logTimestamp}>{formatTimestamp(item.timestamp)}</Text>}
+        <Text style={[styles.logText, { color: lineColor }]} selectable>{item.text}</Text>
+      </Pressable>
+    );
+  },
+);
 
-  // Swipe right to go back to Monitor
-  const panResponder = useRef(
-    PanResponder.create({
-      onMoveShouldSetPanResponder: (_, gs) =>
-        Math.abs(gs.dx) > 30 && Math.abs(gs.dy) < 30,
-      onPanResponderRelease: (_, gs) => {
-        if (gs.dx > 80) {
-          router.push('/monitor');
-        }
-      },
-    })
-  ).current;
+function BlinkingCursor() {
+  const opacity = useSharedValue(1);
+  useEffect(() => {
+    opacity.value = withRepeat(
+      withSequence(
+        withTiming(0, { duration: animation.statusBlink.duration, easing: Easing.steps(1, true) }),
+        withTiming(1, { duration: animation.statusBlink.duration, easing: Easing.steps(1, true) }),
+      ), -1, false,
+    );
+  }, []);
+  const animStyle = useAnimatedStyle(() => ({ opacity: opacity.value }));
+  return (
+    <View style={styles.cursorRow}>
+      <Text style={styles.cursorPrompt}>&gt; </Text>
+      <Animated.Text style={[styles.cursorBlock, animStyle]}>{'\u2588'}</Animated.Text>
+    </View>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Plotter constants
+// ---------------------------------------------------------------------------
+
+const CHART_COLORS = ['#00d2ff', '#4caf50', '#ff9800', '#e91e63', '#9c27b0', '#ffeb3b'];
+const MAX_POINTS = 100;
+
+interface DataSeries { values: number[]; label: string; color: string; }
+
+// ---------------------------------------------------------------------------
+// Main Screen
+// ---------------------------------------------------------------------------
+
+export default function MonitorTabScreen() {
+  const flatListRef = useRef<FlatList>(null);
+  const [commandText, setCommandText] = useState('');
+  const [mode, setMode] = useState<'monitor' | 'plotter'>('monitor');
 
   const status = useConnectionStore((s) => s.status);
   const currentDevice = useConnectionStore((s) => s.currentDevice);
-  const lines = useLogStore((s) => s.lines);
-  const [paused, setPaused] = useState(false);
-  const [series, setSeries] = useState<DataSeries[]>([]);
-  const lastLineIdRef = useRef(0);
-  const chartRef = useRef<ViewShot>(null);
-  const screenWidth = Dimensions.get('window').width;
+  const sendCommand = useConnectionStore((s) => s.sendCommand);
+  const connectionType = useConnectionStore((s) => s.connectionType);
+  const connectedAt = useConnectionStore((s) => s.connectedAt);
 
+  const lines = useLogStore((s) => s.lines);
+  const isPaused = useLogStore((s) => s.isPaused);
+  const filter = useLogStore((s) => s.filter);
+  const clear = useLogStore((s) => s.clear);
+  const togglePause = useLogStore((s) => s.togglePause);
+  const getFilteredLines = useLogStore((s) => s.getFilteredLines);
+
+  const autoScroll = useSettingsStore((s) => s.autoScroll);
+  const showTimestamp = useSettingsStore((s) => s.showTimestamp);
+
+  const filteredLines = useMemo(() => getFilteredLines(), [lines, filter]);
   const isConnected = status === 'connected';
+  const [uptimeStr, setUptimeStr] = useState('');
+
+  // Plotter state
+  const [plotterSeries, setPlotterSeries] = useState<DataSeries[]>([]);
+  const lastLineIdRef = useRef(0);
+  const screenWidth = Dimensions.get('window').width;
   const chartWidth = screenWidth - layout.screenPaddingH * 2 - 32;
-  const chartHeight = 260;
-  const chartPadding = { top: 20, right: 16, bottom: 30, left: 50 };
+  const chartHeight = 220;
+  const chartPadding = { top: 16, right: 12, bottom: 24, left: 45 };
   const plotWidth = chartWidth - chartPadding.left - chartPadding.right;
   const plotHeight = chartHeight - chartPadding.top - chartPadding.bottom;
 
-  // Process new log lines into data series
   useEffect(() => {
-    if (paused || lines.length === 0) return;
+    if (autoScroll && !isPaused && filteredLines.length > 0 && mode === 'monitor') {
+      setTimeout(() => flatListRef.current?.scrollToEnd({ animated: true }), 50);
+    }
+  }, [filteredLines.length, autoScroll, isPaused, mode]);
 
+  useEffect(() => {
+    if (!isConnected || !connectedAt) { setUptimeStr(''); return; }
+    const interval = setInterval(() => setUptimeStr(formatUptime(connectedAt)), 1000);
+    setUptimeStr(formatUptime(connectedAt));
+    return () => clearInterval(interval);
+  }, [isConnected, connectedAt]);
+
+  useEffect(() => {
+    if (mode !== 'plotter' || isPaused || lines.length === 0) return;
     const newLines = lines.filter((l) => l.id > lastLineIdRef.current);
     if (newLines.length === 0) return;
     lastLineIdRef.current = lines[lines.length - 1].id;
-
-    setSeries((prev) => {
+    setPlotterSeries((prev) => {
       const updated = prev.map((s) => ({ ...s, values: [...s.values] }));
-
       for (const line of newLines) {
         const nums = parseNumbers(line.text);
         if (nums.length === 0) continue;
-
-        // Ensure we have enough series
         while (updated.length < nums.length) {
           const idx = updated.length;
-          updated.push({
-            values: [],
-            label: `CH${idx + 1}`,
-            color: CHART_COLORS[idx % CHART_COLORS.length],
-          });
+          updated.push({ values: [], label: `CH${idx + 1}`, color: CHART_COLORS[idx % CHART_COLORS.length] });
         }
-
-        // Push values
         for (let i = 0; i < nums.length; i++) {
           updated[i].values.push(nums[i]);
-          if (updated[i].values.length > MAX_POINTS) {
-            updated[i].values.shift();
-          }
+          if (updated[i].values.length > MAX_POINTS) updated[i].values.shift();
         }
       }
-
       return updated;
     });
-  }, [lines, paused]);
-
-  const handleExport = useCallback(async () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      const uri = await captureRef(chartRef, { format: 'png', quality: 1 });
-      await Sharing.shareAsync(uri, { mimeType: 'image/png', dialogTitle: 'Serial Air Plotter' });
-    } catch {
-      Alert.alert(t('plotter_export_error'));
-    }
-  }, []);
+  }, [lines, mode, isPaused]);
 
   const handleClear = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setSeries([]);
-    lastLineIdRef.current = lines.length > 0 ? lines[lines.length - 1].id : 0;
-  }, [lines]);
+    Alert.alert(t('monitor_clear_title'), t('monitor_clear_msg'), [
+      { text: t('cancel'), style: 'cancel' },
+      { text: t('monitor_clear'), style: 'destructive', onPress: () => { clear(); setPlotterSeries([]); } },
+    ]);
+  }, [clear]);
 
-  const handleTogglePause = useCallback(() => {
-    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-    setPaused((p) => !p);
-  }, []);
+  const handleExport = useCallback(async () => {
+    try { await exportLogToText(filteredLines); } catch { Alert.alert(t('monitor_export_error'), t('monitor_export_error_msg')); }
+  }, [filteredLines]);
 
-  // Calculate chart bounds
-  let yMin = 0;
-  let yMax = 1;
-  const allValues = series.flatMap((s) => s.values);
+  const handleSend = useCallback(() => {
+    const trimmed = commandText.trim();
+    if (!trimmed) return;
+    sendCommand(trimmed);
+    setCommandText('');
+    Keyboard.dismiss();
+  }, [commandText, sendCommand]);
+
+  const renderLogLine = useCallback(
+    ({ item }: { item: LogLine }) => <LogLineRow item={item} showTimestamp={showTimestamp} />,
+    [showTimestamp],
+  );
+  const keyExtractor = useCallback((item: LogLine) => String(item.id), []);
+
+  const allValues = plotterSeries.flatMap((s) => s.values);
+  let yMin = 0, yMax = 1;
   if (allValues.length > 0) {
-    yMin = Math.min(...allValues);
-    yMax = Math.max(...allValues);
-    if (yMin === yMax) {
-      yMin -= 1;
-      yMax += 1;
-    }
-    const padding = (yMax - yMin) * 0.1;
-    yMin -= padding;
-    yMax += padding;
+    yMin = Math.min(...allValues); yMax = Math.max(...allValues);
+    if (yMin === yMax) { yMin -= 1; yMax += 1; }
+    const pad = (yMax - yMin) * 0.1; yMin -= pad; yMax += pad;
+  }
+  const hasPlotData = plotterSeries.some((s) => s.values.length > 1);
+  const yLabels = Array.from({ length: 5 }, (_, i) => ({
+    val: yMin + ((yMax - yMin) * i) / 4,
+    y: chartPadding.top + plotHeight - (plotHeight * i) / 4,
+  }));
+
+  if (!isConnected) {
+    return (
+      <SafeAreaView style={styles.safeArea}>
+        <View style={styles.emptyContainer}>
+          <Feather name="wifi-off" size={40} color={colors.text.muted} />
+          <Text style={styles.emptyTitle}>{t('home_no_connection')}</Text>
+          <Text style={styles.emptySubtext}>{t('macros_not_connected')}</Text>
+        </View>
+      </SafeAreaView>
+    );
   }
 
-  const hasData = series.some((s) => s.values.length > 1);
-
-  // Generate Y-axis labels
-  const yLabels = Array.from({ length: 5 }, (_, i) => {
-    const val = yMin + ((yMax - yMin) * i) / 4;
-    return { val, y: chartPadding.top + plotHeight - (plotHeight * i) / 4 };
-  });
-
   return (
-    <SafeAreaView style={styles.screen} {...panResponder.panHandlers}>
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t('plotter_title')}</Text>
-      </View>
-
-      {/* Action bar */}
-      <View style={styles.actionBar}>
-        {isConnected && (
-          <NeuButton
-            icon="terminal"
-            onPress={() => router.push('/monitor')}
-            size={layout.actionButtonSize}
-          />
-        )}
-        <NeuButton
-          icon="share"
-          onPress={handleExport}
-          size={layout.actionButtonSize}
-          disabled={!hasData}
-        />
-        <NeuButton
-          icon={paused ? 'play' : 'pause'}
-          onPress={handleTogglePause}
-          size={layout.actionButtonSize}
-          active={paused}
-        />
-        <NeuButton
-          icon="trash-2"
-          onPress={handleClear}
-          size={layout.actionButtonSize}
-        />
-      </View>
-
-      {/* Connection status */}
-      <View style={[styles.statusBar, isConnected && styles.statusBarConnected]}>
-        <View style={[styles.statusDot, { backgroundColor: isConnected ? colors.status.connected : colors.text.muted }]} />
-        <Text style={[styles.statusText, { color: isConnected ? colors.status.connected : colors.text.muted }]}>
-          {isConnected ? currentDevice?.name ?? 'Device' : t('plotter_empty_sub')}
-        </Text>
-        {paused && (
-          <View style={styles.pausedBadge}>
-            <Text style={styles.pausedText}>{t('plotter_pause')}</Text>
+    <SafeAreaView style={styles.safeArea}>
+      <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        {/* Header */}
+        <View style={styles.header}>
+          <View style={styles.headerLeft}>
+            {isConnected && <StatusDot />}
+            <Text style={styles.headerDevice} numberOfLines={1}>{currentDevice?.name ?? 'Device'}</Text>
+            {uptimeStr ? <Text style={styles.headerUptime}>{uptimeStr}</Text> : null}
           </View>
-        )}
-      </View>
-
-      {/* Chart */}
-      <ViewShot ref={chartRef} options={{ format: 'png', quality: 1 }} style={styles.chartContainer}>
-        {!hasData ? (
-          <View style={styles.emptyContent}>
-            <Feather name="activity" size={40} color={colors.text.muted} />
-            <Text style={styles.emptyTitle}>{t('plotter_empty')}</Text>
-            <Text style={styles.emptySubtext}>{t('plotter_hint')}</Text>
+          <View style={styles.modeToggle}>
+            <Pressable style={[styles.modeBtn, mode === 'monitor' && styles.modeBtnActive]} onPress={() => setMode('monitor')}>
+              <Feather name="terminal" size={16} color={mode === 'monitor' ? colors.accent.primary : colors.text.muted} />
+            </Pressable>
+            <Pressable style={[styles.modeBtn, mode === 'plotter' && styles.modeBtnActive]} onPress={() => setMode('plotter')}>
+              <Feather name="trending-up" size={16} color={mode === 'plotter' ? colors.accent.primary : colors.text.muted} />
+            </Pressable>
           </View>
-        ) : (
-          <Svg width={chartWidth} height={chartHeight}>
-            {/* Grid lines */}
-            {yLabels.map((l, i) => (
-              <React.Fragment key={i}>
-                <Line
-                  x1={chartPadding.left}
-                  y1={l.y}
-                  x2={chartPadding.left + plotWidth}
-                  y2={l.y}
-                  stroke="rgba(255,255,255,0.06)"
-                  strokeWidth={1}
-                />
-                <SvgText
-                  x={chartPadding.left - 8}
-                  y={l.y + 4}
-                  fill={colors.text.muted}
-                  fontSize={10}
-                  fontFamily="Menlo"
-                  textAnchor="end"
-                >
-                  {l.val.toFixed(l.val % 1 === 0 ? 0 : 1)}
-                </SvgText>
-              </React.Fragment>
-            ))}
-
-            {/* Data lines */}
-            {series.map((s, si) => {
-              if (s.values.length < 2) return null;
-              const points = s.values
-                .map((val, i) => {
-                  const x = chartPadding.left + (plotWidth * i) / (s.values.length - 1);
-                  const y = chartPadding.top + plotHeight - ((val - yMin) / (yMax - yMin)) * plotHeight;
-                  return `${x},${y}`;
-                })
-                .join(' ');
-              return (
-                <Polyline
-                  key={si}
-                  points={points}
-                  fill="none"
-                  stroke={s.color}
-                  strokeWidth={2}
-                  strokeLinejoin="round"
-                  strokeLinecap="round"
-                />
-              );
-            })}
-          </Svg>
-        )}
-      </ViewShot>
-
-      {/* Legend */}
-      {hasData && (
-        <View style={styles.legend}>
-          {series.map((s, i) => (
-            <View key={i} style={styles.legendItem}>
-              <View style={[styles.legendDot, { backgroundColor: s.color }]} />
-              <Text style={styles.legendLabel}>{s.label}</Text>
-              <Text style={styles.legendValue}>
-                {s.values.length > 0 ? s.values[s.values.length - 1].toFixed(1) : '—'}
-              </Text>
-            </View>
-          ))}
         </View>
-      )}
 
-      {/* Swipe hint */}
-      <View style={styles.swipeHint}>
-        <Feather name="chevron-right" size={12} color={colors.text.muted} />
-      </View>
+        {/* Actions */}
+        <View style={styles.actionsRow}>
+          <NeuButton icon="trash-2" onPress={handleClear} size={layout.actionButtonSize} />
+          <NeuButton icon="share" onPress={handleExport} size={layout.actionButtonSize} />
+          <NeuButton icon={isPaused ? 'play' : 'pause'} onPress={togglePause} active={isPaused} size={layout.actionButtonSize} />
+          <NeuButton icon="clock" onPress={() => useSettingsStore.getState().updateSetting('showTimestamp', !showTimestamp)} active={showTimestamp} size={layout.actionButtonSize} />
+          <NeuButton icon={autoScroll ? 'chevrons-down' : 'minus'} onPress={() => useSettingsStore.getState().updateSetting('autoScroll', !autoScroll)} active={autoScroll} size={layout.actionButtonSize} />
+        </View>
 
-      <CoachMark
-        id="plotter"
-        steps={[
-          { icon: 'activity', title: t('coach_plotter_1_title'), description: t('coach_plotter_1_desc') },
-          { icon: 'hash', title: t('coach_plotter_2_title'), description: t('coach_plotter_2_desc') },
-          { icon: 'share', title: t('coach_plotter_3_title'), description: t('coach_plotter_3_desc') },
-        ]}
-        dismissLabel={t('coach_ok')}
-      />
+        {/* Content */}
+        {mode === 'monitor' ? (
+          <NeuContainer style={styles.terminalContainer}>
+            <View style={styles.metaBar}>
+              <Text style={styles.metaText}>{connectionType === 'ble' ? 'BLE' : 'WiFi'} {'\u2022'} {currentDevice?.host ?? '\u2014'}:{currentDevice?.port ?? '\u2014'}</Text>
+              <Text style={styles.metaText}>{t('monitor_lines')(filteredLines.length)}</Text>
+            </View>
+            <FlatList ref={flatListRef} data={filteredLines} renderItem={renderLogLine} keyExtractor={keyExtractor} style={styles.logList} contentContainerStyle={styles.logListContent} showsVerticalScrollIndicator={true} ListFooterComponent={<BlinkingCursor />} />
+          </NeuContainer>
+        ) : (
+          <View style={styles.plotterContainer}>
+            {!hasPlotData ? (
+              <View style={styles.plotterEmpty}>
+                <Feather name="trending-up" size={32} color={colors.text.muted} />
+                <Text style={styles.plotterEmptyText}>{t('plotter_empty')}</Text>
+                <Text style={styles.plotterHint}>{t('plotter_hint')}</Text>
+              </View>
+            ) : (
+              <>
+                <Svg width={chartWidth} height={chartHeight}>
+                  {yLabels.map((l, i) => (
+                    <React.Fragment key={i}>
+                      <Line x1={chartPadding.left} y1={l.y} x2={chartPadding.left + plotWidth} y2={l.y} stroke="rgba(255,255,255,0.06)" strokeWidth={1} />
+                      <SvgText x={chartPadding.left - 8} y={l.y + 4} fill={colors.text.muted} fontSize={10} fontFamily="Menlo" textAnchor="end">{l.val.toFixed(l.val % 1 === 0 ? 0 : 1)}</SvgText>
+                    </React.Fragment>
+                  ))}
+                  {plotterSeries.map((s, si) => {
+                    if (s.values.length < 2) return null;
+                    const points = s.values.map((val, i) => {
+                      const x = chartPadding.left + (plotWidth * i) / (s.values.length - 1);
+                      const y = chartPadding.top + plotHeight - ((val - yMin) / (yMax - yMin)) * plotHeight;
+                      return `${x},${y}`;
+                    }).join(' ');
+                    return <Polyline key={si} points={points} fill="none" stroke={s.color} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" />;
+                  })}
+                </Svg>
+                <View style={styles.legend}>
+                  {plotterSeries.map((s, i) => (
+                    <View key={i} style={styles.legendItem}>
+                      <View style={[styles.legendDot, { backgroundColor: s.color }]} />
+                      <Text style={styles.legendLabel}>{s.label}</Text>
+                      <Text style={styles.legendValue}>{s.values.length > 0 ? s.values[s.values.length - 1].toFixed(1) : '\u2014'}</Text>
+                    </View>
+                  ))}
+                </View>
+              </>
+            )}
+          </View>
+        )}
+
+        {/* Command Input */}
+        <View style={styles.inputRow}>
+          <NeuInput icon="terminal" placeholder={t('monitor_send_placeholder')} value={commandText} onChangeText={setCommandText} onSubmitEditing={handleSend} returnKeyType="send" autoCapitalize="none" autoCorrect={false} containerStyle={styles.inputWrapper} style={styles.inputMono} />
+          <NeuButton icon="send" onPress={handleSend} size={56} variant="accent" disabled={!isConnected || commandText.trim().length === 0} />
+        </View>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: colors.bg.primary,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: layout.screenPaddingH,
-    height: layout.headerHeight,
-    position: 'relative',
-  },
-  headerTitle: {
-    ...typography.headerTitle,
-    color: colors.text.primary,
-  },
-  actionBar: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    gap: spacing.md,
-    paddingVertical: spacing.sm,
-    paddingHorizontal: layout.screenPaddingH,
-    marginBottom: spacing.sm,
-  },
-  statusBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginHorizontal: layout.screenPaddingH,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 8,
-    borderRadius: borderRadius.innerCard,
-    backgroundColor: colors.bg.surface,
-    borderWidth: 1,
-    borderColor: colors.border,
-    gap: 8,
-    marginBottom: spacing.md,
-  },
-  statusBarConnected: {
-    borderColor: 'rgba(76, 175, 80, 0.3)',
-  },
-  statusDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  statusText: {
-    ...typography.caption,
-    fontWeight: '600',
-    flex: 1,
-  },
-  pausedBadge: {
-    backgroundColor: 'rgba(255, 152, 0, 0.15)',
-    borderRadius: 8,
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-  },
-  pausedText: {
-    ...typography.caption,
-    color: colors.status.connecting,
-    fontWeight: '600',
-    fontSize: 10,
-  },
-  chartContainer: {
-    flex: 1,
-    marginHorizontal: layout.screenPaddingH,
-    backgroundColor: colors.bg.surface,
-    borderRadius: borderRadius.card,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    padding: spacing.md,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  emptyContent: {
-    alignItems: 'center',
-    gap: spacing.sm,
-    paddingVertical: spacing.xl,
-  },
-  emptyTitle: {
-    ...typography.body,
-    color: colors.text.secondary,
-    fontWeight: '600',
-  },
-  emptySubtext: {
-    ...typography.caption,
-    color: colors.text.muted,
-    textAlign: 'center',
-    paddingHorizontal: spacing.lg,
-  },
-  legend: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginHorizontal: layout.screenPaddingH,
-    marginTop: spacing.md,
-    gap: spacing.md,
-  },
-  legendItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.bg.surface,
-    borderRadius: borderRadius.small,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderWidth: 1,
-    borderColor: colors.borderLight,
-    gap: 6,
-  },
-  legendDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-  },
-  legendLabel: {
-    ...typography.caption,
-    color: colors.text.secondary,
-    fontWeight: '600',
-  },
-  legendValue: {
-    fontFamily: 'Menlo',
-    fontSize: 12,
-    color: colors.text.primary,
-  },
-  swipeHint: {
-    position: 'absolute',
-    left: 0,
-    top: '50%',
-    backgroundColor: 'rgba(255, 255, 255, 0.06)',
-    borderTopRightRadius: 10,
-    borderBottomRightRadius: 10,
-    paddingVertical: 14,
-    paddingRight: 4,
-    paddingLeft: 2,
-  },
+  safeArea: { flex: 1, backgroundColor: colors.bg.primary },
+  flex: { flex: 1 },
+  emptyContainer: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: spacing.sm },
+  emptyTitle: { ...typography.body, color: colors.text.secondary, fontWeight: '600' },
+  emptySubtext: { ...typography.caption, color: colors.text.muted },
+  header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: layout.screenPaddingH, paddingVertical: spacing.sm, height: layout.headerHeight },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 8, flex: 1 },
+  headerDevice: { ...typography.bodySmall, color: colors.text.primary, fontWeight: '700' },
+  headerUptime: { ...typography.caption, color: colors.text.muted, fontFamily: 'Menlo' },
+  statusDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.status.connectedGlow, alignItems: 'center', justifyContent: 'center' },
+  statusDotInner: { width: 6, height: 6, borderRadius: 3, backgroundColor: colors.status.connected },
+  modeToggle: { flexDirection: 'row', backgroundColor: colors.bg.surfaceLight, borderRadius: 10, padding: 2 },
+  modeBtn: { paddingHorizontal: 14, paddingVertical: 8, borderRadius: 8 },
+  modeBtnActive: { backgroundColor: colors.bg.surface },
+  actionsRow: { flexDirection: 'row', justifyContent: 'space-evenly', alignItems: 'center', paddingVertical: 4, paddingHorizontal: layout.screenPaddingH },
+  terminalContainer: { flex: 1, marginHorizontal: layout.screenPaddingH, marginTop: spacing.xs, padding: spacing.md },
+  metaBar: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: spacing.sm },
+  metaText: { fontFamily: 'Menlo', fontSize: 10, color: colors.text.primary, opacity: 0.3 },
+  logList: { flex: 1 },
+  logListContent: { paddingBottom: spacing.sm },
+  logLine: { flexDirection: 'row', paddingVertical: 3, gap: spacing.sm },
+  logTimestamp: { ...typography.logTimestamp, color: colors.log.info },
+  logText: { ...typography.logText, flex: 1, color: colors.text.primary },
+  cursorRow: { flexDirection: 'row', paddingTop: spacing.xs, alignItems: 'center' },
+  cursorPrompt: { fontFamily: 'Menlo', fontSize: 13, color: colors.accent.primary },
+  cursorBlock: { fontFamily: 'Menlo', fontSize: 13, color: colors.accent.primary },
+  plotterContainer: { flex: 1, marginHorizontal: layout.screenPaddingH, marginTop: spacing.xs, backgroundColor: colors.bg.surface, borderRadius: borderRadius.card, borderWidth: 1, borderColor: colors.borderLight, padding: spacing.md, alignItems: 'center', justifyContent: 'center' },
+  plotterEmpty: { alignItems: 'center', gap: spacing.sm },
+  plotterEmptyText: { ...typography.body, color: colors.text.secondary, fontWeight: '600' },
+  plotterHint: { ...typography.caption, color: colors.text.muted, textAlign: 'center', paddingHorizontal: spacing.lg },
+  legend: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.sm },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.bg.surfaceLight, borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4 },
+  legendDot: { width: 8, height: 8, borderRadius: 4 },
+  legendLabel: { ...typography.caption, color: colors.text.secondary, fontWeight: '600' },
+  legendValue: { fontFamily: 'Menlo', fontSize: 12, color: colors.text.primary },
+  inputRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: layout.screenPaddingH, paddingBottom: spacing.md, paddingTop: spacing.sm, gap: spacing.sm, marginBottom: 80 },
+  inputWrapper: { flex: 1 },
+  inputMono: { fontFamily: 'Menlo', fontSize: 14 },
 });
