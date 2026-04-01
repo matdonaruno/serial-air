@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Code Generator - Serial Air</title>
+    <meta name="description" content="Generate test code for Serial Air wireless serial monitor. Supports ESP8266, ESP32, Arduino UNO R4 WiFi, Raspberry Pi, and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box}
+        body{font-family:'Montserrat',sans-serif;background:#050510;color:#e0e0e0;min-height:100vh}
+        .container{max-width:900px;margin:0 auto;padding:40px 20px 80px}
+        h1{font-size:2rem;font-weight:700;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#00d2ff,#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .subtitle{text-align:center;color:rgba(255,255,255,0.4);margin-bottom:40px;font-size:0.9rem}
+        .section{margin-bottom:24px}
+        .section-label{font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
+        .card{background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:16px;padding:24px;margin-bottom:16px}
+        .board-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px}
+        .board-btn{padding:14px 8px;border-radius:12px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);cursor:pointer;text-align:center;transition:all 0.2s}
+        .board-btn:hover{border-color:rgba(255,107,53,0.3);background:rgba(255,107,53,0.05)}
+        .board-btn.active{border-color:rgba(255,107,53,0.5);background:rgba(255,107,53,0.1)}
+        .board-btn .name{font-weight:600;font-size:0.85rem;color:#fff;margin-bottom:2px}
+        .board-btn .desc{font-size:0.65rem;color:rgba(255,255,255,0.4)}
+        .board-btn.active .name{color:#FF6B35}
+        .input-row{display:flex;gap:12px;margin-bottom:12px}
+        .input-row input{flex:1;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:10px;padding:12px 16px;color:#fff;font-family:'Montserrat',sans-serif;font-size:0.9rem}
+        .input-row input::placeholder{color:rgba(255,255,255,0.25)}
+        .input-row input:focus{outline:none;border-color:rgba(255,107,53,0.4)}
+        .security-row{display:flex;gap:8px;margin-bottom:12px}
+        .sec-btn{flex:1;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(255,255,255,0.03);cursor:pointer;text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.5);transition:all 0.2s}
+        .sec-btn.active{border-color:rgba(255,107,53,0.5);color:#FF6B35;background:rgba(255,107,53,0.08)}
+        .hint{font-size:0.75rem;color:rgba(255,255,255,0.3);margin-bottom:16px}
+        .code-area{position:relative}
+        .code-area pre{background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:20px;overflow-x:auto;font-family:'Fira Code',monospace;font-size:0.8rem;line-height:1.7;color:#c9d1d9;max-height:500px;overflow-y:auto}
+        .copy-btn{position:absolute;top:12px;right:12px;background:#FF6B35;border:none;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-family:'Montserrat',sans-serif;font-weight:600;font-size:0.8rem;transition:opacity 0.2s}
+        .copy-btn:hover{opacity:0.85}
+        .badge{display:inline-block;background:rgba(255,107,53,0.1);color:#FF6B35;font-family:'Fira Code',monospace;font-size:0.7rem;padding:4px 10px;border-radius:6px;margin-bottom:10px}
+        .back-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.4);text-decoration:none;font-size:0.85rem;margin-bottom:30px}
+        .back-link:hover{color:#FF6B35}
+        .lang-sw{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
+        .lang-btn{padding:6px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.8rem}
+        .lang-btn.active{border-color:rgba(255,107,53,0.4);color:#FF6B35;background:rgba(255,107,53,0.05)}
+        @media(max-width:600px){.input-row{flex-direction:column}.board-grid{grid-template-columns:repeat(2,1fr)}}
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="/serial-air/" class="back-link">← Serial Air</a>
+    
+    <h1>Code Generator</h1>
+    <div class="subtitle" id="subtitle">Generate ready-to-use code for your device</div>
+
+    <div class="lang-sw">
+        <div class="lang-btn active" onclick="setLang('en')">English</div>
+        <div class="lang-btn" onclick="setLang('ja')">日本語</div>
+    </div>
+
+    <!-- Board Selection -->
+    <div class="section">
+        <div class="section-label" data-i18n="board">SELECT BOARD</div>
+        <div class="board-grid" id="boardGrid"></div>
+    </div>
+
+    <!-- WiFi -->
+    <div class="section" id="wifiSection">
+        <div class="section-label" data-i18n="wifi">WIFI CREDENTIALS</div>
+        <div class="input-row">
+            <input type="text" id="ssid" placeholder="WiFi SSID" data-ph="ssid_ph">
+            <input type="password" id="pass" placeholder="WiFi Password" data-ph="pass_ph">
+        </div>
+        <div class="hint" data-i18n="wifi_hint">Credentials are only used locally to generate code. Nothing is sent anywhere.</div>
+    </div>
+
+    <!-- Security -->
+    <div class="section" id="secSection">
+        <div class="section-label" data-i18n="security">SECURITY</div>
+        <div class="security-row">
+            <div class="sec-btn active" onclick="setSec('none')" id="sec-none" data-i18n="sec_none">None</div>
+            <div class="sec-btn" onclick="setSec('pairing')" id="sec-pairing" data-i18n="sec_pairing">Pairing Code</div>
+            <div class="sec-btn" onclick="setSec('password')" id="sec-password" data-i18n="sec_password">Password</div>
+        </div>
+        <div class="input-row" id="devPassRow" style="display:none">
+            <input type="text" id="devPass" placeholder="Device password" data-ph="devpass_ph">
+        </div>
+    </div>
+
+    <!-- Generated Code -->
+    <div class="section">
+        <div class="section-label" data-i18n="code">GENERATED CODE</div>
+        <div class="badge" id="platformBadge">Arduino / C++</div>
+        <div class="code-area">
+            <pre id="codeOutput"></pre>
+            <button class="copy-btn" onclick="copyCode()" id="copyBtn">Copy</button>
+        </div>
+    </div>
+</div>
+
+<script>
+const BOARDS = [
+    { id:'esp', name:'ESP', desc:'ESP8266/32, Nano ESP32, M5Stack, XIAO', platform:'arduino', wifi:true },
+    { id:'r4', name:'UNO R4 WiFi', desc:'Arduino UNO R4 WiFi', platform:'arduino', wifi:true },
+    { id:'esp01', name:'Arduino+ESP-01', desc:'Uno/Mega + ESP-01', platform:'arduino', wifi:true },
+    { id:'picow', name:'Pico W', desc:'Raspberry Pi Pico W', platform:'python', wifi:true },
+    { id:'rpi', name:'Raspberry Pi', desc:'Pi 3/4/5, Zero W', platform:'python', wifi:false },
+    { id:'opi', name:'Orange Pi', desc:'Orange Pi, Banana Pi', platform:'python', wifi:false },
+];
+
+const I18N = {
+    en: { board:'SELECT BOARD', wifi:'WIFI CREDENTIALS', security:'SECURITY (Arduino only)',
+        sec_none:'None', sec_pairing:'Pairing Code', sec_password:'Password',
+        code:'GENERATED CODE', wifi_hint:'Credentials are only used locally. Nothing is sent anywhere.',
+        ssid_ph:'WiFi SSID', pass_ph:'WiFi Password', devpass_ph:'Device password',
+        subtitle:'Generate ready-to-use code for your device', copy:'Copy', copied:'Copied!' },
+    ja: { board:'ボードを選択', wifi:'WiFi認証情報', security:'セキュリティ（Arduino専用）',
+        sec_none:'なし', sec_pairing:'ペアリングコード', sec_password:'パスワード',
+        code:'生成されたコード', wifi_hint:'認証情報はローカルでのみ使用。送信されません。',
+        ssid_ph:'WiFi SSID（ネットワーク名）', pass_ph:'WiFiパスワード', devpass_ph:'デバイスパスワード',
+        subtitle:'デバイスに合ったコードを生成', copy:'コピー', copied:'コピーしました！' }
+};
+
+let lang = navigator.language.startsWith('ja') ? 'ja' : 'en';
+let board = 'esp';
+let sec = 'none';
+
+function setLang(l) {
+    lang = l;
+    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(l==='ja'?'日本語':'English')));
+    document.querySelectorAll('[data-i18n]').forEach(el => { const k=el.dataset.i18n; if(I18N[lang][k]) el.textContent=I18N[lang][k]; });
+    document.querySelectorAll('[data-ph]').forEach(el => { const k=el.dataset.ph; if(I18N[lang][k]) el.placeholder=I18N[lang][k]; });
+    document.getElementById('subtitle').textContent = I18N[lang].subtitle;
+    document.getElementById('copyBtn').textContent = I18N[lang].copy;
+    generate();
+}
+
+function selectBoard(id) {
+    board = id;
+    const b = BOARDS.find(x=>x.id===id);
+    document.querySelectorAll('.board-btn').forEach(el => el.classList.toggle('active', el.dataset.id===id));
+    document.getElementById('wifiSection').style.display = b.wifi ? '' : 'none';
+    document.getElementById('secSection').style.display = b.platform==='arduino' ? '' : 'none';
+    document.getElementById('platformBadge').textContent = b.platform==='arduino' ? 'Arduino / C++' : 'Python';
+    generate();
+}
+
+function setSec(s) {
+    sec = s;
+    document.querySelectorAll('.sec-btn').forEach(el => el.classList.toggle('active', el.id==='sec-'+s));
+    document.getElementById('devPassRow').style.display = s==='password' ? '' : 'none';
+    generate();
+}
+
+function getSecSnippet() {
+    if(sec==='pairing') return '\n    // Security: Pairing Code\n    ws.enablePairing();';
+    if(sec==='password') return `\n    // Security: Password\n    ws.setPassword("${document.getElementById('devPass').value||'changeme'}");`;
+    return '';
+}
+
+function generate() {
+    const ssid = document.getElementById('ssid').value || 'YOUR_WIFI_SSID';
+    const pass = document.getElementById('pass').value || 'YOUR_WIFI_PASSWORD';
+    let code = '';
+
+    if(board==='esp') {
+        code = `// Serial Air — ESP Test
+// Board: ESP8266 / ESP32 / C3 / S3
+// #define WS_ENABLE_BLE 1  // Uncomment for BLE
+#include <WirelessSerial.h>
+
+const char* ssid = "${ssid}";
+const char* password = "${pass}";
+
+WirelessSerial ws;
+Print* output;
+
+void setup() {
+    Serial.begin(115200);
+    delay(500);
+    WiFi.mode(WIFI_STA);
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting");
+    while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
+    Serial.println();
+    Serial.print("IP: "); Serial.println(WiFi.localIP());
+
+    ws.begin();${getSecSnippet()}
+    output = ws.mirror(Serial);
+    output->println("Serial Air ready!");
+}
+
+void loop() {
+    ws.handle();
+    output->printf("uptime:%lu heap:%u rssi:%d\\n", millis()/1000, ESP.getFreeHeap(), WiFi.RSSI());
+    delay(2000);
+}`;
+    } else if(board==='r4') {
+        code = `// Serial Air — Arduino UNO R4 WiFi
+#include <WirelessSerial.h>
+
+const char* ssid = "${ssid}";
+const char* password = "${pass}";
+
+WirelessSerial ws;
+DualPrint* output;
+
+void setup() {
+    Serial.begin(115200);
+    delay(1000);
+    WiFi.begin(ssid, password);
+    Serial.print("Connecting");
+    while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }
+    Serial.println();
+    Serial.print("IP: "); Serial.println(WiFi.localIP());
+
+    ws.begin();
+    output = ws.mirror(Serial);
+    output->println("Serial Air ready!");
+}
+
+void loop() {
+    ws.handle();
+    int a0 = analogRead(A0);
+    output->print("analog:"); output->print(a0);
+    output->print(" voltage:"); output->println(a0 * 5.0 / 1023.0);
+    delay(2000);
+}`;
+    } else if(board==='esp01') {
+        code = `// Serial Air — Arduino + ESP-01
+// Wiring: ESP-01 TX→Pin2, RX→Pin3
+#include <SoftwareSerial.h>
+SoftwareSerial esp(2, 3);
+
+void espSend(const char* cmd, unsigned long wait=2000) {
+    esp.println(cmd); unsigned long t=millis();
+    while(millis()-t<wait) { if(esp.available()) Serial.write(esp.read()); }
+    Serial.println();
+}
+
+void setup() {
+    Serial.begin(115200); esp.begin(9600);
+    espSend("AT+RST", 3000);
+    espSend("AT+CWMODE=1");
+    espSend("AT+CWJAP=\\"${ssid}\\",\\"${pass}\\"", 10000);
+    espSend("AT+CIPMUX=1");
+    espSend("AT+CIPSERVER=1,23");
+    espSend("AT+CIFSR");
+}
+
+void loop() {
+    while(esp.available()) Serial.write(esp.read());
+    static unsigned long last=0;
+    if(millis()-last>2000) { last=millis();
+        char msg[60]; snprintf(msg,sizeof(msg),"uptime:%lu analog:%d\\r\\n",millis()/1000,analogRead(A0));
+        char cmd[20]; snprintf(cmd,sizeof(cmd),"AT+CIPSEND=0,%d",(int)strlen(msg));
+        esp.println(cmd); delay(100); esp.print(msg);
+    }
+}`;
+    } else if(board==='picow') {
+        code = `# Serial Air — Raspberry Pi Pico W (MicroPython)
+# Save as main.py
+import network, socket, time, machine
+
+wlan = network.WLAN(network.STA_IF)
+wlan.active(True)
+wlan.connect("${ssid}", "${pass}")
+print("Connecting", end="")
+while not wlan.isconnected(): print(".", end=""); time.sleep(0.5)
+print(f"\\nIP: {wlan.ifconfig()[0]}")
+
+server = socket.socket()
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(("0.0.0.0", 23))
+server.listen(1)
+server.settimeout(0.1)
+temp_sensor = machine.ADC(4)
+clients = []
+
+while True:
+    try:
+        cl, addr = server.accept()
+        cl.setblocking(False); clients.append(cl)
+    except: pass
+    reading = temp_sensor.read_u16() * 3.3 / 65535
+    temp = 27 - (reading - 0.706) / 0.001721
+    msg = f"temp:{temp:.1f} uptime:{time.ticks_ms()//1000}s\\n"
+    for cl in clients[:]:
+        try: cl.send(msg.encode())
+        except: clients.remove(cl)
+    time.sleep(1)`;
+    } else if(board==='rpi' || board==='opi') {
+        const name = board==='rpi' ? 'Raspberry Pi' : 'Orange Pi';
+        code = `#!/usr/bin/env python3
+# Serial Air — ${name} TCP Server
+# Run: python3 serial_air_server.py
+import socket, threading, time, os
+
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+server.bind(("0.0.0.0", 23))
+server.listen(5)
+print(f"IP: {socket.gethostbyname(socket.gethostname())}")
+print("TCP server on port 23\\n")
+
+def handle(conn, addr):
+    print(f"Client: {addr}")
+    try:
+        t0 = time.time()
+        while True:
+            try:
+                with open("/sys/class/thermal/thermal_zone0/temp") as f: cpu=int(f.read().strip())/1000
+            except: cpu=0
+            conn.sendall(f"temp:{cpu:.1f} load:{os.getloadavg()[0]:.2f} uptime:{int(time.time()-t0)}s\\n".encode())
+            time.sleep(1)
+    except: print(f"Disconnected: {addr}"); conn.close()
+
+while True:
+    conn, addr = server.accept()
+    threading.Thread(target=handle, args=(conn,addr), daemon=True).start()`;
+    }
+    document.getElementById('codeOutput').textContent = code;
+}
+
+function copyCode() {
+    navigator.clipboard.writeText(document.getElementById('codeOutput').textContent);
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = I18N[lang].copied;
+    setTimeout(() => btn.textContent = I18N[lang].copy, 2000);
+}
+
+// Init
+const grid = document.getElementById('boardGrid');
+BOARDS.forEach(b => {
+    const el = document.createElement('div');
+    el.className = 'board-btn' + (b.id===board?' active':'');
+    el.dataset.id = b.id;
+    el.innerHTML = `<div class="name">${b.name}</div><div class="desc">${b.desc}</div>`;
+    el.onclick = () => selectBoard(b.id);
+    grid.appendChild(el);
+});
+
+document.getElementById('ssid').addEventListener('input', generate);
+document.getElementById('pass').addEventListener('input', generate);
+document.getElementById('devPass').addEventListener('input', generate);
+
+if(lang==='ja') setLang('ja');
+generate();
+</script>
+</body>
+</html>

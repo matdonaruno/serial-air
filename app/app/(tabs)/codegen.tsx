@@ -719,6 +719,17 @@ export default function CodeGeneratorScreen() {
           </ScrollView>
         </View>
 
+        {/* PC hint */}
+        <View style={styles.pcHintBox}>
+          <Feather name="monitor" size={16} color={colors.text.muted} />
+          <View style={styles.pcHintContent}>
+            <Text style={styles.pcHintText}>{t('codegen_pc_hint')}</Text>
+            <Pressable onPress={() => Clipboard.setStringAsync('https://umemasait.com/serial-air/codegen.html')}>
+              <Text style={styles.pcHintUrl}>{t('codegen_pc_url')} 📋</Text>
+            </Pressable>
+          </View>
+        </View>
+
         {/* Transfer buttons */}
         <Pressable style={styles.copyButton} onPress={handleCopy}>
           <Feather name={copied ? 'check' : 'clipboard'} size={18} color={colors.white} />
@@ -980,6 +991,29 @@ const styles = StyleSheet.create({
     fontSize: 10,
     color: colors.text.secondary,
     flex: 1,
+  },
+  pcHintBox: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    backgroundColor: colors.bg.surfaceLight,
+    borderRadius: borderRadius.innerCard,
+    padding: spacing.md,
+    marginBottom: spacing.md,
+  },
+  pcHintContent: {
+    flex: 1,
+  },
+  pcHintText: {
+    ...typography.caption,
+    color: colors.text.muted,
+    lineHeight: 18,
+  },
+  pcHintUrl: {
+    fontFamily: 'Menlo',
+    fontSize: 11,
+    color: colors.accent.primary,
+    marginTop: 4,
   },
   securityHintText: {
     ...typography.caption,

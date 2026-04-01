@@ -199,6 +199,8 @@ const en = {
   codegen_security_hint_none: 'Anyone on the same network can connect.',
   codegen_security_hint_pairing: 'A 4-digit code is shown on the device serial monitor. You verify it in the app.',
   codegen_security_hint_password: 'Only users who know the password can connect.',
+  codegen_pc_hint: 'For PC coding, search "Serial Air code generator" or visit:',
+  codegen_pc_url: 'umemasait.com/serial-air/codegen',
   codegen_copy: 'Copy to Clipboard',
   codegen_copied: 'Copied!',
   codegen_share: 'Share as .ino file',

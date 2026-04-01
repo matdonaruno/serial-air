@@ -201,6 +201,8 @@ const ja: typeof en = {
   codegen_security_hint_none: '同じネットワーク上の誰でも接続できます。',
   codegen_security_hint_pairing: 'デバイスのシリアルモニターに4桁コードが表示され、アプリで確認します。',
   codegen_security_hint_password: 'パスワードを知っているユーザーのみ接続できます。',
+  codegen_pc_hint: 'PCでコーディングするなら「Serial Air code generator」で検索、または:',
+  codegen_pc_url: 'umemasait.com/serial-air/codegen',
   codegen_copy: 'クリップボードにコピー',
   codegen_copied: 'コピーしました！',
   codegen_share: '.inoファイルで共有',
