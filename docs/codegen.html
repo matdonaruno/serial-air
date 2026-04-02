@@ -11,7 +11,10 @@
         *{margin:0;padding:0;box-sizing:border-box}
         body{font-family:'Montserrat',sans-serif;background:#050510;color:#e0e0e0;min-height:100vh}
         .container{max-width:900px;margin:0 auto;padding:40px 20px 80px}
-        h1{font-size:2rem;font-weight:700;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#00d2ff,#FF6B35);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+        .app-name{text-align:center;font-size:2.2rem;font-weight:800;letter-spacing:-0.5px;color:#fff;margin-bottom:8px}
+        .app-name span{color:#FF6B35}
+        h1{font-size:1.4rem;font-weight:700;text-align:center;margin-bottom:8px;background:linear-gradient(135deg,#FF6B35,#FF8C42,#FFB347);background-size:200% 200%;-webkit-background-clip:text;-webkit-text-fill-color:transparent;animation:gs 6s ease infinite}
+        @keyframes gs{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
         .subtitle{text-align:center;color:rgba(255,255,255,0.4);margin-bottom:40px;font-size:0.9rem}
         .section{margin-bottom:24px}
         .section-label{font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:2px;margin-bottom:10px}
@@ -38,9 +41,17 @@
         .badge{display:inline-block;background:rgba(255,107,53,0.1);color:#FF6B35;font-family:'Fira Code',monospace;font-size:0.7rem;padding:4px 10px;border-radius:6px;margin-bottom:10px}
         .back-link{display:inline-flex;align-items:center;gap:6px;color:rgba(255,255,255,0.4);text-decoration:none;font-size:0.85rem;margin-bottom:30px}
         .back-link:hover{color:#FF6B35}
-        .lang-sw{display:flex;justify-content:center;gap:8px;margin-bottom:24px}
-        .lang-btn{padding:6px 16px;border-radius:16px;border:1px solid rgba(255,255,255,0.1);background:transparent;color:rgba(255,255,255,0.4);cursor:pointer;font-size:0.8rem}
-        .lang-btn.active{border-color:rgba(255,107,53,0.4);color:#FF6B35;background:rgba(255,107,53,0.05)}
+        .lang-dd{position:relative;display:inline-block;margin:0 auto}
+        .lang-sw{display:flex;justify-content:center;margin-bottom:24px}
+        .lang-toggle{display:inline-flex;align-items:center;gap:6px;padding:6px 14px;border-radius:16px;border:1px solid rgba(255,107,53,0.2);background:transparent;color:rgba(255,255,255,0.5);font-size:0.8rem;cursor:pointer;font-family:inherit}
+        .lang-toggle:hover{border-color:rgba(255,107,53,0.4);color:#fff}
+        .lang-toggle svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2}
+        .lang-list{display:none;position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:8px;background:rgba(10,10,30,0.95);backdrop-filter:blur(20px);border:1px solid rgba(255,107,53,0.15);border-radius:16px;padding:8px;min-width:160px;max-height:350px;overflow-y:auto;z-index:200;display:grid;grid-template-columns:1fr 1fr;gap:4px}
+        .lang-list{display:none}
+        .lang-dd.open .lang-list{display:grid}
+        .lang-item{padding:8px 12px;border-radius:10px;cursor:pointer;font-size:0.75rem;color:rgba(255,255,255,0.5);transition:all 0.2s;white-space:nowrap}
+        .lang-item:hover{background:rgba(255,107,53,0.08);color:#fff}
+        .lang-item.active{color:#FF6B35;font-weight:600;background:rgba(255,107,53,0.06)}
         @media(max-width:600px){.input-row{flex-direction:column}.board-grid{grid-template-columns:repeat(2,1fr)}}
     </style>
 </head>
@@ -48,12 +59,35 @@
 <div class="container">
     <a href="/serial-air/" class="back-link">← Serial Air</a>
     
+    <div class="app-name">Serial <span>Air</span></div>
     <h1>Code Generator</h1>
     <div class="subtitle" id="subtitle">Generate ready-to-use code for your device</div>
 
     <div class="lang-sw">
-        <div class="lang-btn active" onclick="setLang('en')">English</div>
-        <div class="lang-btn" onclick="setLang('ja')">日本語</div>
+        <div class="lang-dd" id="langDD">
+            <button class="lang-toggle" onclick="document.getElementById('langDD').classList.toggle('open')">
+                <svg viewBox="0 0 24 24" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                <span id="curLang">English</span>
+            </button>
+            <div class="lang-list">
+                <div class="lang-item active" onclick="setLang('en')">English</div>
+                <div class="lang-item" onclick="setLang('ja')">日本語</div>
+                <div class="lang-item" onclick="setLang('zh')">简体中文</div>
+                <div class="lang-item" onclick="setLang('zh-TW')">繁體中文</div>
+                <div class="lang-item" onclick="setLang('ko')">한국어</div>
+                <div class="lang-item" onclick="setLang('th')">ไทย</div>
+                <div class="lang-item" onclick="setLang('vi')">Tiếng Việt</div>
+                <div class="lang-item" onclick="setLang('id')">Indonesia</div>
+                <div class="lang-item" onclick="setLang('hi')">हिन्दी</div>
+                <div class="lang-item" onclick="setLang('de')">Deutsch</div>
+                <div class="lang-item" onclick="setLang('fr')">Français</div>
+                <div class="lang-item" onclick="setLang('es')">Español</div>
+                <div class="lang-item" onclick="setLang('pt')">Português</div>
+                <div class="lang-item" onclick="setLang('it')">Italiano</div>
+                <div class="lang-item" onclick="setLang('ru')">Русский</div>
+                <div class="lang-item" onclick="setLang('ar')">العربية</div>
+            </div>
+        </div>
     </div>
 
     <!-- Board Selection -->
@@ -116,22 +150,100 @@ const I18N = {
         sec_none:'なし', sec_pairing:'ペアリングコード', sec_password:'パスワード',
         code:'生成されたコード', wifi_hint:'認証情報はローカルでのみ使用。送信されません。',
         ssid_ph:'WiFi SSID（ネットワーク名）', pass_ph:'WiFiパスワード', devpass_ph:'デバイスパスワード',
-        subtitle:'デバイスに合ったコードを生成', copy:'コピー', copied:'コピーしました！' }
+        subtitle:'デバイスに合ったコードを生成', copy:'コピー', copied:'コピーしました！' },
+    zh: { board:'选择开发板', wifi:'WIFI 认证信息', security:'安全设置（仅 Arduino）',
+        sec_none:'无', sec_pairing:'配对码', sec_password:'密码',
+        code:'生成的代码', wifi_hint:'认证信息仅在本地使用，不会发送到任何地方。',
+        ssid_ph:'WiFi SSID（网络名）', pass_ph:'WiFi 密码', devpass_ph:'设备密码',
+        subtitle:'为你的开发板生成可直接使用的代码', copy:'复制', copied:'已复制！' },
+    ko: { board:'보드 선택', wifi:'WIFI 인증 정보', security:'보안 (Arduino 전용)',
+        sec_none:'없음', sec_pairing:'페어링 코드', sec_password:'비밀번호',
+        code:'생성된 코드', wifi_hint:'인증 정보는 로컬에서만 사용됩니다. 어디에도 전송되지 않습니다.',
+        ssid_ph:'WiFi SSID (네트워크 이름)', pass_ph:'WiFi 비밀번호', devpass_ph:'기기 비밀번호',
+        subtitle:'기기에 맞는 코드를 즉시 생성', copy:'복사', copied:'복사됨!' },
+    es: { board:'SELECCIONAR PLACA', wifi:'CREDENCIALES WIFI', security:'SEGURIDAD (solo Arduino)',
+        sec_none:'Ninguna', sec_pairing:'Codigo de emparejamiento', sec_password:'Contrasena',
+        code:'CODIGO GENERADO', wifi_hint:'Las credenciales se usan solo localmente. No se envia nada.',
+        ssid_ph:'WiFi SSID', pass_ph:'Contrasena WiFi', devpass_ph:'Contrasena del dispositivo',
+        subtitle:'Genera codigo listo para tu dispositivo', copy:'Copiar', copied:'Copiado!' },
+    'zh-TW': { board:'選擇開發板', wifi:'WIFI 認證資訊', security:'安全性（僅限 Arduino）',
+        sec_none:'無', sec_pairing:'配對碼', sec_password:'密碼',
+        code:'生成的程式碼', wifi_hint:'認證資訊僅在本機使用，不會傳送至任何地方。',
+        ssid_ph:'WiFi SSID', pass_ph:'WiFi 密碼', devpass_ph:'裝置密碼',
+        subtitle:'為您的裝置生成可直接使用的程式碼', copy:'複製', copied:'已複製！' },
+    th: { board:'เลือกบอร์ด', wifi:'ข้อมูล WIFI', security:'ความปลอดภัย (Arduino เท่านั้น)',
+        sec_none:'ไม่มี', sec_pairing:'รหัสจับคู่', sec_password:'รหัสผ่าน',
+        code:'โค้ดที่สร้างขึ้น', wifi_hint:'ข้อมูลรับรองใช้ในเครื่องเท่านั้น ไม่มีการส่งข้อมูลไปที่ใด',
+        ssid_ph:'WiFi SSID', pass_ph:'รหัสผ่าน WiFi', devpass_ph:'รหัสผ่านอุปกรณ์',
+        subtitle:'สร้างโค้ดพร้อมใช้งานสำหรับอุปกรณ์ของคุณ', copy:'คัดลอก', copied:'คัดลอกแล้ว!' },
+    vi: { board:'CHỌN BOARD', wifi:'THÔNG TIN WIFI', security:'BẢO MẬT (chỉ Arduino)',
+        sec_none:'Không', sec_pairing:'Mã ghép nối', sec_password:'Mật khẩu',
+        code:'MÃ ĐƯỢC TẠO', wifi_hint:'Thông tin xác thực chỉ được sử dụng cục bộ. Không có gì được gửi đi.',
+        ssid_ph:'WiFi SSID', pass_ph:'Mật khẩu WiFi', devpass_ph:'Mật khẩu thiết bị',
+        subtitle:'Tạo mã sẵn sàng sử dụng cho thiết bị của bạn', copy:'Sao chép', copied:'Đã sao chép!' },
+    id: { board:'PILIH BOARD', wifi:'KREDENSIAL WIFI', security:'KEAMANAN (khusus Arduino)',
+        sec_none:'Tidak ada', sec_pairing:'Kode Pairing', sec_password:'Kata Sandi',
+        code:'KODE YANG DIHASILKAN', wifi_hint:'Kredensial hanya digunakan secara lokal. Tidak ada yang dikirim ke mana pun.',
+        ssid_ph:'WiFi SSID', pass_ph:'Kata Sandi WiFi', devpass_ph:'Kata sandi perangkat',
+        subtitle:'Buat kode siap pakai untuk perangkat Anda', copy:'Salin', copied:'Tersalin!' },
+    hi: { board:'बोर्ड चुनें', wifi:'WIFI क्रेडेंशियल', security:'सुरक्षा (केवल Arduino)',
+        sec_none:'कोई नहीं', sec_pairing:'पेयरिंग कोड', sec_password:'पासवर्ड',
+        code:'जनरेट किया गया कोड', wifi_hint:'क्रेडेंशियल केवल स्थानीय रूप से उपयोग किए जाते हैं। कुछ भी कहीं नहीं भेजा जाता।',
+        ssid_ph:'WiFi SSID', pass_ph:'WiFi पासवर्ड', devpass_ph:'डिवाइस पासवर्ड',
+        subtitle:'अपने डिवाइस के लिए उपयोग-योग्य कोड जनरेट करें', copy:'कॉपी करें', copied:'कॉपी हो गया!' },
+    de: { board:'BOARD AUSWÄHLEN', wifi:'WIFI-ZUGANGSDATEN', security:'SICHERHEIT (nur Arduino)',
+        sec_none:'Keine', sec_pairing:'Pairing-Code', sec_password:'Passwort',
+        code:'GENERIERTER CODE', wifi_hint:'Zugangsdaten werden nur lokal verwendet. Es wird nichts übertragen.',
+        ssid_ph:'WiFi SSID', pass_ph:'WiFi-Passwort', devpass_ph:'Gerätepasswort',
+        subtitle:'Einsatzbereiten Code für Ihr Gerät generieren', copy:'Kopieren', copied:'Kopiert!' },
+    fr: { board:'SÉLECTIONNER LA CARTE', wifi:'IDENTIFIANTS WIFI', security:'SÉCURITÉ (Arduino uniquement)',
+        sec_none:'Aucune', sec_pairing:"Code d'appairage", sec_password:'Mot de passe',
+        code:'CODE GÉNÉRÉ', wifi_hint:"Les identifiants sont utilisés uniquement en local. Rien n'est envoyé.",
+        ssid_ph:'WiFi SSID', pass_ph:'Mot de passe WiFi', devpass_ph:"Mot de passe de l'appareil",
+        subtitle:"Générer du code prêt à l'emploi pour votre appareil", copy:'Copier', copied:'Copié !' },
+    pt: { board:'SELECIONAR PLACA', wifi:'CREDENCIAIS WIFI', security:'SEGURANÇA (somente Arduino)',
+        sec_none:'Nenhuma', sec_pairing:'Código de Pareamento', sec_password:'Senha',
+        code:'CÓDIGO GERADO', wifi_hint:'As credenciais são usadas apenas localmente. Nada é enviado.',
+        ssid_ph:'WiFi SSID', pass_ph:'Senha do WiFi', devpass_ph:'Senha do dispositivo',
+        subtitle:'Gere código pronto para uso no seu dispositivo', copy:'Copiar', copied:'Copiado!' },
+    it: { board:'SELEZIONA SCHEDA', wifi:'CREDENZIALI WIFI', security:'SICUREZZA (solo Arduino)',
+        sec_none:'Nessuna', sec_pairing:'Codice di Accoppiamento', sec_password:'Password',
+        code:'CODICE GENERATO', wifi_hint:'Le credenziali vengono utilizzate solo localmente. Nulla viene inviato.',
+        ssid_ph:'WiFi SSID', pass_ph:'Password WiFi', devpass_ph:'Password del dispositivo',
+        subtitle:"Genera codice pronto all'uso per il tuo dispositivo", copy:'Copia', copied:'Copiato!' },
+    ru: { board:'ВЫБРАТЬ ПЛАТУ', wifi:'УЧЁТНЫЕ ДАННЫЕ WIFI', security:'БЕЗОПАСНОСТЬ (только Arduino)',
+        sec_none:'Нет', sec_pairing:'Код сопряжения', sec_password:'Пароль',
+        code:'СГЕНЕРИРОВАННЫЙ КОД', wifi_hint:'Учётные данные используются только локально. Ничего никуда не отправляется.',
+        ssid_ph:'WiFi SSID', pass_ph:'Пароль WiFi', devpass_ph:'Пароль устройства',
+        subtitle:'Сгенерируйте готовый код для вашего устройства', copy:'Копировать', copied:'Скопировано!' },
+    ar: { board:'اختر اللوحة', wifi:'بيانات WIFI', security:'الأمان (Arduino فقط)',
+        sec_none:'بدون', sec_pairing:'رمز الاقتران', sec_password:'كلمة المرور',
+        code:'الكود المُولَّد', wifi_hint:'تُستخدم بيانات الاعتماد محليًا فقط. لا يتم إرسال أي شيء.',
+        ssid_ph:'WiFi SSID', pass_ph:'كلمة مرور WiFi', devpass_ph:'كلمة مرور الجهاز',
+        subtitle:'أنشئ كودًا جاهزًا للاستخدام لجهازك', copy:'نسخ', copied:'تم النسخ!' }
 };
 
-let lang = navigator.language.startsWith('ja') ? 'ja' : 'en';
+const _nl = navigator.language;
+const _ul = _nl.slice(0,2);
+const LANGS = ['ja','zh','ko','es','th','vi','id','hi','de','fr','pt','it','ru','ar'];
+let lang = _nl.startsWith('zh-TW') || _nl.startsWith('zh-Hant') ? 'zh-TW' : LANGS.includes(_ul) ? _ul : 'en';
 let board = 'esp';
 let sec = 'none';
 
+const LNAMES = {en:'English',ja:'日本語',zh:'简体中文','zh-TW':'繁體中文',ko:'한국어',th:'ไทย',vi:'Tiếng Việt',id:'Indonesia',hi:'हिन्दी',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ar:'العربية'};
 function setLang(l) {
     lang = l;
-    document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.textContent.includes(l==='ja'?'日本語':'English')));
-    document.querySelectorAll('[data-i18n]').forEach(el => { const k=el.dataset.i18n; if(I18N[lang][k]) el.textContent=I18N[lang][k]; });
-    document.querySelectorAll('[data-ph]').forEach(el => { const k=el.dataset.ph; if(I18N[lang][k]) el.placeholder=I18N[lang][k]; });
-    document.getElementById('subtitle').textContent = I18N[lang].subtitle;
-    document.getElementById('copyBtn').textContent = I18N[lang].copy;
+    const t = I18N[lang] || I18N.en;
+    document.querySelectorAll('.lang-item').forEach(b => b.classList.toggle('active', b.textContent.trim()===LNAMES[l]));
+    document.getElementById('curLang').textContent = LNAMES[l] || l;
+    document.getElementById('langDD').classList.remove('open');
+    document.querySelectorAll('[data-i18n]').forEach(el => { const k=el.dataset.i18n; if(t[k]) el.textContent=t[k]; });
+    document.querySelectorAll('[data-ph]').forEach(el => { const k=el.dataset.ph; if(t[k]) el.placeholder=t[k]; });
+    document.getElementById('subtitle').textContent = t.subtitle;
+    document.getElementById('copyBtn').textContent = t.copy;
     generate();
 }
+document.addEventListener('click', e => { const dd=document.getElementById('langDD'); if(dd&&!dd.contains(e.target)) dd.classList.remove('open'); });
 
 function selectBoard(id) {
     board = id;
@@ -342,7 +454,7 @@ document.getElementById('ssid').addEventListener('input', generate);
 document.getElementById('pass').addEventListener('input', generate);
 document.getElementById('devPass').addEventListener('input', generate);
 
-if(lang==='ja') setLang('ja');
+if(lang!=='en') setLang(lang);
 generate();
 </script>
 </body>

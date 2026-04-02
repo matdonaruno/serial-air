@@ -15,3 +15,8 @@
   from = "/terms"
   to = "/terms.html"
   status = 200
+
+[[redirects]]
+  from = "/codegen"
+  to = "/codegen.html"
+  status = 200
