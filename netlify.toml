@@ -1,11 +1,34 @@
 [build]
   publish = "docs"
 
+# LP A (Glassmorphism / Orange)
 [[redirects]]
   from = "/"
   to = "/index.html"
   status = 200
 
+[[redirects]]
+  from = "/a"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/a/codegen"
+  to = "/codegen.html"
+  status = 200
+
+# LP B (Tailwind / Dark Terminal)
+[[redirects]]
+  from = "/b"
+  to = "/lp.html"
+  status = 200
+
+[[redirects]]
+  from = "/b/codegen"
+  to = "/lp-codegen.html"
+  status = 200
+
+# Shared pages
 [[redirects]]
   from = "/privacy"
   to = "/privacy.html"
@@ -19,4 +42,9 @@
 [[redirects]]
   from = "/codegen"
   to = "/codegen.html"
+  status = 200
+
+[[redirects]]
+  from = "/lp"
+  to = "/lp.html"
   status = 200

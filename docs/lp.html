@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SERIAL_AIR | THE PRECISION REMOTE TERMINAL</title>
+<meta name="description" content="Wireless serial monitor for ESP8266, ESP32, Raspberry Pi. No PC needed. Debug from your phone.">
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700;800&family=Space+Grotesk:wght@500&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#FF6B35",
+        "primary-container": "#FF8C42",
+        "surface": "#131313",
+        "surface-container": "#1f1f1f",
+        "surface-container-low": "#1b1b1b",
+        "surface-container-lowest": "#0e0e0e",
+        "surface-container-high": "#2a2a2a",
+        "outline": "#414755",
+        "outline-variant": "#414755",
+        "on-surface": "#e2e2e2",
+      },
+      fontFamily: {
+        "headline": ["Inter"],
+        "body": ["Inter"],
+        "mono": ["JetBrains Mono"],
+      },
+    },
+  },
+}
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+body { background-color: #000000; color: #e2e2e2; }
+.terminal-scroll::-webkit-scrollbar { width: 4px; }
+.terminal-scroll::-webkit-scrollbar-track { background: #0e0e0e; }
+.terminal-scroll::-webkit-scrollbar-thumb { background: #414755; }
+.faq-answer { max-height: 0; overflow: hidden; transition: max-height 0.3s ease; }
+.faq-item.open .faq-answer { max-height: 200px; }
+.faq-item.open .faq-icon { transform: rotate(45deg); }
+.faq-icon { transition: transform 0.3s ease; }
+</style>
+</head>
+<body class="font-body selection:bg-primary selection:text-white">
+
+<!-- Nav -->
+<nav class="fixed top-0 w-full border-b border-zinc-800 bg-black/80 backdrop-blur-md z-50">
+<div class="flex justify-between items-center px-6 py-4 max-w-[1440px] mx-auto">
+  <a href="/" class="font-mono font-bold text-xl tracking-tighter text-white">SERIAL_AIR</a>
+  <div class="hidden md:flex gap-8 items-center">
+    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="#features">Features</a>
+    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="#specs">Specifications</a>
+    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="https://github.com/matdonaruno/serial-air" target="_blank">Documentation</a>
+  </div>
+  <div class="flex gap-3 items-center">
+    <a href="/lp-codegen.html" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">Test Code</a>
+    <a href="#" class="px-4 py-2 bg-primary text-white text-xs font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">App Store</a>
+    <a href="#" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">Google Play</a>
+    <a href="https://github.com/matdonaruno/serial-air" target="_blank" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">GitHub</a>
+  </div>
+</div>
+</nav>
+
+<main class="pt-20">
+
+<!-- Hero -->
+<section class="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
+  <div class="z-10 text-center max-w-4xl">
+    <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 text-white uppercase leading-[0.9]">
+      Precision<br/>Terminal<br/>Control.
+    </h1>
+    <p class="font-mono text-zinc-500 text-sm md:text-base tracking-widest uppercase mb-12">
+      Wireless Serial Monitor for ESP &amp; Raspberry Pi // v1.2.0
+    </p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a href="#" class="bg-primary px-8 py-4 text-white font-bold uppercase tracking-tighter text-lg hover:brightness-110 transition-all text-center">Download Free</a>
+      <a href="/lp-codegen.html" class="border border-outline px-8 py-4 text-zinc-400 font-bold uppercase tracking-tighter text-lg hover:text-white hover:border-white transition-all text-center">Generate Test Code</a>
+    </div>
+  </div>
+  <div class="mt-16 w-full max-w-6xl relative aspect-video">
+    <img class="w-full h-full object-cover grayscale brightness-75 border border-outline-variant/30" src="images/lp-hero.webp" alt="iPhone with terminal screen next to ESP32 on laboratory desk"/>
+    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+  </div>
+</section>
+
+<!-- Problem -->
+<section class="py-32 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-6">
+  <div class="grid md:grid-cols-2 gap-20 items-center">
+    <div>
+      <h2 class="text-5xl font-extrabold tracking-tighter text-white mb-8 leading-tight">DITCH THE<br/>USB CABLE.</h2>
+      <div class="space-y-6">
+        <div class="flex gap-4 items-start">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cable</span>
+          <div>
+            <h4 class="font-bold text-white uppercase tracking-tight">No more port failures</h4>
+            <p class="text-zinc-500 text-sm">Eliminate mechanical wear on USB ports through high-speed wireless serial tunneling over WiFi TCP.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">distance</span>
+          <div>
+            <h4 class="font-bold text-white uppercase tracking-tight">Remote Field Access</h4>
+            <p class="text-zinc-500 text-sm">Debug devices across the room or across the factory floor. No laptop required — just your phone.</p>
+          </div>
+        </div>
+        <div class="flex gap-4 items-start">
+          <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">smartphone</span>
+          <div>
+            <h4 class="font-bold text-white uppercase tracking-tight">Phone is your terminal</h4>
+            <p class="text-zinc-500 text-sm">Field testing, quick checks, demos — your iPhone or Android becomes a full serial monitor.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-cols-2 gap-4">
+      <div class="aspect-square bg-black border border-outline-variant/20 p-4">
+        <img class="w-full h-full object-cover grayscale opacity-40" src="images/lp-cables.webp" alt="Tangled USB cables"/>
+      </div>
+      <div class="aspect-square bg-black border border-outline/40 p-4 flex items-center justify-center">
+        <img class="w-full h-full object-cover" src="images/lp-esp32.webp" alt="ESP32 circuit board with blue LED"/>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- 3 Steps -->
+<section class="py-32">
+<div class="max-w-7xl mx-auto px-6">
+  <div class="grid md:grid-cols-3 gap-px bg-outline-variant/30 border border-outline-variant/30">
+    <div class="bg-black p-12">
+      <span class="font-mono text-primary text-6xl font-thin mb-8 block">01</span>
+      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">Install Library</h3>
+      <p class="text-zinc-500 text-sm mb-8">Add WirelessSerial to your ESP via Arduino Library Manager. For Raspberry Pi, use pip or a simple TCP script.</p>
+      <div class="font-mono text-[10px] bg-surface-container-lowest p-4 text-primary-container border border-primary/20">
+        #include &lt;WirelessSerial.h&gt;
+      </div>
+    </div>
+    <div class="bg-black p-12">
+      <span class="font-mono text-primary text-6xl font-thin mb-8 block">02</span>
+      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">Connect App</h3>
+      <p class="text-zinc-500 text-sm mb-8">Serial Air automatically discovers devices on your local network using mDNS / Bonjour. Zero configuration.</p>
+      <div class="font-mono text-[10px] bg-surface-container-lowest p-4 text-zinc-500 border border-outline-variant/20">
+        SCANNING_NETWORK...<br/>
+        FOUND: [ESP32_SERIAL_AIR]
+      </div>
+    </div>
+    <div class="bg-black p-12">
+      <span class="font-mono text-primary text-6xl font-thin mb-8 block">03</span>
+      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">Stream Data</h3>
+      <p class="text-zinc-500 text-sm mb-8">Instant bidirectional serial communication with sub-50ms latency over local WiFi. Send commands, receive logs.</p>
+      <div class="flex justify-between items-center bg-surface-container-lowest p-4 border border-outline-variant/20">
+        <div class="h-2 w-2 bg-primary rounded-full animate-pulse"></div>
+        <div class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">LIVE_CONNECTION</div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Code -->
+<section class="py-32 bg-surface-container-low">
+<div class="max-w-5xl mx-auto px-6">
+  <div class="mb-12">
+    <h2 class="text-3xl font-bold text-white uppercase tracking-tighter">Universal Integration</h2>
+    <p class="text-zinc-500 font-mono text-sm tracking-widest">TWO_LINES_OF_CODE / ANY_PLATFORM</p>
+  </div>
+  <div class="bg-surface-container-lowest border border-outline-variant shadow-2xl">
+    <div class="flex border-b border-outline-variant overflow-x-auto">
+      <button class="code-tab px-6 py-4 font-mono text-xs border-r border-outline-variant uppercase" data-tab="esp" onclick="showCodeTab(this,'esp')">ESP (Arduino)</button>
+      <button class="code-tab px-6 py-4 font-mono text-xs text-zinc-500 border-r border-outline-variant hover:text-white uppercase" data-tab="rpi" onclick="showCodeTab(this,'rpi')">Raspberry Pi</button>
+      <button class="code-tab px-6 py-4 font-mono text-xs text-zinc-500 border-r border-outline-variant hover:text-white uppercase" data-tab="mp" onclick="showCodeTab(this,'mp')">MicroPython</button>
+    </div>
+    <div id="code-esp" class="code-panel p-8 font-mono text-sm leading-relaxed overflow-x-auto terminal-scroll">
+<pre class="text-zinc-400"><span class="text-zinc-600">// Serial Air — ESP8266 / ESP32</span>
+<span class="text-zinc-600">#include</span> <span class="text-primary-container">&lt;WirelessSerial.h&gt;</span>
+
+<span class="text-primary-container">WirelessSerial</span> ws;
+
+<span class="text-zinc-600">void</span> <span class="text-white">setup</span>() {
+  Serial.<span class="text-white">begin</span>(<span class="text-primary-container">115200</span>);
+  WiFi.<span class="text-white">begin</span>(<span class="text-primary-container">"ssid"</span>, <span class="text-primary-container">"password"</span>);
+  ws.<span class="text-white">begin</span>();          <span class="text-zinc-600">// start wireless serial</span>
+  ws.<span class="text-white">mirror</span>(Serial);   <span class="text-zinc-600">// mirror Serial to WiFi</span>
+}
+
+<span class="text-zinc-600">void</span> <span class="text-white">loop</span>() {
+  ws.<span class="text-white">handle</span>();
+  Serial.<span class="text-white">println</span>(<span class="text-primary-container">"SYSTEM_STATUS: NOMINAL"</span>);
+  <span class="text-white">delay</span>(<span class="text-primary-container">1000</span>);
+}</pre>
+    </div>
+    <div id="code-rpi" class="code-panel p-8 font-mono text-sm leading-relaxed overflow-x-auto terminal-scroll hidden">
+<pre class="text-zinc-400"><span class="text-zinc-600"># Serial Air — Raspberry Pi TCP Server</span>
+<span class="text-zinc-600">import</span> socket, time
+
+server = socket.<span class="text-white">socket</span>(socket.AF_INET, socket.SOCK_STREAM)
+server.<span class="text-white">setsockopt</span>(socket.SOL_SOCKET, socket.SO_REUSEADDR, <span class="text-primary-container">1</span>)
+server.<span class="text-white">bind</span>((<span class="text-primary-container">""</span>, <span class="text-primary-container">23</span>))
+server.<span class="text-white">listen</span>(<span class="text-primary-container">1</span>)
+
+conn, addr = server.<span class="text-white">accept</span>()
+<span class="text-zinc-600">while</span> <span class="text-primary-container">True</span>:
+    conn.<span class="text-white">sendall</span>(<span class="text-primary-container">f"temp:{read_sensor()}\n"</span>.<span class="text-white">encode</span>())
+    time.<span class="text-white">sleep</span>(<span class="text-primary-container">1</span>)</pre>
+    </div>
+    <div id="code-mp" class="code-panel p-8 font-mono text-sm leading-relaxed overflow-x-auto terminal-scroll hidden">
+<pre class="text-zinc-400"><span class="text-zinc-600"># MicroPython — ESP32 / Pico W</span>
+<span class="text-zinc-600">import</span> socket, network, time
+
+wlan = network.<span class="text-white">WLAN</span>(network.STA_IF)
+wlan.<span class="text-white">active</span>(<span class="text-primary-container">True</span>)
+wlan.<span class="text-white">connect</span>(<span class="text-primary-container">"ssid"</span>, <span class="text-primary-container">"password"</span>)
+
+server = socket.<span class="text-white">socket</span>()
+server.<span class="text-white">bind</span>((<span class="text-primary-container">""</span>, <span class="text-primary-container">23</span>))
+server.<span class="text-white">listen</span>(<span class="text-primary-container">1</span>)
+
+conn, addr = server.<span class="text-white">accept</span>()
+<span class="text-zinc-600">while</span> <span class="text-primary-container">True</span>:
+    conn.<span class="text-white">send</span>(<span class="text-primary-container">"Hello from MicroPython!\n"</span>)
+    time.<span class="text-white">sleep</span>(<span class="text-primary-container">1</span>)</pre>
+    </div>
+    <div class="bg-black/50 px-8 py-3 border-t border-outline-variant flex justify-between items-center">
+      <div class="flex gap-2">
+        <div class="w-2 h-2 bg-red-900"></div>
+        <div class="w-2 h-2 bg-amber-900"></div>
+        <div class="w-2 h-2 bg-green-900"></div>
+      </div>
+      <a href="/lp-codegen.html" class="text-[10px] text-primary font-mono tracking-widest uppercase hover:underline">GENERATE_TEST_CODE →</a>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Features -->
+<section id="features" class="py-32">
+<div class="max-w-7xl mx-auto px-6">
+  <div class="grid md:grid-cols-3 gap-8">
+    <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+      <span class="material-symbols-outlined text-primary mb-6 text-3xl">wifi</span>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Auto Discovery</h4>
+      <p class="text-zinc-500 text-sm mb-6">Devices found automatically via Bonjour/mDNS. No IP address configuration needed.</p>
+      <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">mdns_broadcast</span>
+    </div>
+    <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+      <span class="material-symbols-outlined text-primary mb-6 text-3xl">analytics</span>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Serial Plotter</h4>
+      <p class="text-zinc-500 text-sm mb-6">Visualize numeric data as real-time graphs. Toggle between log view and plot view.</p>
+      <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">60hz_refresh</span>
+    </div>
+    <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+      <span class="material-symbols-outlined text-primary mb-6 text-3xl">lock</span>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Device Security</h4>
+      <p class="text-zinc-500 text-sm mb-6">Optional pairing codes, passwords, and device fingerprints. Connect only trusted devices.</p>
+      <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">authenticated_access</span>
+    </div>
+    <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+      <span class="material-symbols-outlined text-primary mb-6 text-3xl">search</span>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Search &amp; Filter</h4>
+      <p class="text-zinc-500 text-sm mb-6">Find specific log entries instantly. Filter by keyword in real time across thousands of lines.</p>
+      <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">instant_grep</span>
+    </div>
+    <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+      <span class="material-symbols-outlined text-primary mb-6 text-3xl">terminal</span>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Command Macros</h4>
+      <p class="text-zinc-500 text-sm mb-6">Save frequently used commands and send them with a single tap. Bidirectional communication.</p>
+      <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">one_tap_execute</span>
+    </div>
+    <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+      <span class="material-symbols-outlined text-primary mb-6 text-3xl">sync</span>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Auto Reconnect</h4>
+      <p class="text-zinc-500 text-sm mb-6">Seamless recovery from network interruptions. Never miss a log line.</p>
+      <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">zero_downtime</span>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Test Code Generator -->
+<section class="py-32 bg-surface-container-lowest">
+<div class="max-w-5xl mx-auto px-6 text-center">
+  <span class="material-symbols-outlined text-primary text-5xl mb-8 block">code</span>
+  <h2 class="text-5xl font-extrabold tracking-tighter text-white mb-6 uppercase leading-tight">GENERATE<br/>TEST CODE.</h2>
+  <p class="font-mono text-zinc-500 text-sm tracking-widest uppercase mb-4">SELECT_BOARD // ENTER_WIFI // GET_SKETCH</p>
+  <p class="text-zinc-400 text-base max-w-xl mx-auto mb-12">Pick your board, enter WiFi credentials, and get a ready-to-upload sketch. Supports ESP8266, ESP32, Arduino UNO R4, Raspberry Pi, and more.</p>
+  <a href="/lp-codegen.html" class="inline-flex items-center gap-3 bg-primary px-12 py-5 text-white font-bold uppercase tracking-widest text-sm hover:brightness-110 transition-all">
+    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
+    Open Code Generator
+  </a>
+  <div class="mt-16 max-w-2xl mx-auto bg-black border border-outline-variant/30 p-8">
+    <div class="flex justify-between items-center mb-6">
+      <div class="font-mono text-[10px] text-zinc-600 tracking-widest uppercase">PREVIEW // ESP32_OUTPUT</div>
+      <div class="flex gap-2">
+        <div class="w-2 h-2 bg-primary rounded-full animate-pulse"></div>
+        <div class="font-mono text-[10px] text-zinc-600 tracking-widest">READY</div>
+      </div>
+    </div>
+    <pre class="font-mono text-sm text-left text-zinc-500 leading-relaxed"><span class="text-zinc-700">#include</span> <span class="text-primary-container">&lt;WirelessSerial.h&gt;</span>
+
+<span class="text-primary-container">WirelessSerial</span> ws;
+
+<span class="text-zinc-700">void</span> <span class="text-white">setup</span>() {
+  Serial.<span class="text-white">begin</span>(<span class="text-primary-container">115200</span>);
+  WiFi.<span class="text-white">begin</span>(<span class="text-primary-container">"YOUR_SSID"</span>, <span class="text-primary-container">"YOUR_PASS"</span>);
+  ws.<span class="text-white">begin</span>();
+  ws.<span class="text-white">mirror</span>(Serial);
+}</pre>
+  </div>
+</div>
+</section>
+
+<!-- Comparison -->
+<section id="specs" class="py-32 bg-black">
+<div class="max-w-4xl mx-auto px-6">
+  <h2 class="text-center text-3xl font-bold text-white mb-4 tracking-tighter uppercase">COMPATIBILITY_MATRIX</h2>
+  <p class="text-center text-zinc-500 font-mono text-sm tracking-widest mb-16">SUPPORTED_HARDWARE</p>
+  <div class="border border-outline-variant overflow-hidden mb-20">
+    <table class="w-full text-left font-mono text-sm">
+      <thead>
+        <tr class="border-b border-outline-variant bg-surface-container">
+          <th class="p-6 text-zinc-400 font-normal uppercase tracking-widest">Board</th>
+          <th class="p-6 text-primary font-bold uppercase tracking-widest">WiFi</th>
+          <th class="p-6 text-primary font-bold uppercase tracking-widest">BLE</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/20">
+        <tr><td class="p-5 text-white">ESP8266 (NodeMCU, Wemos D1 Mini)</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-700">—</td></tr>
+        <tr><td class="p-5 text-white">ESP32 / C3 / S3</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td></tr>
+        <tr><td class="p-5 text-white">Arduino Nano ESP32</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td></tr>
+        <tr><td class="p-5 text-white">M5Stack / Seeed XIAO ESP32</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td></tr>
+        <tr><td class="p-5 text-white">Arduino UNO R4 WiFi</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-700">—</td></tr>
+        <tr><td class="p-5 text-white">Raspberry Pi 3/4/5, Pico W</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-700">—</td></tr>
+        <tr><td class="p-5 text-white">Orange Pi / Banana Pi</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-700">—</td></tr>
+        <tr><td class="p-5 text-zinc-400">Any WiFi TCP device</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-700">—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="text-center text-3xl font-bold text-white mb-4 tracking-tighter uppercase">SPEC_COMPARISON</h2>
+  <p class="text-center text-zinc-500 font-mono text-sm tracking-widest mb-16">SERIAL_AIR vs ALTERNATIVES</p>
+  <div class="border border-outline-variant overflow-hidden">
+    <table class="w-full text-left font-mono text-sm">
+      <thead>
+        <tr class="border-b border-outline-variant bg-surface-container">
+          <th class="p-6 text-zinc-400 font-normal uppercase tracking-widest">Feature</th>
+          <th class="p-6 text-primary font-bold uppercase tracking-widest">Serial Air</th>
+          <th class="p-6 text-zinc-500 font-normal uppercase tracking-widest">BLE Terminals</th>
+          <th class="p-6 text-zinc-500 font-normal uppercase tracking-widest">PC Monitor</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-outline-variant/20">
+        <tr><td class="p-5 text-white uppercase">WiFi TCP</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td></tr>
+        <tr><td class="p-5 text-white uppercase">BLE</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td></tr>
+        <tr><td class="p-5 text-white uppercase">No PC Required</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td></tr>
+        <tr><td class="p-5 text-white uppercase">Auto Discovery</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td></tr>
+        <tr><td class="p-5 text-white uppercase">Serial Plotter</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td></tr>
+        <tr><td class="p-5 text-white uppercase">Log Export</td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td><td class="p-5 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td><td class="p-5 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</section>
+
+<!-- FAQ -->
+<section class="py-32">
+<div class="max-w-3xl mx-auto px-6">
+  <h2 class="text-3xl font-bold text-white mb-12 uppercase tracking-tighter">System FAQ</h2>
+  <div class="space-y-4">
+    <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">Does it require an internet connection?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">No. Serial Air works entirely over your local WiFi network. No internet, no cloud, no accounts. All data stays on your device.</p></div>
+    </div>
+    <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">What is the memory footprint on ESP8266?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">Under 2KB RAM (excluding WiFi stack). The library is designed for ESP8266's 80KB RAM constraint. Flash usage is under 8KB.</p></div>
+    </div>
+    <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">Can I use it with Arduino IDE?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">Yes. Install WirelessSerial from the Arduino Library Manager. Works with Arduino IDE, PlatformIO, and CLI. Use our <a href="/lp-codegen.html" class="text-primary hover:underline">Code Generator</a> for instant setup.</p></div>
+    </div>
+    <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">Is the serial data encrypted?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">Serial data is transmitted as plaintext over your local network. WiFi encryption (WPA2/WPA3) protects it in transit. The app includes optional pairing codes and passwords for device authentication.</p></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- Final CTA -->
+<section class="py-40 bg-black text-center relative overflow-hidden">
+  <div class="z-10 relative">
+    <h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter text-white mb-8 uppercase leading-none">UPGRADE YOUR<br/>WORKFLOW.</h2>
+    <p class="font-mono text-zinc-500 mb-12 tracking-widest uppercase">FREE_DOWNLOAD // OPEN_SOURCE_LIBRARY</p>
+    <div class="flex flex-col sm:flex-row justify-center gap-4">
+      <a href="#" class="bg-white text-black px-12 py-5 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-zinc-200 transition-colors">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">ios</span>
+        App Store
+      </a>
+      <a href="#" class="bg-white text-black px-12 py-5 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-zinc-200 transition-colors">
+        <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">android</span>
+        Google Play
+      </a>
+      <a href="https://github.com/matdonaruno/serial-air" target="_blank" class="border border-outline text-white px-12 py-5 font-bold uppercase tracking-widest text-sm hover:border-white transition-colors text-center">
+        GitHub
+      </a>
+    </div>
+  </div>
+  <div class="absolute inset-0 opacity-5 pointer-events-none">
+    <img class="w-full h-full object-cover" src="images/lp-circuit.webp" alt=""/>
+  </div>
+</section>
+
+</main>
+
+<!-- Footer -->
+<footer class="bg-black w-full border-t border-zinc-800">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 px-10 py-12 max-w-7xl mx-auto">
+  <div>
+    <div class="font-mono font-black text-white mb-4">SERIAL_AIR</div>
+    <p class="font-mono text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500">
+      &copy; 2026 Masashi Umetani. MIT License.
+    </p>
+  </div>
+  <div class="grid grid-cols-2 gap-4">
+    <div class="flex flex-col gap-2">
+      <a class="font-mono text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="/privacy.html">Privacy Policy</a>
+      <a class="font-mono text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="/terms.html">Terms of Service</a>
+    </div>
+    <div class="flex flex-col gap-2">
+      <a class="font-mono text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="https://github.com/matdonaruno/serial-air" target="_blank">GitHub</a>
+      <a class="font-mono text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="mailto:support@serialair.app">Contact</a>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+// Code tabs
+function showCodeTab(btn, tab) {
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.remove('text-white','bg-surface-container'));
+  document.querySelectorAll('.code-tab').forEach(t => t.classList.add('text-zinc-500'));
+  btn.classList.remove('text-zinc-500');
+  btn.classList.add('text-white','bg-surface-container');
+  document.querySelectorAll('.code-panel').forEach(p => p.classList.add('hidden'));
+  document.getElementById('code-'+tab).classList.remove('hidden');
+}
+// Init first tab
+document.querySelector('.code-tab').classList.add('text-white','bg-surface-container');
+
+// Smooth scroll
+document.querySelectorAll('a[href^="#"]').forEach(a => {
+  a.addEventListener('click', e => {
+    const t = document.querySelector(a.getAttribute('href'));
+    if(t) { e.preventDefault(); t.scrollIntoView({behavior:'smooth'}); }
+  });
+});
+</script>
+</body>
+</html>

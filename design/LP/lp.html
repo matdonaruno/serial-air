@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SERIAL_AIR | THE PRECISION REMOTE TERMINAL</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&amp;family=JetBrains+Mono:wght@400;700;800&amp;family=Space+Grotesk:wght@500&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-secondary-fixed-variant": "#474746",
+              "error-container": "#93000a",
+              "on-primary-fixed-variant": "#004493",
+              "surface-variant": "#353535",
+              "on-surface-variant": "#c1c6d7",
+              "primary-fixed": "#d8e2ff",
+              "primary-container": "#4b8eff",
+              "surface-tint": "#adc6ff",
+              "outline-variant": "#414755",
+              "on-primary-container": "#00285c",
+              "surface-container-low": "#1b1b1b",
+              "on-error": "#690005",
+              "on-secondary-container": "#b7b5b4",
+              "background": "#000000",
+              "on-secondary": "#313030",
+              "primary": "#007AFF",
+              "tertiary": "#c8c6c6",
+              "on-primary": "#ffffff",
+              "surface-container": "#1f1f1f",
+              "inverse-primary": "#005bc1",
+              "secondary-fixed-dim": "#c8c6c5",
+              "surface-container-high": "#2a2a2a",
+              "surface-container-lowest": "#0e0e0e",
+              "secondary-container": "#474746",
+              "on-tertiary": "#303030",
+              "surface-bright": "#393939",
+              "tertiary-fixed": "#e4e2e1",
+              "secondary-fixed": "#e5e2e1",
+              "on-tertiary-fixed-variant": "#474747",
+              "on-background": "#e2e2e2",
+              "inverse-surface": "#e2e2e2",
+              "surface-container-highest": "#353535",
+              "tertiary-fixed-dim": "#c8c6c6",
+              "surface": "#131313",
+              "on-primary-fixed": "#001a41",
+              "error": "#ffb4ab",
+              "outline": "#414755",
+              "primary-fixed-dim": "#adc6ff",
+              "inverse-on-surface": "#303030",
+              "surface-dim": "#131313",
+              "secondary": "#c8c6c5",
+              "on-error-container": "#ffdad6",
+              "on-secondary-fixed": "#1c1b1b",
+              "on-tertiary-fixed": "#1b1c1c",
+              "on-surface": "#e2e2e2",
+              "on-tertiary-container": "#2a2a2a",
+              "tertiary-container": "#929090"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Space Grotesk"],
+              "mono": ["JetBrains Mono"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+      body { background-color: #000000; color: #e2e2e2; }
+      .terminal-scroll::-webkit-scrollbar { width: 4px; }
+      .terminal-scroll::-webkit-scrollbar-track { background: #0e0e0e; }
+      .terminal-scroll::-webkit-scrollbar-thumb { background: #414755; }
+    </style>
+</head>
+<body class="font-body selection:bg-primary selection:text-white">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full border-b border-zinc-800 bg-black/80 backdrop-blur-md z-50">
+<div class="flex justify-between items-center px-6 py-4 max-w-[1440px] mx-auto">
+<div class="font-['JetBrains_Mono'] font-bold text-xl tracking-tighter text-white">SERIAL_AIR</div>
+<div class="hidden md:flex gap-8 items-center">
+<a class="font-['Inter'] font-medium tracking-tight text-sm uppercase text-blue-500 border-b-2 border-blue-500 pb-1" href="#">Features</a>
+<a class="font-['Inter'] font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-blue-400 transition-colors duration-100" href="#">Specifications</a>
+<a class="font-['Inter'] font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-blue-400 transition-colors duration-100" href="#">Documentation</a>
+</div>
+<div class="flex gap-4 items-center">
+<button class="px-4 py-2 bg-primary text-white text-xs font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">App Store</button>
+<button class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">GitHub</button>
+</div>
+</div>
+</nav>
+<main class="pt-20">
+<!-- Hero Section -->
+<section class="relative min-h-[921px] flex flex-col items-center justify-center px-6 overflow-hidden">
+<div class="z-10 text-center max-w-4xl">
+<h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 text-white uppercase leading-[0.9]">
+                    Precision <br/>Terminal <br/>Control.
+                </h1>
+<p class="font-mono text-zinc-500 text-sm md:text-base tracking-widest uppercase mb-12">
+                    Wireless Debugging for ESP32 &amp; Raspberry Pi // v2.0.4
+                </p>
+<div class="flex justify-center gap-6">
+<button class="bg-primary px-8 py-4 text-white font-bold uppercase tracking-tighter text-lg hover:brightness-110">INITIALIZE CONNECTION</button>
+</div>
+</div>
+<div class="mt-16 w-full max-w-6xl relative aspect-video">
+<img class="w-full h-full object-cover grayscale brightness-75 border border-outline-variant/30" data-alt="Close-up of an iPhone displaying a technical terminal screen next to a exposed ESP32 microcontroller on a black laboratory desk with dramatic overhead lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBIK7eF3IiCypBdIiWaOFsvkc-nOHEZYvz2N5DPwarqj1ZsbkunRHkZE7OIPptljWNQZNO6bWwzGhs7dMtlQsnzO7vA81nZqa9qr-3iBJjqHhbR78KTsY2hjZUdGPpwOyIolcfSVLp-FbgH1nfBLmcHuj-HoEs7FsgYDHygjVZp6NeZ6EapQSqHNHGaYF0sQSmqIhRf_k6TSdRejHaxyfxTkSO3q2F52ENEpkbjB-jBnN09NxKFJdte045V1PEZcSs5SKSX3Uh29j2e"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
+</div>
+</section>
+<!-- The Problem -->
+<section class="py-32 bg-surface-container-lowest">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-2 gap-20 items-center">
+<div>
+<h2 class="text-5xl font-extrabold tracking-tighter text-white mb-8 leading-tight">DITCH THE <br/>USB CABLE.</h2>
+<div class="space-y-6">
+<div class="flex gap-4 items-start">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cable</span>
+<div>
+<h4 class="font-bold text-white uppercase tracking-tight">No more port failures</h4>
+<p class="text-zinc-500 text-sm">Eliminate mechanical wear on Micro-USB and USB-C ports through high-speed wireless serial tunneling.</p>
+</div>
+</div>
+<div class="flex gap-4 items-start">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">distance</span>
+<div>
+<h4 class="font-bold text-white uppercase tracking-tight">Remote Field Access</h4>
+<p class="text-zinc-500 text-sm">Debug equipment across the room or across the factory floor without dragging a laptop around.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="aspect-square bg-black border border-outline-variant/20 p-4">
+<img class="w-full h-full object-cover grayscale opacity-40" data-alt="Messy bundle of tangled black USB cables and electronic wires on a dark textured surface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFhoQpgudYYOFF1NYaZS6ApMrhMw7WzpHTcU-8aUkddrNNDXnrIrKQGbGbv-9cNRJ1VouQCBtpe3RnMOXHM7DgwJBlMCznumHn7P6ALCN5fPAPaqWnuZrT9iTrgtHcFm-E8ZBc8MF3M-6u6LzbzAacqs_qIFIVTKUAuYyLD_oCTy_wjjPbYhDWB9TrCAzdCtepR5-IOQtT13UAPIWbRjnIWMGtlIaqQi9bH7zb22UlhjuOoE8wgum3yinV1Bf52Trv8t_nbNma0gNC"/>
+</div>
+<div class="aspect-square bg-black border border-outline p-4">
+<img class="w-full h-full object-cover" data-alt="Clean macro shot of a blue ESP32 circuit board on a dark background with blue glowing LED indicators" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBY0S67LLXP2ZQIIYxqcOZeUEDlrIX3RcWVlApt-i7fRISPkAdF_ylpaV2BAIPkPpeZKn4Pa6D4h2P2poHZjQJmKdycTUQmeXpoGuRu-VfSjyX5NiLJS0XQSPqOZnx5ILgzmYbjN3NazWQ17epUMcyKu8cmsJ7wSRW7_blSna-nqE6Y5YMx7qDPXKERD3bmu_5YXf41l0Xqw6Yac-ma5C7-vIhoBQyJHSweLFtABuj0Vwk9Vjucfzxm4nIabN_JRXJjaLeFhlQJVUD8"/>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- 3 Steps -->
+<section class="py-32">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-3 gap-1px bg-outline-variant/30 border border-outline-variant/30">
+<div class="bg-black p-12">
+<span class="font-mono text-primary text-6xl font-thin mb-8 block">01</span>
+<h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">FLASH FIRMWARE</h3>
+<p class="text-zinc-500 text-sm mb-8">Deploy our lightweight C++ library to your ESP32 or the Python daemon to your Raspberry Pi.</p>
+<div class="font-mono text-[10px] bg-surface-container-lowest p-4 text-primary-container border border-primary/20">
+                            git clone serial-air/client
+                        </div>
+</div>
+<div class="bg-black p-12">
+<span class="font-mono text-primary text-6xl font-thin mb-8 block">02</span>
+<h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">CONNECT APP</h3>
+<p class="text-zinc-500 text-sm mb-8">The app automatically discovers devices on your local network using mDNS broadcasting.</p>
+<div class="font-mono text-[10px] bg-surface-container-lowest p-4 text-zinc-500 border border-outline-variant/20">
+                            SCANNING_NETWORK... <br/>
+                            FOUND: [ESP32_WROOM_32]
+                        </div>
+</div>
+<div class="bg-black p-12">
+<span class="font-mono text-primary text-6xl font-thin mb-8 block">03</span>
+<h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">STREAM DATA</h3>
+<p class="text-zinc-500 text-sm mb-8">Instant bi-directional serial communication with sub-5ms latency over local WiFi.</p>
+<div class="flex justify-between items-center bg-surface-container-lowest p-4 border border-outline-variant/20">
+<div class="h-2 w-2 bg-primary rounded-full"></div>
+<div class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">LIVE_CONNECTION</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Code Section -->
+<section class="py-32 bg-surface-container-low">
+<div class="max-w-5xl mx-auto px-6">
+<div class="mb-12">
+<h2 class="text-3xl font-bold text-white uppercase tracking-tighter">Universal Integration</h2>
+<p class="text-zinc-500 font-mono text-sm tracking-widest">STRICTLY_ENGINEERED / CLIENT_LIBRARIES</p>
+</div>
+<div class="bg-surface-container-lowest border border-outline-variant shadow-2xl">
+<div class="flex border-b border-outline-variant overflow-x-auto">
+<button class="px-6 py-4 font-mono text-xs text-white border-r border-outline-variant bg-surface-container uppercase">ESP32 (C++)</button>
+<button class="px-6 py-4 font-mono text-xs text-zinc-500 border-r border-outline-variant hover:text-white uppercase">Raspberry Pi</button>
+<button class="px-6 py-4 font-mono text-xs text-zinc-500 border-r border-outline-variant hover:text-white uppercase">Python SDK</button>
+</div>
+<div class="p-8 font-mono text-sm leading-relaxed overflow-x-auto terminal-scroll">
+<pre class="text-zinc-400"><span class="text-zinc-600">#include</span> <span class="text-primary-container">&lt;SerialAir.h&gt;</span>
+
+SerialAir air;
+
+<span class="text-zinc-600">void</span> <span class="text-white">setup</span>() {
+  Serial.<span class="text-white">begin</span>(<span class="text-primary-container">115200</span>);
+  air.<span class="text-white">begin</span>(<span class="text-primary-container">"Lab_Network"</span>, <span class="text-primary-container">"********"</span>);
+}
+
+<span class="text-zinc-600">void</span> <span class="text-white">loop</span>() {
+  air.<span class="text-white">println</span>(<span class="text-primary-container">"SYSTEM_STATUS: NOMINAL"</span>);
+  <span class="text-white">delay</span>(<span class="text-primary-container">1000</span>);
+}
+</pre>
+</div>
+<div class="bg-black/50 px-8 py-3 border-t border-outline-variant flex justify-between items-center">
+<div class="flex gap-2">
+<div class="w-2 h-2 bg-red-900"></div>
+<div class="w-2 h-2 bg-amber-900"></div>
+<div class="w-2 h-2 bg-green-900"></div>
+</div>
+<div class="text-[10px] text-zinc-600 font-mono tracking-widest uppercase">main.cpp — 128 KB</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Feature Grid -->
+<section class="py-32">
+<div class="max-w-7xl mx-auto px-6">
+<div class="grid md:grid-cols-3 gap-8">
+<!-- Feature 1 -->
+<div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary mb-6 text-3xl">terminal</span>
+<h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Full ANSI Support</h4>
+<p class="text-zinc-500 text-sm mb-6">Support for colors, cursors, and complex terminal formatting. It feels like SSH.</p>
+<span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">xterm-256color</span>
+</div>
+<!-- Feature 2 -->
+<div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary mb-6 text-3xl">analytics</span>
+<h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Real-time Plotting</h4>
+<p class="text-zinc-500 text-sm mb-6">Visualise sensor data in real-time with zero-config auto-graphing from serial JSON.</p>
+<span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">60hz_refresh_rate</span>
+</div>
+<!-- Feature 3 -->
+<div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
+<span class="material-symbols-outlined text-primary mb-6 text-3xl">lock</span>
+<h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Encrypted Tunnel</h4>
+<p class="text-zinc-500 text-sm mb-6">Optional AES-256 encryption for secure transmission over non-trusted networks.</p>
+<span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">end_to_end_security</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Comparison Table -->
+<section class="py-32 bg-surface-container-lowest">
+<div class="max-w-4xl mx-auto px-6">
+<h2 class="text-center text-3xl font-bold text-white mb-16 tracking-tighter uppercase">TECHNICAL_SPEC_COMPARISON</h2>
+<div class="border border-outline-variant overflow-hidden">
+<table class="w-full text-left font-mono text-sm">
+<thead>
+<tr class="border-b border-outline-variant bg-surface-container">
+<th class="p-6 text-zinc-400 font-normal uppercase tracking-widest">Feature</th>
+<th class="p-6 text-primary font-bold uppercase tracking-widest">Serial Air</th>
+<th class="p-6 text-zinc-500 font-normal uppercase tracking-widest">BLE Terminals</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-outline-variant/20">
+<tr>
+<td class="p-6 text-white uppercase">Data Throughput</td>
+<td class="p-6 text-primary">12 Mbps (WiFi)</td>
+<td class="p-6 text-zinc-600">2 Mbps (BLE)</td>
+</tr>
+<tr>
+<td class="p-6 text-white uppercase">Range</td>
+<td class="p-6 text-primary">Global (via VPN)</td>
+<td class="p-6 text-zinc-600">10 Meters</td>
+</tr>
+<tr>
+<td class="p-6 text-white uppercase">Auto-Plotting</td>
+<td class="p-6 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="p-6 text-zinc-600"><span class="material-symbols-outlined align-middle">cancel</span></td>
+</tr>
+<tr>
+<td class="p-6 text-white uppercase">Multi-Device</td>
+<td class="p-6 text-primary"><span class="material-symbols-outlined align-middle" style="font-variation-settings: 'FILL' 1;">check_circle</span></td>
+<td class="p-6 text-zinc-600">Single Only</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<!-- FAQ -->
+<section class="py-32">
+<div class="max-w-3xl mx-auto px-6">
+<h2 class="text-3xl font-bold text-white mb-12 uppercase tracking-tighter">System FAQ</h2>
+<div class="space-y-4">
+<div class="border border-outline-variant/30 p-6">
+<button class="w-full flex justify-between items-center text-left">
+<span class="font-bold text-white uppercase text-sm">Does it require an internet connection?</span>
+<span class="material-symbols-outlined text-zinc-600">add</span>
+</button>
+</div>
+<div class="border border-outline-variant/30 p-6">
+<button class="w-full flex justify-between items-center text-left">
+<span class="font-bold text-white uppercase text-sm">What is the memory footprint on ESP32?</span>
+<span class="material-symbols-outlined text-zinc-600">add</span>
+</button>
+</div>
+<div class="border border-outline-variant/30 p-6">
+<button class="w-full flex justify-between items-center text-left">
+<span class="font-bold text-white uppercase text-sm">Can I use it with Arduino IDE?</span>
+<span class="material-symbols-outlined text-zinc-600">add</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Final CTA -->
+<section class="py-40 bg-black text-center relative overflow-hidden">
+<div class="z-10 relative">
+<h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter text-white mb-8 uppercase leading-none">UPGRADE YOUR <br/>WORKFLOW.</h2>
+<p class="font-mono text-zinc-500 mb-12 tracking-widest uppercase">DOWNLOAD_SERIAL_AIR_OS_CLIENT_V2.0</p>
+<div class="flex flex-col md:flex-row justify-center gap-4">
+<button class="bg-white text-black px-12 py-5 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-zinc-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">ios</span>
+                        Get on App Store
+                    </button>
+<button class="border border-outline text-white px-12 py-5 font-bold uppercase tracking-widest text-sm hover:border-white transition-colors">
+                        Documentation
+                    </button>
+</div>
+</div>
+<!-- Background element -->
+<div class="absolute inset-0 opacity-10 pointer-events-none">
+<img class="w-full h-full object-cover" data-alt="Technical schematic drawing of a circuit board overlaying a dark blue and black textured background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIExcKVw_bKqc9TbHiL9AInGP_6n_16pND-6qTliESmxJWpk8N0MIsOJBeZCZQUGi87p1tlI1axmdhF--l-oJla1hIoZ2VcmYCPN6Cnuy58JMKpzEBjpDO6-y5MEnNTK8BEKSCOuFocRp-GKw-DwbvbN7XD5wGS8GWz5Rasl3TKJVecDoNeZhjMiVwv5nQSV9MCD73evvfO-Pfn6HW79kvHelYW0x2V4lJZ31XY-So3WBp-ocCSWfHGTvbnpa1lwS49y5R6cr3ggia"/>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-black w-full border-t border-zinc-800 mt-20">
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8 px-10 py-12 max-w-7xl mx-auto">
+<div>
+<div class="font-['JetBrains_Mono'] font-black text-white mb-4">SERIAL_AIR</div>
+<p class="font-['JetBrains_Mono'] text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500">
+                    © 2024 SERIAL_AIR. ALL_SYSTEMS_OPERATIONAL.
+                </p>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<div class="flex flex-col gap-2">
+<a class="font-['JetBrains_Mono'] text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="#">Privacy Policy</a>
+<a class="font-['JetBrains_Mono'] text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="#">Terms of Service</a>
+</div>
+<div class="flex flex-col gap-2">
+<a class="font-['JetBrains_Mono'] text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="#">Hardware License</a>
+<a class="font-['JetBrains_Mono'] text-[11px] leading-relaxed tracking-widest uppercase text-zinc-500 hover:text-white transition-colors" href="#">Contact</a>
+</div>
+</div>
+</div>
+</footer>
+</body></html>

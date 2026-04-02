@@ -73,14 +73,6 @@ export default function RootLayout() {
           }}
         />
         <Stack.Screen
-          name="device-settings"
-          options={{ animation: 'slide_from_right' }}
-        />
-        <Stack.Screen
-          name="firmware-update"
-          options={{ animation: 'slide_from_bottom' }}
-        />
-        <Stack.Screen
           name="paywall"
           options={{
             animation: 'slide_from_bottom',

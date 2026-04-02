@@ -324,7 +324,7 @@ void setup() {
     Serial.println();
     Serial.print("IP: "); Serial.println(WiFi.localIP());
 
-    ws.begin();
+    ws.begin();${getSecSnippet()}
     output = ws.mirror(Serial);
     output->println("Serial Air ready!");
 }

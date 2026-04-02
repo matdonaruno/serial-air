@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>CODE_GENERATOR | SERIAL_AIR</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&family=JetBrains+Mono:wght@400;700;800&family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script>
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "primary": "#FF6B35",
+        "primary-container": "#FF8C42",
+        "surface": "#131313",
+        "surface-container": "#1f1f1f",
+        "surface-container-low": "#1b1b1b",
+        "surface-container-lowest": "#0e0e0e",
+        "outline": "#414755",
+        "outline-variant": "#414755",
+      },
+      fontFamily: { "mono": ["JetBrains Mono"], "body": ["Inter"] },
+    },
+  },
+}
+</script>
+<style>
+.material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+body { background: #000; color: #e2e2e2; }
+.terminal-scroll::-webkit-scrollbar { width: 4px; }
+.terminal-scroll::-webkit-scrollbar-track { background: #0e0e0e; }
+.terminal-scroll::-webkit-scrollbar-thumb { background: #414755; }
+</style>
+</head>
+<body class="font-body selection:bg-primary selection:text-white min-h-screen">
+
+<!-- Nav -->
+<nav class="fixed top-0 w-full border-b border-zinc-800 bg-black/80 backdrop-blur-md z-50">
+<div class="flex justify-between items-center px-6 py-4 max-w-[1440px] mx-auto">
+  <a href="/lp.html" class="font-mono font-bold text-xl tracking-tighter text-white">SERIAL_AIR</a>
+  <div class="flex gap-3 items-center">
+    <div class="relative" id="langDD">
+      <button onclick="this.parentElement.classList.toggle('open')" class="flex items-center gap-2 px-3 py-2 border border-outline text-zinc-400 text-xs font-mono uppercase tracking-widest hover:text-white hover:border-white transition-all">
+        <span class="material-symbols-outlined text-sm">language</span>
+        <span id="curLang">EN</span>
+      </button>
+      <div class="lang-list hidden absolute right-0 top-full mt-2 bg-surface-container-lowest border border-outline w-44 max-h-72 overflow-y-auto z-50"></div>
+    </div>
+    <a href="/lp.html" class="px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">Back</a>
+  </div>
+</div>
+</nav>
+
+<main class="pt-28 pb-20 max-w-4xl mx-auto px-6">
+
+  <div class="text-center mb-16">
+    <span class="material-symbols-outlined text-primary text-4xl mb-4 block">terminal</span>
+    <h1 class="text-4xl md:text-5xl font-extrabold tracking-tighter text-white uppercase mb-4">Code<br/>Generator.</h1>
+    <p class="font-mono text-zinc-500 text-sm tracking-widest uppercase" id="subtitle">Generate ready-to-use code for your device</p>
+  </div>
+
+  <div class="mb-10">
+    <div class="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-4" data-i18n="board">Select Board</div>
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-2" id="boardGrid"></div>
+  </div>
+
+  <div class="mb-10" id="wifiSection">
+    <div class="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-4" data-i18n="wifi">WiFi Credentials</div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+      <input type="text" id="ssid" placeholder="WiFi SSID" data-ph="ssid_ph" class="bg-surface-container-lowest border border-outline px-5 py-4 text-white font-mono text-sm focus:outline-none focus:border-primary placeholder:text-zinc-700"/>
+      <input type="password" id="pass" placeholder="WiFi Password" data-ph="pass_ph" class="bg-surface-container-lowest border border-outline px-5 py-4 text-white font-mono text-sm focus:outline-none focus:border-primary placeholder:text-zinc-700"/>
+    </div>
+    <p class="font-mono text-[10px] text-zinc-700 mt-3 tracking-widest uppercase" data-i18n="wifi_hint">Credentials are only used locally. Nothing is sent anywhere.</p>
+  </div>
+
+  <div class="mb-10" id="secSection">
+    <div class="font-mono text-xs text-zinc-500 uppercase tracking-widest mb-4" data-i18n="security">Security (Arduino only)</div>
+    <div class="grid grid-cols-3 gap-2">
+      <button class="sec-btn bg-surface-container border border-primary text-primary font-mono text-xs uppercase tracking-widest py-3 transition-all" onclick="setSec('none')" id="sec-none" data-i18n="sec_none">None</button>
+      <button class="sec-btn bg-surface-container-lowest border border-outline text-zinc-500 font-mono text-xs uppercase tracking-widest py-3 hover:text-white hover:border-white transition-all" onclick="setSec('pairing')" id="sec-pairing" data-i18n="sec_pairing">Pairing Code</button>
+      <button class="sec-btn bg-surface-container-lowest border border-outline text-zinc-500 font-mono text-xs uppercase tracking-widest py-3 hover:text-white hover:border-white transition-all" onclick="setSec('password')" id="sec-password" data-i18n="sec_password">Password</button>
+    </div>
+    <div class="mt-3 hidden" id="devPassRow">
+      <input type="text" id="devPass" placeholder="Device password" data-ph="devpass_ph" class="w-full bg-surface-container-lowest border border-outline px-5 py-4 text-white font-mono text-sm focus:outline-none focus:border-primary placeholder:text-zinc-700"/>
+    </div>
+  </div>
+
+  <div>
+    <div class="flex justify-between items-center mb-4">
+      <div class="font-mono text-xs text-zinc-500 uppercase tracking-widest" data-i18n="code">Generated Code</div>
+      <div class="font-mono text-[10px] text-primary uppercase tracking-widest" id="platformBadge">Arduino / C++</div>
+    </div>
+    <div class="bg-surface-container-lowest border border-outline-variant shadow-2xl">
+      <div class="p-6 md:p-8 font-mono text-sm leading-relaxed overflow-x-auto terminal-scroll max-h-[500px] overflow-y-auto">
+        <pre id="codeOutput" class="text-zinc-400"></pre>
+      </div>
+      <div class="bg-black/50 px-6 py-3 border-t border-outline-variant flex justify-between items-center">
+        <div class="flex gap-2">
+          <div class="w-2 h-2 bg-red-900"></div>
+          <div class="w-2 h-2 bg-amber-900"></div>
+          <div class="w-2 h-2 bg-green-900"></div>
+        </div>
+        <button onclick="copyCode()" id="copyBtn" class="bg-primary px-6 py-2 text-white text-xs font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">Copy</button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer class="border-t border-zinc-800 py-8">
+  <div class="max-w-4xl mx-auto px-6 flex justify-between items-center">
+    <div class="font-mono text-[10px] text-zinc-600 tracking-widest uppercase">&copy; 2026 Serial Air</div>
+    <div class="flex gap-6">
+      <a href="/privacy.html" class="font-mono text-[10px] text-zinc-600 tracking-widest uppercase hover:text-white transition-colors">Privacy</a>
+      <a href="/terms.html" class="font-mono text-[10px] text-zinc-600 tracking-widest uppercase hover:text-white transition-colors">Terms</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+const BOARDS = [
+    { id:'esp', name:'ESP', desc:'ESP8266/32, Nano ESP32, M5Stack, XIAO', platform:'arduino', wifi:true },
+    { id:'r4', name:'UNO R4 WiFi', desc:'Arduino UNO R4 WiFi', platform:'arduino', wifi:true },
+    { id:'esp01', name:'Arduino+ESP-01', desc:'Uno/Mega + ESP-01', platform:'arduino', wifi:true },
+    { id:'picow', name:'Pico W', desc:'Raspberry Pi Pico W', platform:'python', wifi:true },
+    { id:'rpi', name:'Raspberry Pi', desc:'Pi 3/4/5, Zero W', platform:'python', wifi:false },
+    { id:'opi', name:'Orange Pi', desc:'Orange Pi, Banana Pi', platform:'python', wifi:false },
+];
+
+const I18N = {
+    en:{board:'SELECT BOARD',wifi:'WIFI CREDENTIALS',security:'SECURITY (Arduino only)',sec_none:'None',sec_pairing:'Pairing Code',sec_password:'Password',code:'GENERATED CODE',wifi_hint:'Credentials are only used locally. Nothing is sent anywhere.',ssid_ph:'WiFi SSID',pass_ph:'WiFi Password',devpass_ph:'Device password',subtitle:'Generate ready-to-use code for your device',copy:'Copy',copied:'Copied!'},
+    ja:{board:'ボードを選択',wifi:'WiFi認証情報',security:'セキュリティ（Arduino専用）',sec_none:'なし',sec_pairing:'ペアリングコード',sec_password:'パスワード',code:'生成されたコード',wifi_hint:'認証情報はローカルでのみ使用。送信されません。',ssid_ph:'WiFi SSID（ネットワーク名）',pass_ph:'WiFiパスワード',devpass_ph:'デバイスパスワード',subtitle:'デバイスに合ったコードを生成',copy:'コピー',copied:'コピーしました！'},
+    zh:{board:'选择开发板',wifi:'WIFI 认证信息',security:'安全设置（仅 Arduino）',sec_none:'无',sec_pairing:'配对码',sec_password:'密码',code:'生成的代码',wifi_hint:'认证信息仅在本地使用。',ssid_ph:'WiFi SSID（网络名）',pass_ph:'WiFi 密码',devpass_ph:'设备密码',subtitle:'为你的开发板生成可直接使用的代码',copy:'复制',copied:'已复制！'},
+    ko:{board:'보드 선택',wifi:'WIFI 인증 정보',security:'보안 (Arduino 전용)',sec_none:'없음',sec_pairing:'페어링 코드',sec_password:'비밀번호',code:'생성된 코드',wifi_hint:'인증 정보는 로컬에서만 사용됩니다.',ssid_ph:'WiFi SSID',pass_ph:'WiFi 비밀번호',devpass_ph:'기기 비밀번호',subtitle:'기기에 맞는 코드를 즉시 생성',copy:'복사',copied:'복사됨!'},
+    es:{board:'SELECCIONAR PLACA',wifi:'CREDENCIALES WIFI',security:'SEGURIDAD (solo Arduino)',sec_none:'Ninguna',sec_pairing:'Codigo de emparejamiento',sec_password:'Contrasena',code:'CODIGO GENERADO',wifi_hint:'Las credenciales se usan solo localmente.',ssid_ph:'WiFi SSID',pass_ph:'Contrasena WiFi',devpass_ph:'Contrasena del dispositivo',subtitle:'Genera codigo listo para tu dispositivo',copy:'Copiar',copied:'Copiado!'},
+    'zh-TW':{board:'選擇開發板',wifi:'WIFI 認證資訊',security:'安全性（僅限 Arduino）',sec_none:'無',sec_pairing:'配對碼',sec_password:'密碼',code:'生成的程式碼',wifi_hint:'認證資訊僅在本機使用。',ssid_ph:'WiFi SSID',pass_ph:'WiFi 密碼',devpass_ph:'裝置密碼',subtitle:'為您的裝置生成可直接使用的程式碼',copy:'複製',copied:'已複製！'},
+    th:{board:'เลือกบอร์ด',wifi:'ข้อมูล WIFI',security:'ความปลอดภัย (Arduino เท่านั้น)',sec_none:'ไม่มี',sec_pairing:'รหัสจับคู่',sec_password:'รหัสผ่าน',code:'โค้ดที่สร้างขึ้น',wifi_hint:'ข้อมูลรับรองใช้ในเครื่องเท่านั้น',ssid_ph:'WiFi SSID',pass_ph:'รหัสผ่าน WiFi',devpass_ph:'รหัสผ่านอุปกรณ์',subtitle:'สร้างโค้ดพร้อมใช้งานสำหรับอุปกรณ์ของคุณ',copy:'คัดลอก',copied:'คัดลอกแล้ว!'},
+    vi:{board:'CHỌN BOARD',wifi:'THÔNG TIN WIFI',security:'BẢO MẬT (chỉ Arduino)',sec_none:'Không',sec_pairing:'Mã ghép nối',sec_password:'Mật khẩu',code:'MÃ ĐƯỢC TẠO',wifi_hint:'Thông tin xác thực chỉ được sử dụng cục bộ.',ssid_ph:'WiFi SSID',pass_ph:'Mật khẩu WiFi',devpass_ph:'Mật khẩu thiết bị',subtitle:'Tạo mã sẵn sàng sử dụng cho thiết bị của bạn',copy:'Sao chép',copied:'Đã sao chép!'},
+    id:{board:'PILIH BOARD',wifi:'KREDENSIAL WIFI',security:'KEAMANAN (khusus Arduino)',sec_none:'Tidak ada',sec_pairing:'Kode Pairing',sec_password:'Kata Sandi',code:'KODE YANG DIHASILKAN',wifi_hint:'Kredensial hanya digunakan secara lokal.',ssid_ph:'WiFi SSID',pass_ph:'Kata Sandi WiFi',devpass_ph:'Kata sandi perangkat',subtitle:'Buat kode siap pakai untuk perangkat Anda',copy:'Salin',copied:'Tersalin!'},
+    hi:{board:'बोर्ड चुनें',wifi:'WIFI क्रेडेंशियल',security:'सुरक्षा (केवल Arduino)',sec_none:'कोई नहीं',sec_pairing:'पेयरिंग कोड',sec_password:'पासवर्ड',code:'जनरेट किया गया कोड',wifi_hint:'क्रेडेंशियल केवल स्थानीय रूप से उपयोग किए जाते हैं।',ssid_ph:'WiFi SSID',pass_ph:'WiFi पासवर्ड',devpass_ph:'डिवाइस पासवर्ड',subtitle:'अपने डिवाइस के लिए उपयोग-योग्य कोड जनरेट करें',copy:'कॉपी करें',copied:'कॉपी हो गया!'},
+    de:{board:'BOARD AUSWÄHLEN',wifi:'WIFI-ZUGANGSDATEN',security:'SICHERHEIT (nur Arduino)',sec_none:'Keine',sec_pairing:'Pairing-Code',sec_password:'Passwort',code:'GENERIERTER CODE',wifi_hint:'Zugangsdaten werden nur lokal verwendet.',ssid_ph:'WiFi SSID',pass_ph:'WiFi-Passwort',devpass_ph:'Gerätepasswort',subtitle:'Einsatzbereiten Code für Ihr Gerät generieren',copy:'Kopieren',copied:'Kopiert!'},
+    fr:{board:'SÉLECTIONNER LA CARTE',wifi:'IDENTIFIANTS WIFI',security:'SÉCURITÉ (Arduino uniquement)',sec_none:'Aucune',sec_pairing:"Code d'appairage",sec_password:'Mot de passe',code:'CODE GÉNÉRÉ',wifi_hint:"Les identifiants sont utilisés uniquement en local.",ssid_ph:'WiFi SSID',pass_ph:'Mot de passe WiFi',devpass_ph:"Mot de passe de l'appareil",subtitle:"Générer du code prêt à l'emploi",copy:'Copier',copied:'Copié !'},
+    pt:{board:'SELECIONAR PLACA',wifi:'CREDENCIAIS WIFI',security:'SEGURANÇA (somente Arduino)',sec_none:'Nenhuma',sec_pairing:'Código de Pareamento',sec_password:'Senha',code:'CÓDIGO GERADO',wifi_hint:'As credenciais são usadas apenas localmente.',ssid_ph:'WiFi SSID',pass_ph:'Senha do WiFi',devpass_ph:'Senha do dispositivo',subtitle:'Gere código pronto para uso no seu dispositivo',copy:'Copiar',copied:'Copiado!'},
+    it:{board:'SELEZIONA SCHEDA',wifi:'CREDENZIALI WIFI',security:'SICUREZZA (solo Arduino)',sec_none:'Nessuna',sec_pairing:'Codice di Accoppiamento',sec_password:'Password',code:'CODICE GENERATO',wifi_hint:'Le credenziali vengono utilizzate solo localmente.',ssid_ph:'WiFi SSID',pass_ph:'Password WiFi',devpass_ph:'Password del dispositivo',subtitle:"Genera codice pronto all'uso",copy:'Copia',copied:'Copiato!'},
+    ru:{board:'ВЫБРАТЬ ПЛАТУ',wifi:'УЧЁТНЫЕ ДАННЫЕ WIFI',security:'БЕЗОПАСНОСТЬ (только Arduino)',sec_none:'Нет',sec_pairing:'Код сопряжения',sec_password:'Пароль',code:'СГЕНЕРИРОВАННЫЙ КОД',wifi_hint:'Учётные данные используются только локально.',ssid_ph:'WiFi SSID',pass_ph:'Пароль WiFi',devpass_ph:'Пароль устройства',subtitle:'Сгенерируйте готовый код для вашего устройства',copy:'Копировать',copied:'Скопировано!'},
+    ar:{board:'اختر اللوحة',wifi:'بيانات WIFI',security:'الأمان (Arduino فقط)',sec_none:'بدون',sec_pairing:'رمز الاقتران',sec_password:'كلمة المرور',code:'الكود المُولَّد',wifi_hint:'تُستخدم بيانات الاعتماد محليًا فقط.',ssid_ph:'WiFi SSID',pass_ph:'كلمة مرور WiFi',devpass_ph:'كلمة مرور الجهاز',subtitle:'أنشئ كودًا جاهزًا للاستخدام لجهازك',copy:'نسخ',copied:'تم النسخ!'}
+};
+
+const _nl=navigator.language,_ul=_nl.slice(0,2);
+const ALL_LANGS=['ja','zh','ko','es','th','vi','id','hi','de','fr','pt','it','ru','ar'];
+let lang=_nl.startsWith('zh-TW')||_nl.startsWith('zh-Hant')?'zh-TW':ALL_LANGS.includes(_ul)?_ul:'en';
+let board='esp',sec='none';
+
+const LNAMES={en:'English',ja:'日本語',zh:'简体中文','zh-TW':'繁體中文',ko:'한국어',th:'ไทย',vi:'Tiếng Việt',id:'Indonesia',hi:'हिन्दी',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ar:'العربية'};
+
+// Build language dropdown
+(function(){
+  const list=document.querySelector('.lang-list');
+  Object.entries(LNAMES).forEach(([code,name])=>{
+    const d=document.createElement('div');
+    d.className='px-4 py-2 text-xs font-mono cursor-pointer hover:bg-zinc-800 hover:text-white transition-colors '+(code===lang?'text-primary':'text-zinc-400');
+    d.textContent=name;
+    d.dataset.lang=code;
+    d.addEventListener('click',()=>setLang(code));
+    list.appendChild(d);
+  });
+})();
+
+function setLang(l){
+  lang=l;
+  const t=I18N[lang]||I18N.en;
+  document.querySelectorAll('.lang-list [data-lang]').forEach(el=>{
+    const a=el.dataset.lang===l;
+    el.classList.toggle('text-primary',a);
+    el.classList.toggle('text-zinc-400',!a);
+  });
+  document.getElementById('curLang').textContent=l==='zh-TW'?'繁中':l.toUpperCase();
+  document.querySelector('.lang-list').classList.add('hidden');
+  document.querySelectorAll('[data-i18n]').forEach(el=>{const k=el.dataset.i18n;if(t[k])el.textContent=t[k];});
+  document.querySelectorAll('[data-ph]').forEach(el=>{const k=el.dataset.ph;if(t[k])el.placeholder=t[k];});
+  document.getElementById('subtitle').textContent=t.subtitle;
+  document.getElementById('copyBtn').textContent=t.copy;
+  generate();
+}
+
+document.addEventListener('click',e=>{
+  const dd=document.getElementById('langDD');
+  if(dd&&!dd.contains(e.target))document.querySelector('.lang-list').classList.add('hidden');
+});
+document.querySelector('#langDD button').addEventListener('click',()=>{
+  document.querySelector('.lang-list').classList.toggle('hidden');
+});
+
+function selectBoard(id){
+  board=id;
+  const b=BOARDS.find(x=>x.id===id);
+  document.querySelectorAll('.board-btn').forEach(el=>{
+    const a=el.dataset.id===id;
+    el.classList.toggle('border-primary',a);el.classList.toggle('text-primary',a);
+    el.classList.toggle('border-outline',!a);el.classList.toggle('text-zinc-400',!a);
+  });
+  document.getElementById('wifiSection').style.display=b.wifi?'':'none';
+  document.getElementById('secSection').style.display=b.platform==='arduino'?'':'none';
+  document.getElementById('platformBadge').textContent=b.platform==='arduino'?'Arduino / C++':'Python';
+  generate();
+}
+
+function setSec(s){
+  sec=s;
+  document.querySelectorAll('.sec-btn').forEach(el=>{
+    const a=el.id==='sec-'+s;
+    el.classList.toggle('border-primary',a);el.classList.toggle('text-primary',a);
+    el.classList.toggle('border-outline',!a);el.classList.toggle('text-zinc-500',!a);
+  });
+  document.getElementById('devPassRow').classList.toggle('hidden',s!=='password');
+  generate();
+}
+
+function getSecSnippet(){
+  if(sec==='pairing')return'\n    // Security: Pairing Code\n    ws.enablePairing();';
+  if(sec==='password')return`\n    // Security: Password\n    ws.setPassword("${document.getElementById('devPass').value||'changeme'}");`;
+  return'';
+}
+
+function generate(){
+  const ssid=document.getElementById('ssid').value||'YOUR_WIFI_SSID';
+  const pass=document.getElementById('pass').value||'YOUR_WIFI_PASSWORD';
+  let code='';
+  if(board==='esp'){
+    code=`// Serial Air — ESP Test\n// Board: ESP8266 / ESP32 / C3 / S3\n// #define WS_ENABLE_BLE 1  // Uncomment for BLE\n#include <WirelessSerial.h>\n\nconst char* ssid = "${ssid}";\nconst char* password = "${pass}";\n\nWirelessSerial ws;\nPrint* output;\n\nvoid setup() {\n    Serial.begin(115200);\n    delay(500);\n    WiFi.mode(WIFI_STA);\n    WiFi.begin(ssid, password);\n    Serial.print("Connecting");\n    while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }\n    Serial.println();\n    Serial.print("IP: "); Serial.println(WiFi.localIP());\n\n    ws.begin();${getSecSnippet()}\n    output = ws.mirror(Serial);\n    output->println("Serial Air ready!");\n}\n\nvoid loop() {\n    ws.handle();\n    output->printf("uptime:%lu heap:%u rssi:%d\\n", millis()/1000, ESP.getFreeHeap(), WiFi.RSSI());\n    delay(2000);\n}`;
+  }else if(board==='r4'){
+    code=`// Serial Air — Arduino UNO R4 WiFi\n#include <WirelessSerial.h>\n\nconst char* ssid = "${ssid}";\nconst char* password = "${pass}";\n\nWirelessSerial ws;\nDualPrint* output;\n\nvoid setup() {\n    Serial.begin(115200);\n    delay(1000);\n    WiFi.begin(ssid, password);\n    Serial.print("Connecting");\n    while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }\n    Serial.println();\n    Serial.print("IP: "); Serial.println(WiFi.localIP());\n\n    ws.begin();${getSecSnippet()}\n    output = ws.mirror(Serial);\n    output->println("Serial Air ready!");\n}\n\nvoid loop() {\n    ws.handle();\n    int a0 = analogRead(A0);\n    output->print("analog:"); output->print(a0);\n    output->print(" voltage:"); output->println(a0 * 5.0 / 1023.0);\n    delay(2000);\n}`;
+  }else if(board==='esp01'){
+    code=`// Serial Air — Arduino + ESP-01\n// Wiring: ESP-01 TX->Pin2, RX->Pin3\n#include <SoftwareSerial.h>\nSoftwareSerial esp(2, 3);\n\nvoid espSend(const char* cmd, unsigned long wait=2000) {\n    esp.println(cmd); unsigned long t=millis();\n    while(millis()-t<wait) { if(esp.available()) Serial.write(esp.read()); }\n    Serial.println();\n}\n\nvoid setup() {\n    Serial.begin(115200); esp.begin(9600);\n    espSend("AT+RST", 3000);\n    espSend("AT+CWMODE=1");\n    espSend("AT+CWJAP=\\"${ssid}\\",\\"${pass}\\"", 10000);\n    espSend("AT+CIPMUX=1");\n    espSend("AT+CIPSERVER=1,23");\n    espSend("AT+CIFSR");\n}\n\nvoid loop() {\n    while(esp.available()) Serial.write(esp.read());\n    static unsigned long last=0;\n    if(millis()-last>2000) { last=millis();\n        char msg[60]; snprintf(msg,sizeof(msg),"uptime:%lu analog:%d\\r\\n",millis()/1000,analogRead(A0));\n        char cmd[20]; snprintf(cmd,sizeof(cmd),"AT+CIPSEND=0,%d",(int)strlen(msg));\n        esp.println(cmd); delay(100); esp.print(msg);\n    }\n}`;
+  }else if(board==='picow'){
+    code=`# Serial Air — Raspberry Pi Pico W (MicroPython)\n# Save as main.py\nimport network, socket, time, machine\n\nwlan = network.WLAN(network.STA_IF)\nwlan.active(True)\nwlan.connect("${ssid}", "${pass}")\nprint("Connecting", end="")\nwhile not wlan.isconnected(): print(".", end=""); time.sleep(0.5)\nprint(f"\\nIP: {wlan.ifconfig()[0]}")\n\nserver = socket.socket()\nserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\nserver.bind(("0.0.0.0", 23))\nserver.listen(1)\nserver.settimeout(0.1)\ntemp_sensor = machine.ADC(4)\nclients = []\n\nwhile True:\n    try:\n        cl, addr = server.accept()\n        cl.setblocking(False); clients.append(cl)\n    except: pass\n    reading = temp_sensor.read_u16() * 3.3 / 65535\n    temp = 27 - (reading - 0.706) / 0.001721\n    msg = f"temp:{temp:.1f} uptime:{time.ticks_ms()//1000}s\\n"\n    for cl in clients[:]:\n        try: cl.send(msg.encode())\n        except: clients.remove(cl)\n    time.sleep(1)`;
+  }else{
+    const name=board==='rpi'?'Raspberry Pi':'Orange Pi';
+    code=`#!/usr/bin/env python3\n# Serial Air — ${name} TCP Server\nimport socket, threading, time, os\n\nserver = socket.socket(socket.AF_INET, socket.SOCK_STREAM)\nserver.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)\nserver.bind(("0.0.0.0", 23))\nserver.listen(5)\nprint(f"IP: {socket.gethostbyname(socket.gethostname())}")\nprint("TCP server on port 23\\n")\n\ndef handle(conn, addr):\n    print(f"Client: {addr}")\n    try:\n        t0 = time.time()\n        while True:\n            try:\n                with open("/sys/class/thermal/thermal_zone0/temp") as f: cpu=int(f.read().strip())/1000\n            except: cpu=0\n            conn.sendall(f"temp:{cpu:.1f} load:{os.getloadavg()[0]:.2f} uptime:{int(time.time()-t0)}s\\n".encode())\n            time.sleep(1)\n    except: print(f"Disconnected: {addr}"); conn.close()\n\nwhile True:\n    conn, addr = server.accept()\n    threading.Thread(target=handle, args=(conn,addr), daemon=True).start()`;
+  }
+  document.getElementById('codeOutput').textContent=code;
+}
+
+function copyCode(){
+  navigator.clipboard.writeText(document.getElementById('codeOutput').textContent);
+  const btn=document.getElementById('copyBtn');
+  const t=I18N[lang]||I18N.en;
+  btn.textContent=t.copied;
+  setTimeout(()=>btn.textContent=t.copy,2000);
+}
+
+// Init board grid
+const grid=document.getElementById('boardGrid');
+BOARDS.forEach(b=>{
+  const el=document.createElement('div');
+  el.className='board-btn cursor-pointer p-4 bg-surface-container-lowest border transition-all '+(b.id===board?'border-primary text-primary':'border-outline text-zinc-400')+' hover:border-white hover:text-white';
+  el.dataset.id=b.id;
+  const nameEl=document.createElement('div');
+  nameEl.className='font-mono font-bold text-sm uppercase tracking-tight';
+  nameEl.textContent=b.name;
+  const descEl=document.createElement('div');
+  descEl.className='font-mono text-[10px] text-zinc-600 mt-1';
+  descEl.textContent=b.desc;
+  el.appendChild(nameEl);
+  el.appendChild(descEl);
+  el.addEventListener('click',()=>selectBoard(b.id));
+  grid.appendChild(el);
+});
+
+document.getElementById('ssid').addEventListener('input',generate);
+document.getElementById('pass').addEventListener('input',generate);
+document.getElementById('devPass').addEventListener('input',generate);
+
+if(lang!=='en')setLang(lang);
+generate();
+</script>
+</body>
+</html>
