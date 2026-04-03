@@ -21,9 +21,10 @@
  *   board = esp32-c3-devkitm-1
  */
 
-// Uncomment to enable BLE (adds ~1.2MB flash).
+// BLE is ON by default on ESP32.
 // Requires: Arduino IDE → Tools → Partition Scheme → "Huge APP (3MB No OTA)"
-#define WS_ENABLE_BLE 1
+// To disable BLE (saves ~1.2MB): uncomment the line below
+// #define WS_NO_BLE 1
 
 #include <WiFi.h>
 #include <WirelessSerial.h>

@@ -25,8 +25,8 @@
 
 // ========== Build Options (define BEFORE #include <WirelessSerial.h>) ==========
 //
-// BLE is OFF by default to keep sketch size small.
-//   #define WS_ENABLE_BLE 1      // +1.2MB flash, needs "Huge APP" partition
+// BLE is ON by default on ESP32. To disable (saves ~1.2MB):
+//   #define WS_NO_BLE 1
 //
 // mDNS is ON by default for auto-discovery.
 //   #define WS_NO_MDNS 1         // -29KB, manual IP connection only
@@ -35,11 +35,10 @@
 //   #define WS_NO_SECURITY 1     // Removes enablePairing()/setPassword()
 //
 // Size guide (ESP32):
-//   Default (WiFi + mDNS + Security):  ~935KB (71%)
-//   Lite (WiFi only, no mDNS):         ~884KB (67%)
-//   Full (WiFi + BLE):                ~1.5MB (needs Huge APP)
+//   WiFi only (WS_NO_BLE):   ~935KB (71%) - fits default partition
+//   WiFi + BLE (default):     ~1.5MB - needs Huge APP partition
 // =============================================================================
-#if defined(ESP32) && defined(WS_ENABLE_BLE)
+#if defined(ESP32) && !defined(WS_NO_BLE)
   #define WS_BLE_ENABLED 1
   #if __has_include(<NimBLEDevice.h>)
     #define WS_USE_NIMBLE 1

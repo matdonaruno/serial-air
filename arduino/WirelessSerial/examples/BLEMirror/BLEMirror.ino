@@ -8,8 +8,8 @@
  * Partition: "Huge APP (3MB No OTA)" required
  */
 
-// Enable BLE support (adds ~1.2MB flash)
-#define WS_ENABLE_BLE 1
+// BLE is ON by default on ESP32
+// Requires: Partition Scheme -> "Huge APP (3MB No OTA)"
 
 #include <WiFi.h>
 #include <WirelessSerial.h>
