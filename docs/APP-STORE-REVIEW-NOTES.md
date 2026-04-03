@@ -51,3 +51,15 @@ If you do not have an ESP32/ESP8266:
 3. Navigate to Monitor tab → shows "No device connected" gracefully
 4. Navigate to Commands tab → create/manage macros without a connection
 5. Settings → all options functional
+
+---
+
+## Submission TODO
+
+- [ ] デモ動画撮影（ESP32実機接続フロー）
+- [ ] App Store Connectメタデータ入力（説明文、キーワード、スクリーンショット）
+- [ ] eas.json の appleId, ascAppId, appleTeamId 記入
+- [ ] `eas build --platform ios` でプロダクションビルド
+- [ ] `eas submit --platform ios` でApp Storeに提出
+- [ ] App Store Connectで審査ノート（このファイルの内容）を貼り付け
+- [ ] Privacy Nutrition Label: "Data Not Collected" を選択
