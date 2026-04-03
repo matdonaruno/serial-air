@@ -36,6 +36,8 @@ tailwind.config = {
 <style>
 .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
 body { background-color: #000000; color: #e2e2e2; }
+#langDD.open .lang-list { display: block !important; }
+.lang-list div.active { color: #FF6B35 !important; }
 .terminal-scroll::-webkit-scrollbar { width: 4px; }
 .terminal-scroll::-webkit-scrollbar-track { background: #0e0e0e; }
 .terminal-scroll::-webkit-scrollbar-thumb { background: #414755; }
@@ -52,12 +54,19 @@ body { background-color: #000000; color: #e2e2e2; }
 <div class="flex justify-between items-center px-6 py-4 max-w-[1440px] mx-auto">
   <a href="/" class="font-mono font-bold text-xl tracking-tighter text-white">SERIAL_AIR</a>
   <div class="hidden md:flex gap-8 items-center">
-    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="#features">Features</a>
-    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="#specs">Specifications</a>
-    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="https://github.com/matdonaruno/serial-air" target="_blank">Documentation</a>
+    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="#features" data-t="nav_features">Features</a>
+    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="#specs" data-t="nav_specs">Specifications</a>
+    <a class="font-body font-medium tracking-tight text-sm uppercase text-zinc-400 hover:text-orange-400 transition-colors" href="https://github.com/matdonaruno/serial-air" target="_blank" data-t="nav_docs">Documentation</a>
   </div>
   <div class="flex gap-3 items-center">
-    <a href="/lp-codegen.html" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">Test Code</a>
+    <div class="relative" id="langDD">
+      <button onclick="this.parentElement.classList.toggle('open')" class="flex items-center gap-2 px-3 py-2 border border-outline text-zinc-400 text-xs font-mono uppercase tracking-widest hover:text-white hover:border-white transition-all">
+        <span class="material-symbols-outlined text-sm">language</span>
+        <span id="curLang">EN</span>
+      </button>
+      <div class="lang-list hidden absolute right-0 top-full mt-2 bg-surface-container-lowest border border-outline w-44 max-h-72 overflow-y-auto z-50"></div>
+    </div>
+    <a href="/lp-codegen.html" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all" data-t="nav_testcode">Test Code</a>
     <a href="#" class="px-4 py-2 bg-primary text-white text-xs font-bold uppercase tracking-widest hover:brightness-110 active:scale-95 transition-all">App Store</a>
     <a href="#" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">Google Play</a>
     <a href="https://github.com/matdonaruno/serial-air" target="_blank" class="hidden md:block px-4 py-2 border border-outline text-zinc-400 text-xs font-bold uppercase tracking-widest hover:text-white hover:border-white transition-all">GitHub</a>
@@ -71,14 +80,14 @@ body { background-color: #000000; color: #e2e2e2; }
 <section class="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
   <div class="z-10 text-center max-w-4xl">
     <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 text-white uppercase leading-[0.9]">
-      Precision<br/>Terminal<br/>Control.
+      <span data-t="hero_h1">Precision<br/>Terminal<br/>Control.</span>
     </h1>
     <p class="font-mono text-zinc-500 text-sm md:text-base tracking-widest uppercase mb-12">
-      Wireless Serial Monitor for ESP &amp; Raspberry Pi // v1.2.0
+      <span data-t="hero_sub">Wireless Serial Monitor for ESP &amp; Raspberry Pi // v1.2.0</span>
     </p>
     <div class="flex flex-col sm:flex-row justify-center gap-4">
-      <a href="#" class="bg-primary px-8 py-4 text-white font-bold uppercase tracking-tighter text-lg hover:brightness-110 transition-all text-center">Download Free</a>
-      <a href="/lp-codegen.html" class="border border-outline px-8 py-4 text-zinc-400 font-bold uppercase tracking-tighter text-lg hover:text-white hover:border-white transition-all text-center">Generate Test Code</a>
+      <a href="#" class="bg-primary px-8 py-4 text-white font-bold uppercase tracking-tighter text-lg hover:brightness-110 transition-all text-center" data-t="hero_btn1">Download Free</a>
+      <a href="/lp-codegen.html" class="border border-outline px-8 py-4 text-zinc-400 font-bold uppercase tracking-tighter text-lg hover:text-white hover:border-white transition-all text-center" data-t="hero_btn2">Generate Test Code</a>
     </div>
   </div>
   <div class="mt-16 w-full max-w-6xl relative aspect-video">
@@ -92,27 +101,27 @@ body { background-color: #000000; color: #e2e2e2; }
 <div class="max-w-7xl mx-auto px-6">
   <div class="grid md:grid-cols-2 gap-20 items-center">
     <div>
-      <h2 class="text-5xl font-extrabold tracking-tighter text-white mb-8 leading-tight">DITCH THE<br/>USB CABLE.</h2>
+      <h2 class="text-5xl font-extrabold tracking-tighter text-white mb-8 leading-tight"><span data-t="problem_h2">DITCH THE<br/>USB CABLE.</span></h2>
       <div class="space-y-6">
         <div class="flex gap-4 items-start">
           <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">cable</span>
           <div>
-            <h4 class="font-bold text-white uppercase tracking-tight">No more port failures</h4>
-            <p class="text-zinc-500 text-sm">Eliminate mechanical wear on USB ports through high-speed wireless serial tunneling over WiFi TCP.</p>
+            <h4 class="font-bold text-white uppercase tracking-tight" data-t="problem_t1">No more port failures</h4>
+            <p class="text-zinc-500 text-sm"><span data-t="problem_d1">Eliminate mechanical wear on USB ports through high-speed wireless serial tunneling over WiFi TCP.</span></p>
           </div>
         </div>
         <div class="flex gap-4 items-start">
           <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">distance</span>
           <div>
-            <h4 class="font-bold text-white uppercase tracking-tight">Remote Field Access</h4>
-            <p class="text-zinc-500 text-sm">Debug devices across the room or across the factory floor. No laptop required — just your phone.</p>
+            <h4 class="font-bold text-white uppercase tracking-tight" data-t="problem_t2">Remote Field Access</h4>
+            <p class="text-zinc-500 text-sm"><span data-t="problem_d2">Debug devices across the room or across the factory floor. No laptop required — just your phone.</span></p>
           </div>
         </div>
         <div class="flex gap-4 items-start">
           <span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">smartphone</span>
           <div>
-            <h4 class="font-bold text-white uppercase tracking-tight">Phone is your terminal</h4>
-            <p class="text-zinc-500 text-sm">Field testing, quick checks, demos — your iPhone or Android becomes a full serial monitor.</p>
+            <h4 class="font-bold text-white uppercase tracking-tight" data-t="problem_t3">Phone is your terminal</h4>
+            <p class="text-zinc-500 text-sm"><span data-t="problem_d3">Field testing, quick checks, demos — your iPhone or Android becomes a full serial monitor.</span></p>
           </div>
         </div>
       </div>
@@ -135,16 +144,16 @@ body { background-color: #000000; color: #e2e2e2; }
   <div class="grid md:grid-cols-3 gap-px bg-outline-variant/30 border border-outline-variant/30">
     <div class="bg-black p-12">
       <span class="font-mono text-primary text-6xl font-thin mb-8 block">01</span>
-      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">Install Library</h3>
-      <p class="text-zinc-500 text-sm mb-8">Add WirelessSerial to your ESP via Arduino Library Manager. For Raspberry Pi, use pip or a simple TCP script.</p>
+      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4" data-t="step1_h">Install Library</h3>
+      <p class="text-zinc-500 text-sm mb-8"><span data-t="step1_p">Add WirelessSerial to your ESP via Arduino Library Manager. For Raspberry Pi, use pip or a simple TCP script.</span></p>
       <div class="font-mono text-[10px] bg-surface-container-lowest p-4 text-primary-container border border-primary/20">
         #include &lt;WirelessSerial.h&gt;
       </div>
     </div>
     <div class="bg-black p-12">
       <span class="font-mono text-primary text-6xl font-thin mb-8 block">02</span>
-      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">Connect App</h3>
-      <p class="text-zinc-500 text-sm mb-8">Serial Air automatically discovers devices on your local network using mDNS / Bonjour. Zero configuration.</p>
+      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4" data-t="step2_h">Connect App</h3>
+      <p class="text-zinc-500 text-sm mb-8"><span data-t="step2_p">Serial Air automatically discovers devices on your local network using mDNS / Bonjour. Zero configuration.</span></p>
       <div class="font-mono text-[10px] bg-surface-container-lowest p-4 text-zinc-500 border border-outline-variant/20">
         SCANNING_NETWORK...<br/>
         FOUND: [ESP32_SERIAL_AIR]
@@ -152,8 +161,8 @@ body { background-color: #000000; color: #e2e2e2; }
     </div>
     <div class="bg-black p-12">
       <span class="font-mono text-primary text-6xl font-thin mb-8 block">03</span>
-      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4">Stream Data</h3>
-      <p class="text-zinc-500 text-sm mb-8">Instant bidirectional serial communication with sub-50ms latency over local WiFi. Send commands, receive logs.</p>
+      <h3 class="text-2xl font-bold text-white uppercase tracking-tighter mb-4" data-t="step3_h">Stream Data</h3>
+      <p class="text-zinc-500 text-sm mb-8"><span data-t="step3_p">Instant bidirectional serial communication with sub-50ms latency over local WiFi. Send commands, receive logs.</span></p>
       <div class="flex justify-between items-center bg-surface-container-lowest p-4 border border-outline-variant/20">
         <div class="h-2 w-2 bg-primary rounded-full animate-pulse"></div>
         <div class="font-mono text-[10px] text-zinc-500 uppercase tracking-widest">LIVE_CONNECTION</div>
@@ -167,7 +176,7 @@ body { background-color: #000000; color: #e2e2e2; }
 <section class="py-32 bg-surface-container-low">
 <div class="max-w-5xl mx-auto px-6">
   <div class="mb-12">
-    <h2 class="text-3xl font-bold text-white uppercase tracking-tighter">Universal Integration</h2>
+    <h2 class="text-3xl font-bold text-white uppercase tracking-tighter" data-t="code_h">Universal Integration</h2>
     <p class="text-zinc-500 font-mono text-sm tracking-widest">TWO_LINES_OF_CODE / ANY_PLATFORM</p>
   </div>
   <div class="bg-surface-container-lowest border border-outline-variant shadow-2xl">
@@ -244,38 +253,38 @@ conn, addr = server.<span class="text-white">accept</span>()
   <div class="grid md:grid-cols-3 gap-8">
     <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary mb-6 text-3xl">wifi</span>
-      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Auto Discovery</h4>
-      <p class="text-zinc-500 text-sm mb-6">Devices found automatically via Bonjour/mDNS. No IP address configuration needed.</p>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight" data-t="feat1_h">Auto Discovery</h4>
+      <p class="text-zinc-500 text-sm mb-6"><span data-t="feat1_p">Devices found automatically via Bonjour/mDNS. No IP address configuration needed.</span></p>
       <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">mdns_broadcast</span>
     </div>
     <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary mb-6 text-3xl">analytics</span>
-      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Serial Plotter</h4>
-      <p class="text-zinc-500 text-sm mb-6">Visualize numeric data as real-time graphs. Toggle between log view and plot view.</p>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight" data-t="feat2_h">Serial Plotter</h4>
+      <p class="text-zinc-500 text-sm mb-6"><span data-t="feat2_p">Visualize numeric data as real-time graphs. Toggle between log view and plot view.</span></p>
       <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">60hz_refresh</span>
     </div>
     <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary mb-6 text-3xl">lock</span>
-      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Device Security</h4>
-      <p class="text-zinc-500 text-sm mb-6">Optional pairing codes, passwords, and device fingerprints. Connect only trusted devices.</p>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight" data-t="feat3_h">Device Security</h4>
+      <p class="text-zinc-500 text-sm mb-6"><span data-t="feat3_p">Optional pairing codes, passwords, and device fingerprints. Connect only trusted devices.</span></p>
       <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">authenticated_access</span>
     </div>
     <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary mb-6 text-3xl">search</span>
-      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Search &amp; Filter</h4>
-      <p class="text-zinc-500 text-sm mb-6">Find specific log entries instantly. Filter by keyword in real time across thousands of lines.</p>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight" data-t="feat4_h">Search &amp; Filter</h4>
+      <p class="text-zinc-500 text-sm mb-6"><span data-t="feat4_p">Find specific log entries instantly. Filter by keyword in real time across thousands of lines.</span></p>
       <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">instant_grep</span>
     </div>
     <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary mb-6 text-3xl">terminal</span>
-      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Command Macros</h4>
-      <p class="text-zinc-500 text-sm mb-6">Save frequently used commands and send them with a single tap. Bidirectional communication.</p>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight" data-t="feat5_h">Command Macros</h4>
+      <p class="text-zinc-500 text-sm mb-6"><span data-t="feat5_p">Save frequently used commands and send them with a single tap. Bidirectional communication.</span></p>
       <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">one_tap_execute</span>
     </div>
     <div class="bg-black border border-outline-variant/40 p-10 group hover:border-primary transition-colors">
       <span class="material-symbols-outlined text-primary mb-6 text-3xl">sync</span>
-      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight">Auto Reconnect</h4>
-      <p class="text-zinc-500 text-sm mb-6">Seamless recovery from network interruptions. Never miss a log line.</p>
+      <h4 class="text-xl font-bold text-white mb-2 uppercase tracking-tight" data-t="feat6_h">Auto Reconnect</h4>
+      <p class="text-zinc-500 text-sm mb-6"><span data-t="feat6_p">Seamless recovery from network interruptions. Never miss a log line.</span></p>
       <span class="font-mono text-[10px] text-zinc-700 tracking-widest uppercase group-hover:text-primary-container">zero_downtime</span>
     </div>
   </div>
@@ -286,9 +295,9 @@ conn, addr = server.<span class="text-white">accept</span>()
 <section class="py-32 bg-surface-container-lowest">
 <div class="max-w-5xl mx-auto px-6 text-center">
   <span class="material-symbols-outlined text-primary text-5xl mb-8 block">code</span>
-  <h2 class="text-5xl font-extrabold tracking-tighter text-white mb-6 uppercase leading-tight">GENERATE<br/>TEST CODE.</h2>
-  <p class="font-mono text-zinc-500 text-sm tracking-widest uppercase mb-4">SELECT_BOARD // ENTER_WIFI // GET_SKETCH</p>
-  <p class="text-zinc-400 text-base max-w-xl mx-auto mb-12">Pick your board, enter WiFi credentials, and get a ready-to-upload sketch. Supports ESP8266, ESP32, Arduino UNO R4, Raspberry Pi, and more.</p>
+  <h2 class="text-5xl font-extrabold tracking-tighter text-white mb-6 uppercase leading-tight"><span data-t="codegen_h">GENERATE<br/>TEST CODE.</span></h2>
+  <p class="font-mono text-zinc-500 text-sm tracking-widest uppercase mb-4"><span data-t="codegen_sub">SELECT_BOARD // ENTER_WIFI // GET_SKETCH</span></p>
+  <p class="text-zinc-400 text-base max-w-xl mx-auto mb-12"><span data-t="codegen_p">Pick your board, enter WiFi credentials, and get a ready-to-upload sketch. Supports ESP8266, ESP32, Arduino UNO R4, Raspberry Pi, and more.</span></p>
   <a href="/lp-codegen.html" class="inline-flex items-center gap-3 bg-primary px-12 py-5 text-white font-bold uppercase tracking-widest text-sm hover:brightness-110 transition-all">
     <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">terminal</span>
     Open Code Generator
@@ -318,8 +327,8 @@ conn, addr = server.<span class="text-white">accept</span>()
 <!-- Comparison -->
 <section id="specs" class="py-32 bg-black">
 <div class="max-w-4xl mx-auto px-6">
-  <h2 class="text-center text-3xl font-bold text-white mb-4 tracking-tighter uppercase">COMPATIBILITY_MATRIX</h2>
-  <p class="text-center text-zinc-500 font-mono text-sm tracking-widest mb-16">SUPPORTED_HARDWARE</p>
+  <h2 class="text-center text-3xl font-bold text-white mb-4 tracking-tighter uppercase" data-t="compat_h">COMPATIBILITY_MATRIX</h2>
+  <p class="text-center text-zinc-500 font-mono text-sm tracking-widest mb-16" data-t="compat_sub">SUPPORTED_HARDWARE</p>
   <div class="border border-outline-variant overflow-hidden mb-20">
     <table class="w-full text-left font-mono text-sm">
       <thead>
@@ -342,8 +351,8 @@ conn, addr = server.<span class="text-white">accept</span>()
     </table>
   </div>
 
-  <h2 class="text-center text-3xl font-bold text-white mb-4 tracking-tighter uppercase">SPEC_COMPARISON</h2>
-  <p class="text-center text-zinc-500 font-mono text-sm tracking-widest mb-16">SERIAL_AIR vs ALTERNATIVES</p>
+  <h2 class="text-center text-3xl font-bold text-white mb-4 tracking-tighter uppercase" data-t="comp_h">SPEC_COMPARISON</h2>
+  <p class="text-center text-zinc-500 font-mono text-sm tracking-widest mb-16"><span data-t="comp_sub">SERIAL_AIR vs ALTERNATIVES</span></p>
   <div class="border border-outline-variant overflow-hidden">
     <table class="w-full text-left font-mono text-sm">
       <thead>
@@ -370,22 +379,22 @@ conn, addr = server.<span class="text-white">accept</span>()
 <!-- FAQ -->
 <section class="py-32">
 <div class="max-w-3xl mx-auto px-6">
-  <h2 class="text-3xl font-bold text-white mb-12 uppercase tracking-tighter">System FAQ</h2>
+  <h2 class="text-3xl font-bold text-white mb-12 uppercase tracking-tighter" data-t="faq_h">System FAQ</h2>
   <div class="space-y-4">
     <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
-      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">Does it require an internet connection?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
-      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">No. Serial Air works entirely over your local WiFi network. No internet, no cloud, no accounts. All data stays on your device.</p></div>
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm" data-t="faq_q1">Does it require an internet connection?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4"><span data-t="faq_a1">No. Serial Air works entirely over your local WiFi network. No internet, no cloud, no accounts. All data stays on your device.</span></p></div>
     </div>
     <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
-      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">What is the memory footprint on ESP8266?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
-      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">Under 2KB RAM (excluding WiFi stack). The library is designed for ESP8266's 80KB RAM constraint. Flash usage is under 8KB.</p></div>
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm" data-t="faq_q2">What is the memory footprint on ESP8266?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4"><span data-t="faq_a2">Under 2KB RAM (excluding WiFi stack). The library is designed for ESP8266's 80KB RAM constraint. Flash usage is under 8KB.</span></p></div>
     </div>
     <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
-      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">Can I use it with Arduino IDE?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm" data-t="faq_q3">Can I use it with Arduino IDE?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
       <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">Yes. Install WirelessSerial from the Arduino Library Manager. Works with Arduino IDE, PlatformIO, and CLI. Use our <a href="/lp-codegen.html" class="text-primary hover:underline">Code Generator</a> for instant setup.</p></div>
     </div>
     <div class="faq-item border border-outline-variant/30 p-6 cursor-pointer" onclick="this.classList.toggle('open')">
-      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm">Is the serial data encrypted?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
+      <div class="flex justify-between items-center"><span class="font-bold text-white uppercase text-sm" data-t="faq_q4">Is the serial data encrypted?</span><span class="material-symbols-outlined text-zinc-600 faq-icon">add</span></div>
       <div class="faq-answer"><p class="text-zinc-500 text-sm mt-4">Serial data is transmitted as plaintext over your local network. WiFi encryption (WPA2/WPA3) protects it in transit. The app includes optional pairing codes and passwords for device authentication.</p></div>
     </div>
   </div>
@@ -395,8 +404,8 @@ conn, addr = server.<span class="text-white">accept</span>()
 <!-- Final CTA -->
 <section class="py-40 bg-black text-center relative overflow-hidden">
   <div class="z-10 relative">
-    <h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter text-white mb-8 uppercase leading-none">UPGRADE YOUR<br/>WORKFLOW.</h2>
-    <p class="font-mono text-zinc-500 mb-12 tracking-widest uppercase">FREE_DOWNLOAD // OPEN_SOURCE_LIBRARY</p>
+    <h2 class="text-5xl md:text-7xl font-extrabold tracking-tighter text-white mb-8 uppercase leading-none"><span data-t="cta_h">UPGRADE YOUR<br/>WORKFLOW.</span></h2>
+    <p class="font-mono text-zinc-500 mb-12 tracking-widest uppercase"><span data-t="cta_sub">FREE_DOWNLOAD // OPEN_SOURCE_LIBRARY</span></p>
     <div class="flex flex-col sm:flex-row justify-center gap-4">
       <a href="#" class="bg-white text-black px-12 py-5 font-bold uppercase tracking-widest text-sm flex items-center justify-center gap-3 hover:bg-zinc-200 transition-colors">
         <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">ios</span>

@@ -21,19 +21,12 @@ export default function RootLayout() {
   useEffect(() => {
     async function prepare() {
       try {
-        console.log('[App] Loading settings...');
         await useSettingsStore.getState().loadSettings();
-        console.log('[App] Loading recent connections...');
         await useDiscoveryStore.getState().loadRecentConnections();
-        console.log('[App] Loading app state...');
         await useAppStore.getState().loadState();
-        console.log('[App] Loading purchase status...');
         await usePurchaseStore.getState().loadStatus();
-        console.log('[App] Loading trusted devices...');
         await useTrustStore.getState().loadTrustedDevices();
-        console.log('[App] Loading macros...');
         await useMacroStore.getState().loadMacros();
-        console.log('[App] All loaded, showing app');
         setReady(true);
         await SplashScreen.hideAsync();
       } catch (e) {

@@ -30,8 +30,8 @@
 #include <math.h>
 
 // ===== EDIT THESE =====
-const char* WIFI_SSID = "BBIQRT-2G-pe388f";
-const char* WIFI_PASS = "8c7f21e9c1edd";
+const char* WIFI_SSID = "L01_OC8FFF168D4D";
+const char* WIFI_PASS = "3e5ta2y1579m4jt";
 // ======================
 
 WirelessSerial ws;
