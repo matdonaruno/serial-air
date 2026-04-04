@@ -80,6 +80,8 @@ export class TcpConnection implements Connection {
 
         for (const line of lines) {
           if (line.length > 0) {
+            // Filter out protocol messages (start with \x01)
+            if (line.charCodeAt(0) === 1) continue;
             this.events.onData(line);
           }
         }

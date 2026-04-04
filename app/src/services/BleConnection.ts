@@ -110,6 +110,7 @@ export class BleConnection implements Connection {
 
     for (const line of lines) {
       if (line.length > 0) {
+        if (line.charCodeAt(0) === 1) continue;
         this.events.onData(line);
       }
     }
