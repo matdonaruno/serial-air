@@ -15,7 +15,15 @@
  * Arduino IDE Setup:
  *   Board: "ESP32C3 Dev Module"
  *   USB CDC On Boot: Enabled
+ *   Partition Scheme: "Huge APP (3MB No OTA)" if BLE enabled
  *   Upload Speed: 921600
+ *
+ * WiFi Tips:
+ *   - If "Association refused": wait 10s+ between resets
+ *   - WPA (not WPA2) router: WiFi.setMinSecurity() is set below
+ *   - ESP32-C3 Super Mini: weak antenna, keep close to router
+ *   - WiFi.setAutoReconnect(true): auto-retry in background
+ *   - Check WiFi.RSSI() — above -70dBm recommended
  *
  * PlatformIO:
  *   board = esp32-c3-devkitm-1
@@ -23,16 +31,21 @@
 
 // BLE is ON by default on ESP32.
 // Requires: Arduino IDE → Tools → Partition Scheme → "Huge APP (3MB No OTA)"
-// To disable BLE (saves ~1.2MB): uncomment the line below
-// #define WS_NO_BLE 1
+// WiFi debug: BLE disabled to test WiFi alone
+#define WS_NO_BLE 1
 
 #include <WiFi.h>
 #include <WirelessSerial.h>
 #include <math.h>
 
 // ===== EDIT THESE =====
-const char* WIFI_SSID = "L01_OC8FFF168D4D";
-const char* WIFI_PASS = "3e5ta2y1579m4jt";
+const char* WIFI_SSID = "L01_0C8FFF168D4D";
+const char* WIFI_PASS = "3e5ta2y1679m4jt";
+// ======================
+
+// ===== EDIT THESE =====
+//const char* WIFI_SSID = "iPhone 13 mini";
+//const char* WIFI_PASS = "surfingmat";
 // ======================
 
 WirelessSerial ws;
@@ -61,30 +74,35 @@ void setup() {
 
     Serial.println();
     Serial.println("╔══════════════════════════════════╗");
-    Serial.println("║  Serial Air Test Firmware v0.8   ║");
+    Serial.println("║  Serial Air Test Firmware v2.1   ║");
     Serial.println("║  ESP32-C3 Super Mini             ║");
     Serial.println("╚══════════════════════════════════╝");
     Serial.println();
 
     // STA mode — connect to WiFi router
-    Serial.printf("Connecting to WiFi: %s", WIFI_SSID);
+    Serial.printf("WiFi SSID: [%s] (len=%d)\n", WIFI_SSID, strlen(WIFI_SSID));
+    Serial.printf("WiFi PASS: [%s] (len=%d)\n", WIFI_PASS, strlen(WIFI_PASS));
     WiFi.mode(WIFI_STA);
-    // Fix for ESP32-C3 Super Mini: lower TX power to stabilize WiFi
-    // Default 20dBm overloads the weak power supply on this board
-    WiFi.setTxPower(WIFI_POWER_8_5dBm);
+    WiFi.disconnect(true);
+    delay(500);
+
+    // Allow WPA1 connections (ESP32 defaults to WPA2 minimum)
+    WiFi.setMinSecurity(WIFI_AUTH_WPA_PSK);
+    WiFi.disconnect(true, true);
+    delay(1000);
+    Serial.printf("Connecting to %s (will keep retrying in background)...\n", WIFI_SSID);
+    WiFi.setAutoReconnect(true);
     WiFi.begin(WIFI_SSID, WIFI_PASS);
 
-    int attempts = 0;
-    while (WiFi.status() != WL_CONNECTED && attempts < 40) {
-        delay(500);
+    // Wait up to 15 seconds for initial connection
+    for (int t = 0; t < 15 && WiFi.status() != WL_CONNECTED; t++) {
+        delay(1000);
         Serial.print(".");
-        attempts++;
-        digitalWrite(LED_BUILTIN, attempts % 2 == 0 ? LOW : HIGH);
     }
     Serial.println();
 
     if (WiFi.status() != WL_CONNECTED) {
-        Serial.println("warn: WiFi failed — running BLE only");
+        Serial.printf("WiFi not ready yet (status=%d) - starting anyway, will connect in background\n", WiFi.status());
     } else {
         Serial.printf("ok: Connected! IP: %s\n", WiFi.localIP().toString().c_str());
         Serial.printf("RSSI: %d dBm\n", WiFi.RSSI());
@@ -99,9 +117,18 @@ void setup() {
     Serial.printf("TCP: port 23\n");
     Serial.printf("mDNS: serial-air-test.local\n");
 
-    // Start BLE UART service
-    ws.beginBLE();
-    Serial.println("BLE: Nordic UART Service active");
+#if WS_BLE_ENABLED
+    if (WiFi.status() == WL_CONNECTED) {
+        ws.beginBLE();
+        Serial.println("BLE: active");
+        Serial.printf("Heap after BLE: %d\n", ESP.getFreeHeap());
+    } else {
+        ws.beginBLE();
+        Serial.println("BLE: active (WiFi off)");
+    }
+#else
+    Serial.println("BLE: disabled (WS_NO_BLE)");
+#endif
 
     // Mirror: Serial output → WiFi + BLE
     output = ws.mirror(Serial);
@@ -144,12 +171,19 @@ void loop() {
         int m = (uptime % 3600) / 60;
         int s = uptime % 60;
 
-        output->printf("--- status: uptime=%02d:%02d:%02d heap=%d wifi=%ddBm tcp=%d ble=%d ---\n",
+        output->printf("--- status: uptime=%02d:%02d:%02d IP=%s heap=%d wifi=%ddBm tcp=%d ble=%d ---\n",
                        h, m, s,
+                       WiFi.localIP().toString().c_str(),
                        ESP.getFreeHeap(),
                        WiFi.RSSI(),
                        ws.clientCount(),
-                       ws.bleClientCount());
+
+#if WS_BLE_ENABLED
+                       ws.bleClientCount()
+#else
+                       0
+#endif
+                       );
 
         // Blink LED briefly on status update
         digitalWrite(LED_BUILTIN, LOW);
@@ -173,7 +207,11 @@ void loop() {
             output->printf("Heap: %d bytes\n", ESP.getFreeHeap());
             output->printf("WiFi: %s (%d dBm)\n", WiFi.localIP().toString().c_str(), WiFi.RSSI());
             output->printf("TCP clients: %d\n", ws.clientCount());
+            #if WS_BLE_ENABLED
             output->printf("BLE clients: %d\n", ws.bleClientCount());
+#else
+            output->println("BLE: disabled");
+#endif
             output->printf("Buffer: %d bytes\n", ws.bufferedBytes());
         }
         else if (cmd == "led on") {

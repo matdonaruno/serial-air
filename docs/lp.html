@@ -472,9 +472,10 @@ ar:{hero_h1:'تحكم<br/>طرفي<br/>دقيق.',hero_sub:'مراقب Serial ل
 
 // Keys that contain HTML (br tags) - these use a safe setter since values are hardcoded above
 const HTML_KEYS=['hero_h1','problem_h2','codegen_h','cta_h'];
+const _saved=localStorage.getItem('sa_lang');
 const _nl=navigator.language,_ul=_nl.slice(0,2);
 const ALL_L=['ja','zh','ko','es','th','vi','id','hi','de','fr','pt','it','ru','ar'];
-let curLang=_nl.startsWith('zh-TW')||_nl.startsWith('zh-Hant')?'zh-TW':ALL_L.includes(_ul)?_ul:'en';
+let curLang=_saved||(_nl.startsWith('zh-TW')||_nl.startsWith('zh-Hant')?'zh-TW':ALL_L.includes(_ul)?_ul:'en');
 
 // Build language dropdown items
 (function(){
@@ -492,6 +493,7 @@ let curLang=_nl.startsWith('zh-TW')||_nl.startsWith('zh-Hant')?'zh-TW':ALL_L.inc
 
 function setPageLang(l){
   curLang=l;
+  localStorage.setItem('sa_lang',l);
   var t=T[l]||T.en;
   document.querySelectorAll('[data-t]').forEach(function(el){
     var k=el.dataset.t;

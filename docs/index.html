@@ -4395,6 +4395,7 @@ conn, addr = server.<span class="fn">accept</span>()
         // Language switching
         const LANG_NAMES = {en:'English',ja:'日本語',zh:'简体中文','zh-TW':'繁體中文',ko:'한국어',th:'ไทย',vi:'Tiếng Việt',id:'Indonesia',hi:'हिन्दी',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ar:'العربية'};
         function switchLang(lang) {
+            localStorage.setItem('sa_lang', lang);
             document.querySelectorAll('[data-lang]').forEach(el => el.classList.remove('active'));
             let target = document.querySelector(`[data-lang="${lang}"]`);
             if (!target && lang.includes('-')) target = document.querySelector(`[data-lang="${lang.slice(0,2)}"]`);
@@ -4410,11 +4411,13 @@ conn, addr = server.<span class="fn">accept</span>()
             document.documentElement.lang = lang;
             if (lang === 'ar') document.documentElement.dir = 'rtl'; else document.documentElement.dir = 'ltr';
         }
-        // Auto-detect language
+        // Auto-detect language (localStorage > navigator.language)
+        const _savedLang = localStorage.getItem('sa_lang');
         const _navLang = navigator.language;
         const _uLang = _navLang.slice(0, 2);
         const _allLangs = ['ja','zh','ko','es','th','vi','id','hi','de','fr','pt','it','ru','ar'];
-        if (_navLang.startsWith('zh-TW') || _navLang.startsWith('zh-Hant')) switchLang('zh-TW');
+        if (_savedLang) switchLang(_savedLang);
+        else if (_navLang.startsWith('zh-TW') || _navLang.startsWith('zh-Hant')) switchLang('zh-TW');
         else if (_allLangs.includes(_uLang)) switchLang(_uLang);
 
         // Code tab switching

@@ -187,6 +187,54 @@ Copy to your Arduino libraries directory:
 | ESP32-S3 | ✅ | ✅ | |
 | Arduino UNO R4 WiFi | ✅ | — | No mDNS, manual IP connection |
 
+## WiFi Troubleshooting
+
+If your ESP32 fails to connect to WiFi, try these solutions:
+
+### "Association refused" / status=6
+Some routers temporarily block rapid reconnections. Solutions:
+- **Wait and retry**: Don't press RST rapidly. Wait 10+ seconds between attempts.
+- **Auto-reconnect**: Use `WiFi.setAutoReconnect(true)` — ESP32 will keep trying in background.
+- **Progressive delay**: Add increasing delays between retry attempts.
+
+### WPA (not WPA2) routers
+ESP32 defaults to WPA2 minimum security. For older WPA routers:
+```cpp
+WiFi.setMinSecurity(WIFI_AUTH_WPA_PSK);
+```
+
+### ESP32-C3 Super Mini weak signal
+The PCB antenna on C3 Super Mini is weak. Solutions:
+- Lower TX power: `WiFi.setTxPower(WIFI_POWER_8_5dBm)` (counterintuitive but stabilizes power supply)
+- Place closer to router (within 2m for testing)
+- Use `WiFi.RSSI()` to check signal strength (above -70dBm recommended)
+
+### Connection template
+```cpp
+WiFi.mode(WIFI_STA);
+WiFi.setMinSecurity(WIFI_AUTH_WPA_PSK);  // Support WPA1 routers
+WiFi.disconnect(true, true);              // Clean slate
+delay(1000);
+WiFi.setAutoReconnect(true);              // Keep trying if disconnected
+WiFi.begin(ssid, password);
+
+// Don't block — let it connect in background
+for (int i = 0; i < 15; i++) {
+    if (WiFi.status() == WL_CONNECTED) break;
+    delay(1000);
+}
+// App starts regardless — WiFi may connect later
+```
+
+### WiFi status codes
+| Code | Meaning | Action |
+|------|---------|--------|
+| 0 | WL_IDLE_STATUS | Still connecting, wait |
+| 1 | WL_NO_SSID_AVAIL | SSID not found, check name |
+| 3 | WL_CONNECTED | Success |
+| 4 | WL_CONNECT_FAILED | Wrong password |
+| 6 | WL_DISCONNECTED | Auth failed or router busy, retry |
+
 ## License
 
 MIT

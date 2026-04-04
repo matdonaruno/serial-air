@@ -223,16 +223,18 @@ const I18N = {
         subtitle:'أنشئ كودًا جاهزًا للاستخدام لجهازك', copy:'نسخ', copied:'تم النسخ!' }
 };
 
+const _saved = localStorage.getItem('sa_lang');
 const _nl = navigator.language;
 const _ul = _nl.slice(0,2);
 const LANGS = ['ja','zh','ko','es','th','vi','id','hi','de','fr','pt','it','ru','ar'];
-let lang = _nl.startsWith('zh-TW') || _nl.startsWith('zh-Hant') ? 'zh-TW' : LANGS.includes(_ul) ? _ul : 'en';
+let lang = _saved || (_nl.startsWith('zh-TW') || _nl.startsWith('zh-Hant') ? 'zh-TW' : LANGS.includes(_ul) ? _ul : 'en');
 let board = 'esp';
 let sec = 'none';
 
 const LNAMES = {en:'English',ja:'日本語',zh:'简体中文','zh-TW':'繁體中文',ko:'한국어',th:'ไทย',vi:'Tiếng Việt',id:'Indonesia',hi:'हिन्दी',de:'Deutsch',fr:'Français',es:'Español',pt:'Português',it:'Italiano',ru:'Русский',ar:'العربية'};
 function setLang(l) {
     lang = l;
+    localStorage.setItem('sa_lang', l);
     const t = I18N[lang] || I18N.en;
     document.querySelectorAll('.lang-item').forEach(b => b.classList.toggle('active', b.textContent.trim()===LNAMES[l]));
     document.getElementById('curLang').textContent = LNAMES[l] || l;
@@ -289,6 +291,8 @@ void setup() {
     Serial.begin(115200);
     delay(500);
     WiFi.mode(WIFI_STA);
+    WiFi.setMinSecurity(WIFI_AUTH_WPA_PSK); // WPA1 support
+    WiFi.setAutoReconnect(true); // Auto-retry
     WiFi.begin(ssid, password);
     Serial.print("Connecting");
     while (WiFi.status() != WL_CONNECTED) { delay(500); Serial.print("."); }

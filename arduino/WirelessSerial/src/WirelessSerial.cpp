@@ -345,8 +345,10 @@ void WirelessSerial::_acceptNewClients() {
         rejected.stop();
     }
 #else // ESP32
-    WiFiClient newClient = _server->accept();
+    WiFiClient newClient = _server->available();
+    if (!newClient) newClient = _server->accept();
     if (newClient) {
+        Serial.printf("[WS] Client connected! (slot search)\n");
         for (uint8_t i = 0; i < _maxClients; i++) {
             if (!_clients[i].connected()) {
                 _clients[i] = newClient;
