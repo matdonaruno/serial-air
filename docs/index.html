@@ -1,8 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KJ6VR63EK7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KJ6VR63EK7');
+  // A/B variant tracking
+  var _abVariant = sessionStorage.getItem('sa_ab') || 'direct';
+  gtag('set', 'user_properties', { ab_variant: _abVariant });
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>
+    // A/B Test: 50% redirect to dark variant
+    // Skip if accessed via /lp_glass directly
+    if (location.pathname === '/' || location.pathname === '/index.html') {
+      if (!sessionStorage.getItem('sa_ab')) {
+        var v = Math.random() < 0.5 ? 'glass' : 'dark';
+        sessionStorage.setItem('sa_ab', v);
+        if (v === 'dark') location.replace('/lp_dark');
+      } else if (sessionStorage.getItem('sa_ab') === 'dark') {
+        location.replace('/lp_dark');
+      }
+    }
+    </script>
     <title>Serial Air — Wireless Serial Monitor for ESP & Raspberry Pi</title>
     <meta name="description" content="Monitor ESP8266, ESP32, Raspberry Pi serial output wirelessly from your phone. No PC needed. Free Arduino library included.">
     <meta property="og:title" content="Serial Air — Wireless Serial Monitor">
@@ -4471,5 +4495,24 @@ conn, addr = server.<span class="fn">accept</span>()
         }
         animate();
     </script>
+
+<script>
+// Event tracking for conversions
+document.addEventListener('click', function(e) {
+  var a = e.target.closest('a');
+  if (!a) return;
+  var text = (a.textContent || '').trim().toLowerCase();
+  var href = (a.getAttribute('href') || '').toLowerCase();
+  if (text.includes('app store') || text.includes('ios')) {
+    gtag('event', 'click_appstore', { link_text: text });
+  } else if (text.includes('google play') || text.includes('android')) {
+    gtag('event', 'click_googleplay', { link_text: text });
+  } else if (href.includes('codegen') || text.includes('test code') || text.includes('generate')) {
+    gtag('event', 'click_codegen', { link_text: text });
+  } else if (href.includes('github.com')) {
+    gtag('event', 'click_github', { link_text: text });
+  }
+});
+</script>
 </body>
 </html>

@@ -1,6 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-KJ6VR63EK7"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-KJ6VR63EK7');
+  // A/B variant tracking
+  var _abVariant = sessionStorage.getItem('sa_ab') || 'direct';
+  gtag('set', 'user_properties', { ab_variant: _abVariant });
+</script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Code Generator - Serial Air</title>
@@ -460,6 +471,25 @@ document.getElementById('devPass').addEventListener('input', generate);
 
 if(lang!=='en') setLang(lang);
 generate();
+</script>
+
+<script>
+// Event tracking for conversions
+document.addEventListener('click', function(e) {
+  var a = e.target.closest('a');
+  if (!a) return;
+  var text = (a.textContent || '').trim().toLowerCase();
+  var href = (a.getAttribute('href') || '').toLowerCase();
+  if (text.includes('app store') || text.includes('ios')) {
+    gtag('event', 'click_appstore', { link_text: text });
+  } else if (text.includes('google play') || text.includes('android')) {
+    gtag('event', 'click_googleplay', { link_text: text });
+  } else if (href.includes('codegen') || text.includes('test code') || text.includes('generate')) {
+    gtag('event', 'click_codegen', { link_text: text });
+  } else if (href.includes('github.com')) {
+    gtag('event', 'click_github', { link_text: text });
+  }
+});
 </script>
 </body>
 </html>
