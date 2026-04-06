@@ -4,7 +4,6 @@ import {
   Text,
   FlatList,
   StyleSheet,
-  SafeAreaView,
   Pressable,
   Keyboard,
   KeyboardAvoidingView,
@@ -12,6 +11,7 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Polyline, Line, Text as SvgText } from 'react-native-svg';
 import * as Clipboard from 'expo-clipboard';
 import * as Haptics from 'expo-haptics';
@@ -179,7 +179,7 @@ export default function MonitorTabScreen() {
   const autoScroll = useSettingsStore((s) => s.autoScroll);
   const showTimestamp = useSettingsStore((s) => s.showTimestamp);
 
-  const filteredLines = useMemo(() => getFilteredLines(), [lines, filter]);
+  const filteredLines = useMemo(() => getFilteredLines(), [lines.length, filter]);
   const isConnected = status === 'connected';
   const [uptimeStr, setUptimeStr] = useState('');
 
@@ -243,7 +243,7 @@ export default function MonitorTabScreen() {
       }
       return updated;
     });
-  }, [lines, mode, isPaused]);
+  }, [lines.length, mode, isPaused]);
 
   const handleClear = useCallback(() => {
     Alert.alert(t('monitor_clear_title'), t('monitor_clear_msg'), [

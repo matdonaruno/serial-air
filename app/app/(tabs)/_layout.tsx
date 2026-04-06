@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { Tabs } from 'expo-router';
-import { View, StyleSheet, Pressable, Dimensions, Alert } from 'react-native';
+import { View, StyleSheet, Platform, Pressable, Dimensions, Alert } from 'react-native';
 import { BlurView } from 'expo-blur';
 import { Feather } from '@expo/vector-icons';
 import Animated, {
@@ -132,7 +132,7 @@ function TabButton({
       <Animated.View style={[styles.tabIconContainer, animStyle]}>
         <Feather
           name={icon}
-          size={26}
+          size={Platform.OS === 'android' ? 22 : 26}
           color={focused ? colors.accent.primary : colors.text.secondary}
         />
       </Animated.View>
@@ -179,8 +179,8 @@ const styles = StyleSheet.create({
     height: 70,
   },
   tabIconContainer: {
-    width: 56,
-    height: 56,
+    width: Platform.OS === 'android' ? 44 : 56,
+    height: Platform.OS === 'android' ? 44 : 56,
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',

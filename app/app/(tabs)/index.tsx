@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import {
+  Platform,
   View,
   Text,
   ScrollView,
@@ -664,12 +665,7 @@ export default function HomeScreen() {
       />
 
       {/* Connect Modal */}
-      <Modal
-        visible={modalDevice !== null}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setModalDevice(null)}
-      >
+      {modalDevice !== null && (
         <Pressable style={modalStyles.overlay} onPress={() => setModalDevice(null)}>
           <Pressable style={modalStyles.card} onPress={() => {}}>
             {/* Device icon & name */}
@@ -740,18 +736,19 @@ export default function HomeScreen() {
             </Pressable>
           </Pressable>
         </Pressable>
-      </Modal>
+      )}
     </SafeAreaView>
   );
 }
 
 const modalStyles = StyleSheet.create({
   overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.75)',
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.85)',
     justifyContent: 'center',
     alignItems: 'center',
     padding: spacing.lg,
+    zIndex: 999,
   },
   card: {
     width: '100%',
@@ -1140,6 +1137,6 @@ const styles = StyleSheet.create({
 
   // Bottom spacer
   bottomSpacer: {
-    height: 140,
+    height: Platform.OS === 'android' ? 100 : 140,
   },
 });

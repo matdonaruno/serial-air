@@ -1,3 +1,5 @@
+import { Platform } from 'react-native';
+
 /**
  * Serial Air — Dark Neumorphism Design System
  *
@@ -109,64 +111,67 @@ export const borderRadius = {
 // Typography
 // ============================================================
 
+// Android renders fonts ~15% larger than iOS at same dp/pt
+export const fs = (size: number) => Platform.OS === 'android' ? Math.round(size * 0.85) : size;
+
 export const typography = {
   titleLarge: {
-    fontSize: 28,
+    fontSize: fs(28),
     fontWeight: '700' as const,
     letterSpacing: 1.5,
   },
   titleMedium: {
-    fontSize: 22,
+    fontSize: fs(22),
     fontWeight: '700' as const,
     letterSpacing: 1.5,
   },
   titleSmall: {
-    fontSize: 18,
+    fontSize: fs(18),
     fontWeight: '600' as const,
     letterSpacing: 0,
   },
   sectionHeader: {
-    fontSize: 11,
+    fontSize: fs(11),
     fontWeight: '700' as const,
     letterSpacing: 3,
     textTransform: 'uppercase' as const,
   },
   body: {
-    fontSize: 16,
+    fontSize: fs(16),
     fontWeight: '400' as const,
     letterSpacing: 0,
   },
   bodySmall: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '400' as const,
     letterSpacing: 0,
   },
   caption: {
-    fontSize: 12,
+    fontSize: fs(12),
     fontWeight: '400' as const,
     letterSpacing: 0,
   },
   logText: {
-    fontSize: 13,
+    fontSize: fs(13),
     fontFamily: 'Menlo',
   },
   logTimestamp: {
-    fontSize: 11,
+    fontSize: fs(11),
     fontFamily: 'Menlo',
   },
   deviceName: {
-    fontSize: 17,
+    fontSize: fs(17),
     fontWeight: '600' as const,
     letterSpacing: -0.2,
   },
   headerTitle: {
-    fontSize: 14,
+    fontSize: fs(14),
     fontWeight: '700' as const,
     letterSpacing: 2.5,
     textTransform: 'uppercase' as const,
   },
   buttonLabel: {
-    fontSize: 10,
+    fontSize: fs(10),
     fontWeight: '500' as const,
   },
 } as const;

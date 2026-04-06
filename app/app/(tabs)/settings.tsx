@@ -1,14 +1,15 @@
 import React, { useCallback } from 'react';
 import {
+  Platform,
   View,
   Text,
   ScrollView,
   StyleSheet,
-  SafeAreaView,
   Pressable,
   Alert,
   Linking,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Feather } from '@expo/vector-icons';
 import * as StoreReview from 'expo-store-review';
 import * as Haptics from 'expo-haptics';
@@ -629,6 +630,6 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   bottomSpacer: {
-    height: 140,
+    height: Platform.OS === 'android' ? 100 : 140,
   },
 });

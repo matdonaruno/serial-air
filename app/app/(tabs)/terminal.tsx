@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Platform,
   View,
   Text,
   StyleSheet,
@@ -402,6 +403,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.status.connected,
   },
   bottomSpacer: {
-    height: 140,
+    height: Platform.OS === 'android' ? 100 : 140,
   },
 });

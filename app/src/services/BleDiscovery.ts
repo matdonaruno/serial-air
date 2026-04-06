@@ -107,16 +107,29 @@ export class BleDiscovery {
     if (Platform.OS !== 'android') return true;
 
     try {
-      const results = await PermissionsAndroid.requestMultiple([
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN,
-        PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT,
+      // Android 12+ needs BLUETOOTH_SCAN/CONNECT, Android 11- needs only LOCATION
+      const apiLevel = Platform.Version;
+      const permissions: string[] = [
         PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
-      ]);
+      ];
+
+      if (typeof apiLevel === 'number' && apiLevel >= 31) {
+        // Android 12+
+        if (PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN) {
+          permissions.push(PermissionsAndroid.PERMISSIONS.BLUETOOTH_SCAN);
+        }
+        if (PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT) {
+          permissions.push(PermissionsAndroid.PERMISSIONS.BLUETOOTH_CONNECT);
+        }
+      }
+
+      const results = await PermissionsAndroid.requestMultiple(permissions as any);
 
       return Object.values(results).every(
         (r) => r === PermissionsAndroid.RESULTS.GRANTED,
       );
-    } catch {
+    } catch (e) {
+      console.warn('[BleDiscovery] Permission request failed:', e);
       return false;
     }
   }

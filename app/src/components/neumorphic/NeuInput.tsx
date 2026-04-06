@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import React, { useState } from 'react';
 import {
   View,
@@ -9,7 +10,7 @@ import {
   TextInputProps,
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
-import { colors, borderRadius, spacing } from '../../constants/theme';
+import { colors, borderRadius, spacing, fs } from '../../constants/theme';
 
 type FeatherIconName = React.ComponentProps<typeof Feather>['name'];
 
@@ -66,7 +67,7 @@ export function NeuInput({
 
 const styles = StyleSheet.create({
   label: {
-    fontSize: 13,
+    fontSize: fs(Platform.OS === 'android' ? 11 : 13),
     fontWeight: '500',
     color: colors.text.secondary,
     marginBottom: spacing.sm,
@@ -98,7 +99,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    fontSize: 15,
+    fontSize: fs(Platform.OS === 'android' ? 13 : 15),
     fontWeight: '500',
     color: colors.text.primary,
     padding: 0,

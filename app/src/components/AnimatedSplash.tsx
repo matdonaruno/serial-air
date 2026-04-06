@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import React, { useEffect } from 'react';
 import { View, StyleSheet, Image, Text } from 'react-native';
 import Animated, {
@@ -10,7 +11,7 @@ import Animated, {
   Easing,
   runOnJS,
 } from 'react-native-reanimated';
-import { colors } from '../constants/theme';
+import { colors , fs } from '../constants/theme';
 
 interface AnimatedSplashProps {
   onFinish: () => void;
@@ -96,19 +97,19 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   icon: {
-    width: 120,
-    height: 120,
+    width: Platform.OS === 'android' ? 90 : 120,
+    height: Platform.OS === 'android' ? 90 : 120,
     borderRadius: 28,
     marginBottom: 24,
   },
   title: {
-    fontSize: 42,
+    fontSize: fs(42),
     fontWeight: '700',
     color: colors.accent.primary,
     letterSpacing: 2,
   },
   subtitle: {
-    fontSize: 18,
+    fontSize: fs(18),
     fontWeight: '400',
     color: colors.text.secondary,
     marginTop: 8,
