@@ -56,6 +56,20 @@ body { background-color: #000000; color: #e2e2e2; }
 .faq-item.open .faq-icon { transform: rotate(45deg); }
 .faq-icon { transition: transform 0.3s ease; }
 </style>
+
+    <link rel="canonical" href="https://umemasait.com/serial-air/lp.html">
+    <meta property="og:title" content="Serial Air — Wireless Serial Monitor">
+    <meta property="og:description" content="Monitor ESP8266, ESP32, Raspberry Pi serial output wirelessly from your phone. No PC needed.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://umemasait.com/serial-air/lp.html">
+    <meta property="og:image" content="https://umemasait.com/serial-air/images/wireless-freedom.webp">
+    <meta property="og:site_name" content="Serial Air">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Serial Air — Wireless Serial Monitor">
+    <meta name="twitter:description" content="Monitor ESP, Raspberry Pi serial output wirelessly. No PC needed.">
+    <meta name="twitter:image" content="https://umemasait.com/serial-air/images/wireless-freedom.webp">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "MobileApplication", "name": "Serial Air", "operatingSystem": "iOS, Android", "applicationCategory": "DeveloperApplication", "description": "Wireless serial monitor for ESP8266, ESP32, and Raspberry Pi. Debug from your phone without a PC.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Person", "name": "Masashi Umetani", "url": "https://github.com/matdonaruno"}, "featureList": "mDNS auto-discovery, Real-time serial output, Serial plotter, Bidirectional communication, Code generator, 16 languages"}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which boards are supported by Serial Air?", "acceptedAnswer": {"@type": "Answer", "text": "ESP8266 and ESP32 (including C3/S3 variants) are supported with the WirelessSerial Arduino library. Raspberry Pi, MicroPython boards, and any device that can create a TCP socket over WiFi can connect directly without a library."}}, {"@type": "Question", "name": "How much latency does Serial Air have?", "acceptedAnswer": {"@type": "Answer", "text": "Under 50ms from device output to screen display on a typical home WiFi network. TCP ensures reliable, in-order delivery."}}, {"@type": "Question", "name": "Is serial data encrypted in Serial Air?", "acceptedAnswer": {"@type": "Answer", "text": "Serial data is transmitted as plaintext over your local network. WiFi encryption (WPA2/WPA3) protects it in transit. The app includes optional pairing codes and passwords for device-level authentication."}}, {"@type": "Question", "name": "Does Serial Air require an internet connection?", "acceptedAnswer": {"@type": "Answer", "text": "No. Serial Air works entirely over your local WiFi network. No internet, no cloud, no accounts required. All data stays on your device."}}]}</script>
 </head>
 <body class="font-body selection:bg-primary selection:text-white">
 
@@ -87,22 +101,20 @@ body { background-color: #000000; color: #e2e2e2; }
 <main class="pt-20">
 
 <!-- Hero -->
-<section class="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
+<section class="relative min-h-[100vh] flex items-center justify-center px-6 overflow-hidden">
+  <img class="absolute inset-0 w-full h-full object-cover brightness-75" src="images/lp-hero.webp" alt=""/>
+  <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
   <div class="z-10 text-center max-w-4xl">
     <h1 class="text-6xl md:text-8xl font-extrabold tracking-tighter mb-6 text-white uppercase leading-[0.9]">
       <span data-t="hero_h1">Precision<br/>Terminal<br/>Control.</span>
     </h1>
-    <p class="font-mono text-zinc-500 text-sm md:text-base tracking-widest uppercase mb-12">
+    <p class="font-mono text-zinc-400 text-sm md:text-base tracking-widest uppercase mb-12">
       <span data-t="hero_sub">Wireless Serial Monitor for ESP &amp; Raspberry Pi</span>
     </p>
     <div class="flex flex-col sm:flex-row justify-center gap-4">
       <a href="#" class="bg-primary px-8 py-4 text-black font-bold uppercase tracking-tighter text-lg hover:brightness-110 transition-all text-center" data-t="hero_btn1">Download Free</a>
-      <a href="/lp-codegen.html" class="border border-outline px-8 py-4 text-zinc-400 font-bold uppercase tracking-tighter text-lg hover:text-white hover:border-white transition-all text-center" data-t="hero_btn2">Generate Test Code</a>
+      <a href="/lp-codegen.html" class="border border-white/30 px-8 py-4 text-white font-bold uppercase tracking-tighter text-lg hover:bg-white/10 transition-all text-center" data-t="hero_btn2">Generate Test Code</a>
     </div>
-  </div>
-  <div class="mt-16 w-full max-w-6xl relative aspect-video">
-    <img class="w-full h-full object-cover grayscale brightness-75 border border-outline-variant/30" src="images/lp-hero.webp" alt="iPhone with terminal screen next to ESP32 on laboratory desk"/>
-    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
   </div>
 </section>
 

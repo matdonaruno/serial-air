@@ -1,0 +1,60 @@
+# Serial Air
+
+> Wireless serial monitor for ESP8266, ESP32, and Raspberry Pi.
+> Monitor serial output from your phone over WiFi — no PC needed.
+> Free iOS & Android app with open-source Arduino library (MIT License).
+
+## What is Serial Air?
+
+Serial Air turns your smartphone into a wireless serial monitor. It connects to ESP8266, ESP32, Raspberry Pi, and any WiFi-capable microcontroller over TCP. The companion Arduino library (WirelessSerial) requires just 2 lines of code to add wireless serial output to any project.
+
+## Key Features
+
+- **Auto Discovery**: Devices found automatically via Bonjour/mDNS
+- **Real-time Monitoring**: Live serial output with millisecond timestamps, under 50ms latency
+- **Serial Plotter**: Visualize numeric data as real-time graphs
+- **Bidirectional Communication**: Send commands to your device
+- **Search & Filter**: Find specific log entries by keyword
+- **Command Macros**: Save and send frequently used commands with one tap
+- **Auto Reconnect**: Seamless recovery from network interruptions
+- **Device Security**: Optional pairing codes, passwords, and device fingerprints
+- **Log Export**: Save and share logs as text files
+- **16 Languages**: English, Japanese, Chinese (Simplified/Traditional), Korean, Thai, Vietnamese, Indonesian, Hindi, German, French, Spanish, Portuguese, Italian, Russian, Arabic
+
+## Supported Hardware
+
+| Board | WiFi | BLE |
+|-------|------|-----|
+| ESP8266 (NodeMCU, Wemos D1 Mini) | Yes | — |
+| ESP32 / C3 / S3 | Yes | Yes |
+| Arduino Nano ESP32 | Yes | Yes |
+| M5Stack / Seeed XIAO ESP32 | Yes | Yes |
+| Arduino UNO R4 WiFi | Yes | — |
+| Arduino + ESP-01 | Yes | — |
+| Raspberry Pi Pico W | Yes | — |
+| Raspberry Pi 3/4/5 | Yes | — |
+| Orange Pi / Banana Pi | Yes | — |
+| Any WiFi TCP device | Yes | — |
+
+## Pages
+
+- [Landing Page](https://umemasait.com/serial-air/): Product overview, features, compatibility, FAQ
+- [Landing Page (Dark variant)](https://umemasait.com/serial-air/lp.html): Alternative design
+- [Code Generator](https://umemasait.com/serial-air/codegen.html): Generate ready-to-upload test code for your board
+- [Code Generator (Dark variant)](https://umemasait.com/serial-air/lp-codegen.html): Alternative design
+
+## Source Code
+
+- [GitHub Repository](https://github.com/matdonaruno/serial-air): Full source code (MIT License)
+- [Arduino Library (WirelessSerial)](https://github.com/matdonaruno/serial-air/tree/main/arduino/WirelessSerial): ESP8266/ESP32 library
+
+## Legal
+
+- [Privacy Policy](https://umemasait.com/serial-air/privacy.html)
+- [Terms of Service](https://umemasait.com/serial-air/terms.html)
+
+## Developer
+
+- Author: Masashi Umetani
+- Contact: support@serialair.app
+- Website: https://umemasait.com

@@ -54,7 +54,8 @@
           "username": "serial-air"
         }
       ],
-      "expo-secure-store"
+      "expo-secure-store",
+      "expo-localization"
     ],
     "experiments": {
       "typedRoutes": true
@@ -65,6 +66,15 @@
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "3cd1e3fa-5063-4118-8dbe-c17116f7e294"
+      }
+    },
+    "owner": "masashiumetani"
   }
 }

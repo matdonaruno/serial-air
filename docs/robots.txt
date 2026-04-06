@@ -1,0 +1,35 @@
+# Serial Air - robots.txt
+
+User-agent: *
+Allow: /
+
+# AI Training Bots - Block
+User-agent: GPTBot
+Disallow: /
+
+User-agent: Google-Extended
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: ClaudeBot
+Disallow: /
+
+User-agent: Meta-ExternalAgent
+Disallow: /
+
+# AI Search/Retrieval Bots - Allow
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+Sitemap: https://umemasait.com/serial-air/sitemap.xml

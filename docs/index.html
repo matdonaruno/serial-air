@@ -29,10 +29,6 @@
     </script>
     <title>Serial Air — Wireless Serial Monitor for ESP & Raspberry Pi</title>
     <meta name="description" content="Monitor ESP8266, ESP32, Raspberry Pi serial output wirelessly from your phone. No PC needed. Free Arduino library included.">
-    <meta property="og:title" content="Serial Air — Wireless Serial Monitor">
-    <meta property="og:description" content="PCなしで、ESP・ラズパイのシリアル出力をスマホでリアルタイム確認。">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="https://serialair.netlify.app">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Noto+Sans+JP:wght@300;400;500;700&family=Noto+Sans+SC:wght@300;400;500;700&family=Noto+Sans+KR:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
@@ -133,7 +129,7 @@
         .hero-img {
             position: absolute; top: 0; left: 50%; transform: translateX(-50%);
             width: 100%; max-width: 960px; height: 100%; z-index: 1;
-            opacity: 0.15; pointer-events: none;
+            opacity: 0.25; pointer-events: none;
         }
         .hero-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 30px; }
         .hero-appname {
@@ -356,6 +352,20 @@
         [data-lang] { display: none; }
         [data-lang].active { display: block; }
     </style>
+
+    <link rel="canonical" href="https://umemasait.com/serial-air/">
+    <meta property="og:title" content="Serial Air — Wireless Serial Monitor">
+    <meta property="og:description" content="Monitor ESP8266, ESP32, Raspberry Pi serial output wirelessly from your phone. No PC needed.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://umemasait.com/serial-air/">
+    <meta property="og:image" content="https://umemasait.com/serial-air/images/wireless-freedom.webp">
+    <meta property="og:site_name" content="Serial Air">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Serial Air — Wireless Serial Monitor">
+    <meta name="twitter:description" content="Monitor ESP, Raspberry Pi serial output wirelessly. No PC needed.">
+    <meta name="twitter:image" content="https://umemasait.com/serial-air/images/wireless-freedom.webp">
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "MobileApplication", "name": "Serial Air", "operatingSystem": "iOS, Android", "applicationCategory": "DeveloperApplication", "description": "Wireless serial monitor for ESP8266, ESP32, and Raspberry Pi. Debug from your phone without a PC.", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "author": {"@type": "Person", "name": "Masashi Umetani", "url": "https://github.com/matdonaruno"}, "featureList": "mDNS auto-discovery, Real-time serial output, Serial plotter, Bidirectional communication, Code generator, 16 languages"}</script>
+    <script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which boards are supported by Serial Air?", "acceptedAnswer": {"@type": "Answer", "text": "ESP8266 and ESP32 (including C3/S3 variants) are supported with the WirelessSerial Arduino library. Raspberry Pi, MicroPython boards, and any device that can create a TCP socket over WiFi can connect directly without a library."}}, {"@type": "Question", "name": "How much latency does Serial Air have?", "acceptedAnswer": {"@type": "Answer", "text": "Under 50ms from device output to screen display on a typical home WiFi network. TCP ensures reliable, in-order delivery."}}, {"@type": "Question", "name": "Is serial data encrypted in Serial Air?", "acceptedAnswer": {"@type": "Answer", "text": "Serial data is transmitted as plaintext over your local network. WiFi encryption (WPA2/WPA3) protects it in transit. The app includes optional pairing codes and passwords for device-level authentication."}}, {"@type": "Question", "name": "Does Serial Air require an internet connection?", "acceptedAnswer": {"@type": "Answer", "text": "No. Serial Air works entirely over your local WiFi network. No internet, no cloud, no accounts required. All data stays on your device."}}]}</script>
 </head>
 <body>
     <canvas id="particleCanvas"></canvas>
