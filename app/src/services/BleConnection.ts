@@ -6,6 +6,12 @@ const NUS_SERVICE_UUID = '6E400001-B5A3-F393-E0A9-E50E24DCCA9E';
 const NUS_TX_CHAR_UUID = '6E400003-B5A3-F393-E0A9-E50E24DCCA9E'; // Server TX → App RX (notify)
 const NUS_RX_CHAR_UUID = '6E400002-B5A3-F393-E0A9-E50E24DCCA9E'; // App TX → Server RX (write)
 
+// SECURITY NOTE: BLE NUS data is Base64-encoded but NOT encrypted at application layer.
+// BLE 4.2+ link-layer encryption is available when devices are paired/bonded, but
+// react-native-ble-plx does not expose pairing control. Serial data transmitted over
+// BLE can be sniffed by nearby BLE devices within ~10m range.
+// For sensitive data, use the WiFi+security password mode instead.
+
 export interface BleConnectionEvents {
   onConnect: () => void;
   onData: (data: string) => void;

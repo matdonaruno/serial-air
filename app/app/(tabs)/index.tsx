@@ -229,6 +229,7 @@ export default function HomeScreen() {
   const devices = useDiscoveryStore((s) => s.devices);
   const addDevice = useDiscoveryStore((s) => s.addDevice);
   const removeDevice = useDiscoveryStore((s) => s.removeDevice);
+  const refreshDevices = useDiscoveryStore((s) => s.refreshDevices);
   const recentConnections = useDiscoveryStore((s) => s.recentConnections);
   const addRecentConnection = useDiscoveryStore((s) => s.addRecentConnection);
   const loadRecentConnections = useDiscoveryStore((s) => s.loadRecentConnections);
@@ -281,11 +282,17 @@ export default function HomeScreen() {
       bleDiscovery.startScan();
     }
 
+    // Periodic refresh: mark stale devices as offline
+    const refreshInterval = setInterval(() => {
+      refreshDevices();
+    }, 5_000);
+
     return () => {
       discovery.destroy();
       discoveryRef.current = null;
       bleDiscoveryRef.current?.destroy();
       bleDiscoveryRef.current = null;
+      clearInterval(refreshInterval);
     };
   }, []);
 
@@ -360,6 +367,21 @@ export default function HomeScreen() {
     setModalDevice(null);
   }, [modalDevice, doConnect, isDeviceTrusted, trustDevice]);
 
+  const handleRescan = useCallback(() => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+    // Clear stale devices and restart BLE scan
+    useDiscoveryStore.getState().clearDevices();
+    bleDiscoveryRef.current?.stopScan();
+    bleDiscoveryRef.current?.startScan();
+    discoveryRef.current?.destroy();
+    const discovery = new DeviceDiscovery(
+      (device: Device) => addDevice(device),
+      (name: string) => removeDevice(name),
+    );
+    discoveryRef.current = discovery;
+    discovery.startScan();
+  }, [addDevice, removeDevice]);
+
   const handleManualConnect = useCallback(() => {
     const ip = manualIp.trim();
     if (!ip) return;
@@ -433,7 +455,16 @@ export default function HomeScreen() {
         )}
 
         {/* ---- Discovered ---- */}
-        <Text style={styles.sectionHeader}>{t('home_discovered')}</Text>
+        <View style={styles.sectionHeaderRow}>
+          <Text style={[styles.sectionHeader, { marginTop: 0, marginBottom: 0 }]}>{t('home_discovered')}</Text>
+          <Pressable
+            style={styles.rescanButton}
+            onPress={handleRescan}
+            hitSlop={12}
+          >
+            <Feather name="refresh-cw" size={16} color={colors.accent.primary} />
+          </Pressable>
+        </View>
 
         {devices.length > 0 && (
           <View style={styles.tapHint}>
@@ -881,11 +912,28 @@ const styles = StyleSheet.create({
   },
 
   // Section headers
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: spacing.lg,
+    marginBottom: spacing.md,
+  },
   sectionHeader: {
     ...typography.sectionHeader,
     color: colors.text.secondary,
     marginBottom: spacing.md,
     marginTop: spacing.lg,
+  },
+  rescanButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: colors.bg.surface,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: colors.borderLight,
   },
 
   // Device cards

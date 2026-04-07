@@ -14,10 +14,30 @@
 
 import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 import * as IAP from 'react-native-iap';
 
 const TRIAL_START_KEY = 'serial-air:trial-start';
 const PURCHASE_KEY = 'serial-air:purchased';
+
+// Secure read/write helpers — use Keychain/Keystore instead of plain AsyncStorage
+async function secureGet(key: string): Promise<string | null> {
+  try {
+    return await SecureStore.getItemAsync(key);
+  } catch {
+    // Fallback to AsyncStorage for migration
+    return AsyncStorage.getItem(key);
+  }
+}
+async function secureSet(key: string, value: string): Promise<void> {
+  try {
+    await SecureStore.setItemAsync(key, value);
+    // Remove old AsyncStorage entry after migration
+    AsyncStorage.removeItem(key).catch(() => {});
+  } catch {
+    await AsyncStorage.setItem(key, value);
+  }
+}
 const TRIAL_DAYS = 7;
 
 export const PRODUCT_ID = 'serial_air_pro';
@@ -70,9 +90,9 @@ export class PurchaseService {
    * Initialize trial on first launch.
    */
   static async initializeTrial(): Promise<void> {
-    const existing = await AsyncStorage.getItem(TRIAL_START_KEY);
+    const existing = await secureGet(TRIAL_START_KEY);
     if (!existing) {
-      await AsyncStorage.setItem(TRIAL_START_KEY, new Date().toISOString());
+      await secureSet(TRIAL_START_KEY, new Date().toISOString());
     }
   }
 
@@ -81,8 +101,8 @@ export class PurchaseService {
    */
   static async getStatus(): Promise<TrialStatus> {
     const [trialStartStr, purchasedStr] = await Promise.all([
-      AsyncStorage.getItem(TRIAL_START_KEY),
-      AsyncStorage.getItem(PURCHASE_KEY),
+      secureGet(TRIAL_START_KEY),
+      secureGet(PURCHASE_KEY),
     ]);
 
     let isPurchased = purchasedStr === 'true';
@@ -93,7 +113,7 @@ export class PurchaseService {
         const purchases = await IAP.getAvailablePurchases();
         isPurchased = purchases.some((p) => p.productId === PRODUCT_ID);
         if (isPurchased) {
-          await AsyncStorage.setItem(PURCHASE_KEY, 'true');
+          await secureSet(PURCHASE_KEY, 'true');
         }
       } catch {
         // Fall through to local check
@@ -163,7 +183,7 @@ export class PurchaseService {
    * Mark purchase as complete locally.
    */
   static async setPurchased(): Promise<void> {
-    await AsyncStorage.setItem(PURCHASE_KEY, 'true');
+    await secureSet(PURCHASE_KEY, 'true');
   }
 
   /**

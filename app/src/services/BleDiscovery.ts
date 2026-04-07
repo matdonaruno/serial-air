@@ -57,17 +57,13 @@ export class BleDiscovery {
 
     this.manager.startDeviceScan(
       [NUS_SERVICE_UUID],
-      { allowDuplicates: false },
+      { allowDuplicates: true },
       (error, bleDevice) => {
         if (error) {
           console.warn('[BleDiscovery] Scan error:', error.message);
           return;
         }
         if (!bleDevice) return;
-
-        // Skip already discovered
-        if (this.discoveredIds.has(bleDevice.id)) return;
-        this.discoveredIds.add(bleDevice.id);
 
         const device: Device = {
           name: bleDevice.localName || bleDevice.name || `BLE-${bleDevice.id.slice(-6)}`,

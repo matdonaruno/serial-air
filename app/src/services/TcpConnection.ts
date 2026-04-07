@@ -6,6 +6,9 @@ import {
   RECONNECT_INTERVAL_MS,
 } from '../constants/defaults';
 
+const MAX_RECONNECT_ATTEMPTS = 15;
+const MAX_RECONNECT_INTERVAL_MS = 30_000;
+
 export class TcpConnection implements Connection {
   private socket: ReturnType<typeof TcpSocket.createConnection> | null = null;
   private options: Required<TcpConnectionOptions>;
@@ -117,11 +120,26 @@ export class TcpConnection implements Connection {
   private _scheduleReconnect(): void {
     this._clearReconnectTimer();
     this.reconnectAttempt++;
+
+    if (this.reconnectAttempt > MAX_RECONNECT_ATTEMPTS) {
+      this.events.onError(
+        new Error(`Reconnect failed after ${MAX_RECONNECT_ATTEMPTS} attempts`),
+      );
+      this.events.onClose();
+      return;
+    }
+
     this.events.onReconnecting(this.reconnectAttempt);
+
+    // Exponential backoff: 5s, 10s, 20s, ... capped at 30s
+    const delay = Math.min(
+      this.options.reconnectInterval * Math.pow(2, this.reconnectAttempt - 1),
+      MAX_RECONNECT_INTERVAL_MS,
+    );
 
     this.reconnectTimer = setTimeout(() => {
       this._connect();
-    }, this.options.reconnectInterval);
+    }, delay);
   }
 
   private _clearReconnectTimer(): void {

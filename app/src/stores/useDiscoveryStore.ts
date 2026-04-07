@@ -5,6 +5,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 const RECENT_CONNECTIONS_KEY = 'serial-air:recent-connections';
 const MAX_RECENT = 10;
 
+const BLE_DEVICE_TIMEOUT_MS = 15_000; // 15 seconds without advertisement → offline
+
 interface DiscoveryStore {
   devices: Device[];
   isScanning: boolean;
@@ -14,6 +16,7 @@ interface DiscoveryStore {
   addDevice: (device: Device) => void;
   removeDevice: (name: string) => void;
   clearDevices: () => void;
+  refreshDevices: () => void;
   addRecentConnection: (connection: RecentConnection) => void;
   loadRecentConnections: () => Promise<void>;
 }
@@ -49,6 +52,23 @@ export const useDiscoveryStore = create<DiscoveryStore>((set, get) => ({
 
   clearDevices: () => {
     set({ devices: [] });
+  },
+
+  refreshDevices: () => {
+    const now = Date.now();
+    set((state) => ({
+      devices: state.devices
+        .map((d) => {
+          if (!d.isOnline) return d;
+          const lastSeenMs = new Date(d.lastSeen).getTime();
+          if (now - lastSeenMs > BLE_DEVICE_TIMEOUT_MS) {
+            return { ...d, isOnline: false };
+          }
+          return d;
+        })
+        // Remove offline devices that have been gone for > 60s
+        .filter((d) => d.isOnline || now - new Date(d.lastSeen).getTime() < 60_000),
+    }));
   },
 
   addRecentConnection: (connection: RecentConnection) => {

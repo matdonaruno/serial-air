@@ -105,6 +105,7 @@
 
         /* ===== CONTAINER ===== */
         .container { position: relative; z-index: 1; max-width: 960px; margin: 0 auto; padding: 0 20px; }
+        .hero { width: 100vw; margin-left: calc(-50vw + 50%); }
         section { padding: 80px 0; }
         .section-label {
             display: inline-block; color: var(--accent); font-size: 0.75rem; font-weight: 700;
@@ -124,14 +125,14 @@
         .icon-lg svg { width: 28px; height: 28px; }
 
         /* ===== HERO ===== */
-        .hero { padding: 130px 0 60px; position: relative; }
+        .hero { padding: 80px 0 40px; position: relative; overflow: hidden; }
         .hero-content { position: relative; z-index: 2; text-align: center; }
         .hero-img {
-            position: absolute; top: 0; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 960px; height: 100%; z-index: 1;
-            opacity: 0.25; pointer-events: none;
+            position: absolute; top: 0; left: 0;
+            width: 100%; height: 100%; z-index: 1;
+            opacity: 0.45; pointer-events: none;
         }
-        .hero-img img { width: 100%; height: 100%; object-fit: cover; border-radius: 30px; }
+        .hero-img img { width: 100%; height: 100%; object-fit: cover; object-position: center; }
         .hero-appname {
             font-size: 2.8rem; font-weight: 800; letter-spacing: -1px;
             color: #fff; margin-bottom: 16px;
@@ -317,7 +318,7 @@
 
         /* ===== MOBILE ===== */
         @media (max-width: 768px) {
-            .hero { padding: 110px 0 40px; }
+            .hero { padding: 70px 0 20px; }
             .hero h1 { font-size: 2rem; }
             .hero p { font-size: 0.95rem; }
             .hero-cta { flex-direction: column; align-items: center; }
@@ -337,15 +338,24 @@
             .cta-card { padding: 40px 20px; }
             .cta-card h2 { font-size: 1.5rem; }
             .img-banner { height: 160px; }
-            .nav-links a:not(.nav-cta):not(.lang-toggle) { display: none; }
-            .nav-links { gap: 6px; }
+            .nav-links a:not(.lang-toggle), .nav-links .nav-cta { display: none !important; }
+            .nav-links { gap: 4px; }
+            .nav-logo { font-size: 0.9rem; }
+            .nav-cta { padding: 6px 12px; font-size: 0.7rem; }
+            .lang-toggle { padding: 4px 8px; font-size: 0.7rem; }
+            .lang-toggle span { display: none; }
             .hero-appname { font-size: 2rem; }
+            .hero { padding: 60px 0 20px; }
         }
         @media (max-width: 480px) {
             .hero h1 { font-size: 1.7rem; }
             .hero-appname { font-size: 1.6rem; }
             .boards-grid { grid-template-columns: 1fr; }
             .container { padding: 0 16px; }
+            .nav-inner { padding: 10px 12px; }
+            .nav-logo { font-size: 0.8rem; }
+            .nav-cta { padding: 5px 10px; font-size: 0.65rem; }
+
         }
 
         /* Lang content */
@@ -400,7 +410,7 @@
                     </div>
                 </div>
                 <a href="https://github.com/matdonaruno/serial-air" target="_blank" rel="noopener">GitHub</a>
-                <a href="/codegen.html" class="nav-cta" style="min-width:95px;justify-content:center;background:transparent;border:1px solid rgba(255,107,53,0.3);">
+                <a href="codegen.html" class="nav-cta" style="min-width:95px;justify-content:center;background:transparent;border:1px solid rgba(255,107,53,0.3);">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>
                     Test Code
                 </a>
@@ -433,7 +443,7 @@
                     <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
                     <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
                     <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
                 </div>
                 <!-- <div class="hero-sub">7-day free trial · $1.99 one-time purchase · No subscription</div> -->
             </div>
@@ -662,7 +672,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <div class="section-label">Code Generator</div>
             <div class="section-title">Generate test code for your board.</div>
             <div class="section-desc center">Select your board, enter WiFi credentials, and get a ready-to-upload sketch.</div>
-            <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Generate Code</a>
+            <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Generate Code</a>
         </section>
 
         <!-- CTA -->
@@ -709,7 +719,7 @@ conn, addr = server.<span class="fn">accept</span>()
                     <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
                     <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
                     <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduinoライブラリ</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
                 </div>
                 <!-- <div class="hero-sub">7日間無料 · $1.99 買い切り · サブスクなし</div> -->
             </div>
@@ -854,7 +864,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <div class="section-label">コードジェネレーター</div>
             <div class="section-title">ボード用テストコードを生成。</div>
             <div class="section-desc center">ボードを選択、WiFi情報を入力するだけで、すぐにアップロードできるスケッチが完成。</div>
-            <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>コードを生成する</a>
+            <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>コードを生成する</a>
         </section>
 
                         <h2>ワイヤレスモニタリングを始めよう。</h2>
@@ -893,7 +903,7 @@ conn, addr = server.<span class="fn">accept</span>()
                     <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> 免费下载</a>
                     <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
                     <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino 库</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
                 </div>
             </div>
         </section>
@@ -1027,7 +1037,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <div class="section-label">Code Generator</div>
             <div class="section-title">为你的开发板生成测试代码。</div>
             <div class="section-desc center">选择开发板，输入 WiFi 信息，即可获得可直接上传的代码。</div>
-            <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>生成代码</a>
+            <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>生成代码</a>
         </section>
 
                         <h2>开始无线监控。</h2>
@@ -1066,7 +1076,7 @@ conn, addr = server.<span class="fn">accept</span>()
                     <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> 무료 다운로드</a>
                     <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
                     <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino 라이브러리</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
                 </div>
             </div>
         </section>
@@ -1200,7 +1210,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <div class="section-label">Code Generator</div>
             <div class="section-title">보드용 테스트 코드를 생성하세요.</div>
             <div class="section-desc center">보드를 선택하고 WiFi 정보를 입력하면 바로 업로드할 수 있는 스케치가 완성됩니다.</div>
-            <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>코드 생성</a>
+            <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>코드 생성</a>
         </section>
 
                         <h2>무선 모니터링을 시작하세요.</h2>
@@ -1239,7 +1249,7 @@ conn, addr = server.<span class="fn">accept</span>()
                     <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> Descargar gratis</a>
                     <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
                     <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Libreria Arduino</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
                 </div>
             </div>
         </section>
@@ -1373,7 +1383,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <div class="section-label">Code Generator</div>
             <div class="section-title">Genera codigo de prueba para tu placa.</div>
             <div class="section-desc center">Selecciona tu placa, ingresa credenciales WiFi y obtendras un sketch listo para subir.</div>
-            <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Generar codigo</a>
+            <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Generar codigo</a>
         </section>
 
                         <h2>Empieza a monitorear de forma inalambrica.</h2>
@@ -1412,7 +1422,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino 函式庫</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -1639,7 +1649,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">程式碼產生器</div>
     <div class="section-title">為你的開發板產生測試程式碼。</div>
     <div class="section-desc center">選擇開發板，輸入 WiFi 資訊，即可獲得可直接上傳的程式碼。</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>產生程式碼</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>產生程式碼</a>
 </section>
 
 <!-- CTA -->
@@ -1686,7 +1696,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -1913,7 +1923,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">ตัวสร้างโค้ด</div>
     <div class="section-title">สร้างโค้ดทดสอบสำหรับบอร์ดของคุณ</div>
     <div class="section-desc center">เลือกบอร์ด ใส่ข้อมูล WiFi แล้วรับ sketch พร้อมอัปโหลด</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>สร้างโค้ด</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>สร้างโค้ด</a>
 </section>
 
 <!-- CTA -->
@@ -1960,7 +1970,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -2187,7 +2197,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Trình tạo code</div>
     <div class="section-title">Tạo code thử nghiệm cho board của bạn.</div>
     <div class="section-desc center">Chọn board, nhập thông tin WiFi, và nhận sketch sẵn sàng upload.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Tạo code</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Tạo code</a>
 </section>
 
 <!-- CTA -->
@@ -2234,7 +2244,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -2461,7 +2471,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Generator Kode</div>
     <div class="section-title">Buat kode uji untuk board Anda.</div>
     <div class="section-desc center">Pilih board, masukkan kredensial WiFi, dan dapatkan sketch siap upload.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Buat Kode</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Buat Kode</a>
 </section>
 
 <!-- CTA -->
@@ -2508,7 +2518,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -2735,7 +2745,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">कोड जनरेटर</div>
     <div class="section-title">अपने बोर्ड के लिए टेस्ट कोड जनरेट करें।</div>
     <div class="section-desc center">अपना बोर्ड चुनें, WiFi क्रेडेंशियल डालें, और अपलोड-रेडी स्केच पाएं।</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>कोड जनरेट करें</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>कोड जनरेट करें</a>
 </section>
 
 <!-- CTA -->
@@ -2782,7 +2792,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino-Bibliothek</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -3009,7 +3019,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Code-Generator</div>
     <div class="section-title">Testcode für Ihr Board generieren.</div>
     <div class="section-desc center">Board auswählen, WiFi-Zugangsdaten eingeben, und einen Upload-fertigen Sketch erhalten.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Code generieren</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Code generieren</a>
 </section>
 
 <!-- CTA -->
@@ -3056,7 +3066,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Bibliothèque Arduino</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -3283,7 +3293,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Générateur de code</div>
     <div class="section-title">Générez du code de test pour votre carte.</div>
     <div class="section-desc center">Sélectionnez votre carte, entrez vos identifiants WiFi, et obtenez un sketch prêt à téléverser.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Générer le code</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Générer le code</a>
 </section>
 
 <!-- CTA -->
@@ -3330,7 +3340,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Biblioteca Arduino</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -3557,7 +3567,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Gerador de código</div>
     <div class="section-title">Gere código de teste para sua placa.</div>
     <div class="section-desc center">Selecione sua placa, insira as credenciais WiFi e obtenha um sketch pronto para upload.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Gerar código</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Gerar código</a>
 </section>
 
 <!-- CTA -->
@@ -3604,7 +3614,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Libreria Arduino</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -3831,7 +3841,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Generatore di codice</div>
     <div class="section-title">Genera codice di test per la tua scheda.</div>
     <div class="section-desc center">Seleziona la tua scheda, inserisci le credenziali WiFi e ottieni uno sketch pronto da caricare.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Genera codice</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Genera codice</a>
 </section>
 
 <!-- CTA -->
@@ -3878,7 +3888,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -4105,7 +4115,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">Генератор кода</div>
     <div class="section-title">Сгенерируйте тестовый код для вашей платы.</div>
     <div class="section-desc center">Выберите плату, введите данные WiFi и получите готовый к загрузке скетч.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Сгенерировать код</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>Сгенерировать код</a>
 </section>
 
 <!-- CTA -->
@@ -4152,7 +4162,7 @@ conn, addr = server.<span class="fn">accept</span>()
             <a href="#" class="btn-primary"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg> App Store</a>
             <a href="#" class="btn-primary" style="background:transparent;border:1px solid var(--accent);"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M3.609 1.814L13.792 12 3.61 22.186a.996.996 0 01-.61-.92V2.734a1 1 0 01.609-.92zm10.89 10.893l2.302 2.302-10.937 6.333 8.635-8.635zm3.199-3.198l2.807 1.626a1 1 0 010 1.73l-2.808 1.626L15.206 12l2.492-2.491zM5.864 2.658L16.8 8.99l-2.302 2.302-8.634-8.634z"/></svg> Google Play</a>
             <a href="https://github.com/matdonaruno/serial-air" class="btn-secondary" target="_blank" rel="noopener"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg> Arduino Library</a>
-                    <a href="/codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
+                    <a href="codegen.html" class="btn-secondary"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg> Test Code</a>
         </div>
     </div>
 </section>
@@ -4379,7 +4389,7 @@ conn, addr = server.<span class="fn">accept</span>()
     <div class="section-label">مولّد الكود</div>
     <div class="section-title">أنشئ كود اختبار للوحتك.</div>
     <div class="section-desc center">اختر لوحتك، أدخل بيانات WiFi، واحصل على sketch جاهز للرفع.</div>
-    <a href="/codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>إنشاء الكود</a>
+    <a href="codegen.html" class="btn-primary" style="font-size:1rem;padding:16px 40px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle;margin-right:8px;"><path d="M16 18l6-6-6-6M8 6l-6 6 6 6"/></svg>إنشاء الكود</a>
 </section>
 
 <!-- CTA -->
@@ -4415,8 +4425,8 @@ conn, addr = server.<span class="fn">accept</span>()
         <!-- FOOTER (shared) -->
         <footer>
             <div class="footer-links">
-                <a href="/privacy">Privacy Policy</a>
-                <a href="/terms">Terms of Service</a>
+                <a href="privacy.html">Privacy Policy</a>
+                <a href="terms.html">Terms of Service</a>
                 <a href="https://github.com/matdonaruno/serial-air" target="_blank" rel="noopener">GitHub</a>
                 <a href="mailto:support@serialair.app">Contact</a>
             </div>
