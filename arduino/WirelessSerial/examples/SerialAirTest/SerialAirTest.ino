@@ -31,21 +31,16 @@
 
 // BLE is ON by default on ESP32.
 // Requires: Arduino IDE → Tools → Partition Scheme → "Huge APP (3MB No OTA)"
-// WiFi debug: BLE disabled to test WiFi alone
-#define WS_NO_BLE 1
+// BLE enabled for demo (comment out WS_NO_BLE to enable)
+// #define WS_NO_BLE 1
 
 #include <WiFi.h>
 #include <WirelessSerial.h>
 #include <math.h>
 
 // ===== EDIT THESE =====
-const char* WIFI_SSID = "L01_0C8FFF168D4D";
-const char* WIFI_PASS = "3e5ta2y1679m4jt";
-// ======================
-
-// ===== EDIT THESE =====
-//const char* WIFI_SSID = "iPhone 13 mini";
-//const char* WIFI_PASS = "surfingmat";
+const char* WIFI_SSID = "YOUR_WIFI_SSID";
+const char* WIFI_PASS = "YOUR_WIFI_PASSWORD";
 // ======================
 
 WirelessSerial ws;
@@ -59,6 +54,53 @@ float pressure = 1013.25;
 unsigned long lastSensorUpdate = 0;
 unsigned long lastStatusUpdate = 0;
 unsigned long bootTime = 0;
+unsigned long sensorInterval = 500;
+
+
+void processCommand(String cmd) {
+    cmd.trim();
+    if (cmd.length() == 0) return;
+
+    if (cmd == "help") {
+        output->println("Commands: help, status, led on, led off, reboot, fast, slow");
+    }
+    else if (cmd == "status") {
+        output->printf("Device: %s\n", ws.getDeviceId());
+        output->printf("Heap: %d bytes\n", ESP.getFreeHeap());
+        output->printf("WiFi: %s (%d dBm)\n", WiFi.localIP().toString().c_str(), WiFi.RSSI());
+        output->printf("TCP clients: %d\n", ws.clientCount());
+#if WS_BLE_ENABLED
+        output->printf("BLE clients: %d\n", ws.bleClientCount());
+#else
+        output->println("BLE: disabled");
+#endif
+        output->printf("Buffer: %d bytes\n", ws.bufferedBytes());
+    }
+    else if (cmd == "led on") {
+        digitalWrite(LED_BUILTIN, LOW); // Active low
+        output->println("ok: LED on");
+    }
+    else if (cmd == "led off") {
+        digitalWrite(LED_BUILTIN, HIGH);
+        output->println("ok: LED off");
+    }
+    else if (cmd == "reboot") {
+        output->println("Rebooting in 1s...");
+        delay(1000);
+        ESP.restart();
+    }
+    else if (cmd == "fast") {
+        sensorInterval = 100;
+        output->println("ok: Sensor update rate → 100ms");
+    }
+    else if (cmd == "slow") {
+        sensorInterval = 2000;
+        output->println("ok: Sensor update rate → 2000ms");
+    }
+    else {
+        output->printf("echo: %s\n", cmd.c_str());
+    }
+}
 
 // LED pin (ESP32-C3 Super Mini built-in LED = GPIO8)
 #ifndef LED_BUILTIN
@@ -146,8 +188,8 @@ void loop() {
 
     unsigned long now = millis();
 
-    // === Sensor simulation (every 500ms) — for Plotter testing ===
-    if (now - lastSensorUpdate >= 500) {
+    // === Sensor simulation — for Plotter testing ===
+    if (now - lastSensorUpdate >= sensorInterval) {
         lastSensorUpdate = now;
 
         float elapsed = (now - bootTime) / 1000.0;
@@ -191,52 +233,15 @@ void loop() {
         digitalWrite(LED_BUILTIN, HIGH);
     }
 
-    // === Read incoming commands from TCP clients ===
-    // (Commands sent from Serial Air app's command input)
-    // Note: WirelessSerial doesn't have a built-in read API,
-    // but you can read from Serial for USB commands
+    // === Read commands from USB Serial ===
     if (Serial.available()) {
         String cmd = Serial.readStringUntil('\n');
-        cmd.trim();
+        processCommand(cmd);
+    }
 
-        if (cmd == "help") {
-            output->println("Commands: help, status, led on, led off, reboot, fast, slow");
-        }
-        else if (cmd == "status") {
-            output->printf("Device: %s\n", ws.getDeviceId());
-            output->printf("Heap: %d bytes\n", ESP.getFreeHeap());
-            output->printf("WiFi: %s (%d dBm)\n", WiFi.localIP().toString().c_str(), WiFi.RSSI());
-            output->printf("TCP clients: %d\n", ws.clientCount());
-            #if WS_BLE_ENABLED
-            output->printf("BLE clients: %d\n", ws.bleClientCount());
-#else
-            output->println("BLE: disabled");
-#endif
-            output->printf("Buffer: %d bytes\n", ws.bufferedBytes());
-        }
-        else if (cmd == "led on") {
-            digitalWrite(LED_BUILTIN, LOW); // Active low
-            output->println("ok: LED on");
-        }
-        else if (cmd == "led off") {
-            digitalWrite(LED_BUILTIN, HIGH);
-            output->println("ok: LED off");
-        }
-        else if (cmd == "reboot") {
-            output->println("Rebooting in 1s...");
-            delay(1000);
-            ESP.restart();
-        }
-        else if (cmd == "fast") {
-            output->println("ok: Sensor update rate → 100ms");
-            // Change sensor update rate for rapid plotter testing
-            // (Would need a variable, simplified here)
-        }
-        else if (cmd == "slow") {
-            output->println("ok: Sensor update rate → 2000ms");
-        }
-        else if (cmd.length() > 0) {
-            output->printf("echo: %s\n", cmd.c_str());
-        }
+    // === Read commands from TCP (app's command input) ===
+    if (ws.available()) {
+        String cmd = ws.readStringUntil('\n');
+        processCommand(cmd);
     }
 }
