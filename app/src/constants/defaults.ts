@@ -8,8 +8,24 @@ import { SettingsState } from '../types';
  * To enable paid mode, set this to false and ensure the IAP product
  * "serial_air_pro" is configured in App Store Connect.
  * See docs/MONETIZATION.md for the full migration guide.
+ *
+ * This value can be overridden remotely via config.json (freeMode field).
+ * Use getEffectiveFreeMode() to check the runtime value.
  */
 export const FREE_MODE = true;
+
+/**
+ * Returns the effective FREE_MODE value, checking remote config override first.
+ * Falls back to the compile-time FREE_MODE constant.
+ */
+export function getEffectiveFreeMode(): boolean {
+  try {
+    const { useAppStore } = require('../stores/useAppStore');
+    const remoteConfig = useAppStore.getState().remoteConfig;
+    if (remoteConfig !== null) return remoteConfig.freeMode;
+  } catch {}
+  return FREE_MODE;
+}
 
 export const DEFAULT_PORT = 23;
 export const MDNS_SERVICE_TYPE = '_serial-air._tcp.';

@@ -7,27 +7,71 @@ The IAP code is fully implemented but dormant.
 
 ## How It Works
 
-A single flag controls the entire monetization system:
+Two layers control the monetization system:
 
+### 1. Compile-time flag (local)
 ```
 app/src/constants/defaults.ts → FREE_MODE = true | false
 ```
 
-| FREE_MODE | Behavior |
-|-----------|----------|
-| `true`  | All features unlocked, no trial timer, no paywall, PURCHASE section hidden in Settings |
+### 2. Remote config (server override)
+```
+https://umemasait.com/serial-air/config.json
+```
+
+The remote `freeMode` field overrides the local `FREE_MODE` flag at runtime.
+Use `getEffectiveFreeMode()` to get the active value.
+
+| Effective freeMode | Behavior |
+|--------------------|----------|
+| `true`  | All features unlocked, no trial timer, no paywall |
 | `false` | 7-day free trial → $1.99 one-time purchase (non-consumable IAP) |
+
+### Remote Config (config.json)
+
+```json
+{
+  "minVersion": "1.0.0",
+  "freeMode": true,
+  "message": null,
+  "updatedAt": "2026-04-17T00:00:00Z"
+}
+```
+
+| Field | Purpose |
+|-------|---------|
+| `minVersion` | Minimum app version required. If user's version < this, force update screen blocks the app |
+| `freeMode` | Remote override of FREE_MODE. Set to `false` to enable monetization without app update |
+| `message` | Optional message shown on the force update screen |
+
+**Hosted at**: `docs/config.json` → deployed to `umemasait.com/serial-air/config.json`
+
+### Forced Update Flow
+
+```
+App Launch → fetch config.json (5s timeout)
+  ├─ Network OK → cache config, compare versions
+  │   ├─ app version < minVersion → ForceUpdateScreen (blocking, links to App Store)
+  │   └─ app version >= minVersion → continue normally
+  ├─ Network fail → use cached config (AsyncStorage)
+  └─ No cache → use defaults (freeMode=true, no force update)
+```
 
 ## Files Involved
 
 | File | Role |
 |------|------|
-| `app/src/constants/defaults.ts` | `FREE_MODE` flag definition |
-| `app/src/stores/usePurchaseStore.ts` | Checks `FREE_MODE`, skips IAP init when true |
+| `docs/config.json` | Remote config (deployed to website) |
+| `app/src/services/RemoteConfigService.ts` | Fetch, cache, version compare |
+| `app/src/components/ForceUpdateScreen.tsx` | Blocking update screen |
+| `app/src/constants/defaults.ts` | `FREE_MODE` flag + `getEffectiveFreeMode()` |
+| `app/src/stores/useAppStore.ts` | Remote config state + `loadRemoteConfig()` |
+| `app/src/stores/usePurchaseStore.ts` | Checks `getEffectiveFreeMode()`, skips IAP init when true |
 | `app/src/services/PurchaseService.ts` | IAP logic (StoreKit/Google Play via react-native-iap) |
-| `app/app/(tabs)/index.tsx` | Trial banner hidden when `FREE_MODE` |
-| `app/app/(tabs)/settings.tsx` | PURCHASE section hidden when `FREE_MODE` |
-| `app/app/paywall.tsx` | Paywall screen (unreachable in `FREE_MODE` but code remains) |
+| `app/app/_layout.tsx` | Startup: load remote config → check version → render ForceUpdateScreen |
+| `app/app/(tabs)/index.tsx` | Trial banner hidden when `getEffectiveFreeMode()` |
+| `app/app/(tabs)/settings.tsx` | PURCHASE section hidden when `getEffectiveFreeMode()` |
+| `app/app/paywall.tsx` | Paywall screen (unreachable in free mode but code remains) |
 
 ## Migration: Free → Paid (v1.x Update)
 
@@ -43,21 +87,34 @@ app/src/constants/defaults.ts → FREE_MODE = true | false
 
 ### Steps
 
-1. **Change the flag**:
-   ```typescript
-   // app/src/constants/defaults.ts
-   export const FREE_MODE = false;  // ← Change from true to false
+**Option A: Remote switch (no app update needed)**
+
+1. Edit `docs/config.json`:
+   ```json
+   { "minVersion": "1.1.0", "freeMode": false, "message": null }
    ```
+2. Deploy to `umemasait.com/serial-air/config.json`
+3. Set `minVersion` to the version that has IAP properly configured
+4. All users on that version will see the trial/paywall on next launch
 
-2. **Verify IAP product exists** in App Store Connect with ID `serial_air_pro`
+**Option B: Local flag change (requires app update)**
 
-3. **Test on TestFlight**:
+1. Change `FREE_MODE = false` in `defaults.ts`
+2. Submit app update
+3. Optionally set `minVersion` in config.json to force users to update
+
+**Recommended approach**: Combine both. Release an app update with IAP product configured, then flip `freeMode` to `false` remotely once the update is widely adopted. Set `minVersion` to the new version to force stragglers to update.
+
+### Testing
+
+1. **Verify IAP product exists** in App Store Connect with ID `serial_air_pro`
+2. **Test on TestFlight**:
    - Fresh install → should see 7-day trial
    - Trial expiry → paywall appears
    - Purchase flow → completes successfully
    - Restore purchase → works
-
-4. **Submit update** with release notes explaining the new Pro tier
+3. **Test forced update**: Set `minVersion` to `99.0.0` in config.json temporarily → app shows ForceUpdateScreen
+4. **Test remote freeMode**: Set `freeMode: false` in config.json → monetization activates without app update
 
 ### What Happens to Existing Users
 
@@ -104,6 +161,7 @@ PurchaseService
 |-----|---------|
 | `serial-air:trial-start` | ISO date when trial began |
 | `serial-air:purchased` | `"true"` if purchased |
+| `serial-air:remote-config` | Cached remote config JSON (fallback when offline) |
 
 ## Paywall UI
 

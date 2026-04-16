@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useState } from 'react';
 import {
   Platform,
   View,
@@ -27,11 +27,31 @@ import {
   layout,
 } from '../../src/constants/theme';
 import * as Clipboard from 'expo-clipboard';
-import { t } from '../../src/i18n';
-import { FREE_MODE } from '../../src/constants/defaults';
+import { t, setLanguage, getLanguage } from '../../src/i18n';
+import { getEffectiveFreeMode } from '../../src/constants/defaults';
 import { resetCoachMarks } from '../../src/components/CoachMark';
 
 // --- Cycle helpers ---
+
+const LANGUAGE_OPTIONS = [
+  { code: null, label: 'Auto' },
+  { code: 'en', label: 'English' },
+  { code: 'ja', label: '日本語' },
+  { code: 'zh', label: '简体中文' },
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'ko', label: '한국어' },
+  { code: 'th', label: 'ไทย' },
+  { code: 'vi', label: 'Tiếng Việt' },
+  { code: 'id', label: 'Indonesia' },
+  { code: 'hi', label: 'हिन्दी' },
+  { code: 'de', label: 'Deutsch' },
+  { code: 'fr', label: 'Français' },
+  { code: 'es', label: 'Español' },
+  { code: 'pt', label: 'Português' },
+  { code: 'it', label: 'Italiano' },
+  { code: 'ru', label: 'Русский' },
+  { code: 'ar', label: 'العربية' },
+] as const;
 
 const FONT_SIZE_OPTIONS = [12, 14, 16, 18] as const;
 const MAX_LINES_OPTIONS = [1000, 5000, 10000, 50000] as const;
@@ -156,6 +176,7 @@ export default function SettingsScreen() {
   } = useSettingsStore();
 
   const appVersion = useAppStore((s) => s.appVersion);
+  const [currentLang, setCurrentLang] = useState<string | null>(null);
 
   const handleCycleFontSize = useCallback(() => {
     updateSetting('fontSize', cycleValue(fontSize, FONT_SIZE_OPTIONS));
@@ -263,8 +284,20 @@ export default function SettingsScreen() {
             />
           </SettingRow>
 
-          <SettingRow label={t('settings_theme')} isLast>
+          <SettingRow label={t('settings_theme')}>
             <ValueBadge value={t('settings_theme_dark')} disabled />
+          </SettingRow>
+
+          <SettingRow label={t('settings_language')} isLast>
+            <ValueBadge
+              value={LANGUAGE_OPTIONS.find((l) => l.code === currentLang)?.label ?? 'Auto'}
+              onPress={() => {
+                const idx = LANGUAGE_OPTIONS.findIndex((l) => l.code === currentLang);
+                const next = LANGUAGE_OPTIONS[(idx + 1) % LANGUAGE_OPTIONS.length];
+                setLanguage(next.code as string | null);
+                setCurrentLang(next.code as string | null);
+              }}
+            />
           </SettingRow>
         </NeuCard>
 
@@ -339,7 +372,7 @@ export default function SettingsScreen() {
         </NeuCard>
 
         {/* PURCHASE Section (hidden in FREE_MODE) */}
-        {!FREE_MODE && (
+        {!getEffectiveFreeMode() && (
           <>
             <Text style={styles.sectionHeader}>{t('settings_purchase')}</Text>
             <NeuCard style={styles.card}>

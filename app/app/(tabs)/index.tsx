@@ -28,7 +28,7 @@ import { NeuCard, NeuButton, NeuInput } from '../../src/components/neumorphic';
 import { useConnectionStore, getBleManager } from '../../src/stores/useConnectionStore';
 import { useDiscoveryStore } from '../../src/stores/useDiscoveryStore';
 import { useSettingsStore } from '../../src/stores/useSettingsStore';
-import { FREE_MODE } from '../../src/constants/defaults';
+import { getEffectiveFreeMode } from '../../src/constants/defaults';
 import { usePurchaseStore } from '../../src/stores/usePurchaseStore';
 import { useTrustStore } from '../../src/stores/useTrustStore';
 import { DeviceDiscovery } from '../../src/services/DeviceDiscovery';
@@ -424,7 +424,7 @@ export default function HomeScreen() {
         <ConnectionBanner />
 
         {/* ---- Trial Banner (hidden in FREE_MODE) ---- */}
-        {!FREE_MODE && !isPurchased && (
+        {!getEffectiveFreeMode() && !isPurchased && (
           <Pressable
             style={[
               styles.trialBanner,

@@ -10,6 +10,7 @@ import { usePurchaseStore } from '../src/stores/usePurchaseStore';
 import { useTrustStore } from '../src/stores/useTrustStore';
 import { useMacroStore } from '../src/stores/useMacroStore';
 import { AnimatedSplash } from '../src/components/AnimatedSplash';
+import { ForceUpdateScreen } from '../src/components/ForceUpdateScreen';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -17,6 +18,8 @@ export default function RootLayout() {
   const [ready, setReady] = useState(false);
   const [splashDone, setSplashDone] = useState(false);
   const hasOnboarded = useAppStore((s) => s.hasOnboarded);
+  const forceUpdateRequired = useAppStore((s) => s.forceUpdateRequired);
+  const remoteMessage = useAppStore((s) => s.remoteConfig?.message ?? null);
 
   useEffect(() => {
     async function prepare() {
@@ -24,6 +27,7 @@ export default function RootLayout() {
         await useSettingsStore.getState().loadSettings();
         await useDiscoveryStore.getState().loadRecentConnections();
         await useAppStore.getState().loadState();
+        await useAppStore.getState().loadRemoteConfig();
         await usePurchaseStore.getState().loadStatus();
         await useTrustStore.getState().loadTrustedDevices();
         await useMacroStore.getState().loadMacros();
@@ -44,6 +48,7 @@ export default function RootLayout() {
     <>
       <StatusBar style="light" />
       {!splashDone && <AnimatedSplash onFinish={() => setSplashDone(true)} />}
+      {forceUpdateRequired && <ForceUpdateScreen message={remoteMessage} />}
       <Stack
         screenOptions={{
           headerShown: false,

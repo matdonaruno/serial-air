@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
+import { RemoteConfig, fetchRemoteConfig, isUpdateRequired } from '../services/RemoteConfigService';
 
 const APP_STATE_KEY = 'serial-air:app-state';
 const LAUNCH_COUNT_KEY = 'serial-air:launch-count';
@@ -14,8 +15,12 @@ interface AppState {
   lastUpdateCheck: string | null;
   updateAvailable: boolean;
   updateVersion: string | null;
+  remoteConfig: RemoteConfig | null;
+  forceUpdateRequired: boolean;
+  remoteConfigLoaded: boolean;
 
   loadState: () => Promise<void>;
+  loadRemoteConfig: () => Promise<void>;
   completeOnboarding: () => void;
   resetOnboarding: () => void;
   incrementLaunchCount: () => void;
@@ -35,6 +40,24 @@ export const useAppStore = create<AppState>((set, get) => ({
   lastUpdateCheck: null,
   updateAvailable: false,
   updateVersion: null,
+  remoteConfig: null,
+  forceUpdateRequired: false,
+  remoteConfigLoaded: false,
+
+  loadRemoteConfig: async () => {
+    try {
+      const config = await fetchRemoteConfig();
+      const appVersion = get().appVersion;
+      const forceUpdate = isUpdateRequired(appVersion, config.minVersion);
+      set({
+        remoteConfig: config,
+        forceUpdateRequired: forceUpdate,
+        remoteConfigLoaded: true,
+      });
+    } catch {
+      set({ remoteConfigLoaded: true });
+    }
+  },
 
   loadState: async () => {
     try {
